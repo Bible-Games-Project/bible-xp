@@ -78,29 +78,44 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
 ## Bible XP — project notes
 
 - Stack: Vite + React 19 + TypeScript, plain CSS (`src/theme/`), lucide-react
-  icons, self-hosted Nunito via `@fontsource-variable/nunito`. No router or state
-  library: a small hash router (`src/app/router.ts`) and a `useSyncExternalStore`
-  store (`src/progress/store.ts`). Hash routes need no server rewrites and no base
-  path, which keeps the Capacitor shell happy without touching build config.
-- The maintainer's spec asked for React Native/Expo; we stayed on the web stack
-  because bgp-admin owns the native wrapping. Do not add Expo or Capacitor code.
+  icons, self-hosted fonts (`@fontsource-variable/nunito` for UI,
+  `@fontsource/lilita-one` for display headings). No router or state library:
+  a small hash router (`src/app/router.ts`) and a `useSyncExternalStore` store
+  (`src/progress/store.ts`). Hash routes need no server rewrites and no base path.
+- The maintainer's first spec asked for React Native/Expo; we stayed on the web
+  stack because bgp-admin owns the native wrapping. Do not add Expo or Capacitor.
+- Visual identity (maintainer decision): dark only. Navy base, gold is the single
+  dominant accent (primary actions, rewards), cyan the secondary (selection).
+  Each difficulty tier has one colour (`--tier-1..5`), used only where a tier is
+  shown. Game modes are told apart by icon, not colour. Tokens in
+  `src/theme/tokens.css`; never hard-code colours in components.
+- The path must not look like Duolingo (maintainer decision): it is the
+  "Atlas" — a region map (`src/components/EdenMap.tsx`) plus an expedition log.
+  No winding trail of round buttons.
 - Commands: `bun run build` (runs `tsc -b` first), `bun run test` (vitest),
   `bun run preview`. Playwright is not a dependency; for screenshots use the
-  globally installed one at `/opt/node-tools/node_modules/playwright` against
+  global one at `/opt/node-tools/node_modules/playwright` against
   `bun run preview`.
 - Bible text: every literal quote must be verbatim World English Bible.
-  `src/content/content.test.ts` checks quotes, `“…”` fragments inside
-  explanations, and that every reference exists, against
-  `src/content/sources/web-genesis-1-3.json`. Curly quotes `“ ”` are reserved for
-  Bible wording; clues/questions must not contain them (also tested). WEB writes
-  “Yahweh God” and only names Adam from Genesis 3:17 on.
-- Progress is one JSON object (`src/progress/model.ts`), all mutations are pure
-  functions with tests. Bump `PROGRESS_VERSION` and extend `migrate()` when the
-  shape changes; never drop saved data.
-- XP amounts live only in `src/progress/rewards.ts`. Replays give XP once per
-  activity per day; the daily challenge once per date.
+  `src/content/content.test.ts` checks quotes, curly-quoted fragments in
+  explanations, quiz questions and match cards, and that every reference exists,
+  against `src/content/sources/web-genesis-1-3.json`. Curly quotes are reserved
+  for Bible wording. WEB writes “Yahweh God”, “Hiddekel” (Tigris elsewhere), and
+  names Adam from Genesis 3:17 on. Only Genesis 1–3 is verified; do not write
+  questions from other passages without adding and testing their source text.
+- Difficulty: questions carry `tier` 1–5 (Beginner…Master); a session draws
+  `SESSION_SIZE[mode]` least-seen steps of the selected tier. Promotion rules
+  live in `src/progress/tiers.ts`; XP never unlocks a tier. Wrong options must be
+  real details from the text (other days, rivers, speakers), never absurd, and
+  never a synonym another translation uses for the right answer.
+- Progress is one JSON object (`src/progress/model.ts`, version 2), all
+  mutations are pure functions with tests. Bump `PROGRESS_VERSION` and extend
+  `migrate()` when the shape changes; never drop XP, path progress or mistakes.
+- XP amounts live only in `src/progress/rewards.ts`.
 - All UI text goes through `src/i18n/locales/en.ts`; only English exists. Do not
   list languages that are not fully translated (the 12 planned languages were
   not specified).
-- Multiplayer and Plus are intentionally "coming soon" (`src/config/features.ts`);
-  never show fake players, scores or completed payments.
+- Multiplayer (Duels) and Plus are intentionally "coming soon"
+  (`src/config/features.ts`); never show fake players, scores or payments.
+- CSS trap: a selector like `.atlas-map svg` also hits icon SVGs nested in the
+  map; scope with `>`.

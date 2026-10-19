@@ -4,12 +4,13 @@ import { Button } from "../components/Button";
 import type { GameProps } from "../engine/types";
 import { useI18n } from "../i18n";
 import { playCue } from "../lib/feedback";
-import { scrambleLetters } from "./formWordLogic";
+import { decoyCount, scrambleLetters } from "./formWordLogic";
 import { GameFooter, PromptCard } from "./shared";
 
 export function FormTheWord({ step, locked, onResolve }: GameProps<"form-word">) {
   const { t } = useI18n();
-  const tiles = useMemo(() => scrambleLetters(step.word, step.id), [step.word, step.id]);
+  const decoys = decoyCount(step.tier);
+  const tiles = useMemo(() => scrambleLetters(step.word, step.id, decoys), [step.word, step.id, decoys]);
   const [picked, setPicked] = useState<string[]>([]);
   const [result, setResult] = useState<"correct" | "incorrect" | null>(null);
 
@@ -88,6 +89,8 @@ export function FormTheWord({ step, locked, onResolve }: GameProps<"form-word">)
           );
         })}
       </div>
+
+      {decoys > 0 && <p className="decoy-note">{t("game.decoys")}</p>}
 
       <GameFooter>
         <Button variant="secondary" size="lg" onClick={() => setPicked([])} disabled={!picked.length || locked || !!result} aria-label={t("game.clear")} icon={<Delete size={22} />} />

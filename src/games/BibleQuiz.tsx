@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "../components/Button";
 import type { GameProps } from "../engine/types";
 import { useI18n } from "../i18n";
 import { playCue } from "../lib/feedback";
+import { shuffle } from "../lib/random";
 import { GameFooter, PromptCard } from "./shared";
 
 const LETTERS = ["A", "B", "C", "D"];
 
 export function BibleQuiz({ step, locked, onResolve }: GameProps<"quiz">) {
   const { t } = useI18n();
+  // Shown in a shuffled order so the right answer's position carries no hint.
+  const order = useMemo(() => shuffle([0, 1, 2, 3], step.id), [step.id]);
   const [choice, setChoice] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
 
@@ -30,7 +33,8 @@ export function BibleQuiz({ step, locked, onResolve }: GameProps<"quiz">) {
         <p className="prompt-card__question">{step.question}</p>
       </PromptCard>
       <div className="options" role="radiogroup" aria-label={step.question}>
-        {step.options.map((option, i) => {
+        {order.map((i, position) => {
+          const option = step.options[i];
           const state = !checked ? (choice === i ? "is-selected" : "") : i === step.correctIndex ? "is-correct" : choice === i ? "is-wrong" : "is-dim";
           return (
             <button
@@ -45,7 +49,7 @@ export function BibleQuiz({ step, locked, onResolve }: GameProps<"quiz">) {
                 setChoice(i);
               }}
             >
-              <span className="option__key" aria-hidden="true">{LETTERS[i]}</span>
+              <span className="option__key" aria-hidden="true">{LETTERS[position]}</span>
               <span className="option__label">{option}</span>
             </button>
           );

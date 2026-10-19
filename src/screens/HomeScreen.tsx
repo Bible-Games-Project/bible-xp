@@ -1,116 +1,128 @@
-import { CalendarDays, Check, ChevronRight, Lock, Swords } from "lucide-react";
-import { href, navigate } from "../app/router";
+import { CalendarDays, Check, ChevronRight } from "lucide-react";
+import { href, navigate, type Route } from "../app/router";
 import { Button } from "../components/Button";
 import { MODE_STYLE } from "../components/icons";
 import { AppHeader, Screen, TabBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
 import { ProgressBar } from "../components/ProgressBar";
-import { dailyChallengeFor, findActivity, findTopic } from "../content";
-import { GAME_MODES } from "../content/types";
+import { TierBadge, useTierName } from "../components/Tier";
+import { dailyChallengeFor, findActivity, findTopic, SESSION_SIZE } from "../content";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
 import { localDate } from "../lib/date";
 import { sessionKey } from "../progress/model";
-import { completedCount, nextNode, nodeStatus } from "../progress/path";
+import { recommend } from "../progress/recommend";
 import { useProgress } from "../progress/store";
-import { nodeLabel } from "./pathLabels";
+import { PROMOTION, promotionStatus } from "../progress/tiers";
 
 export function HomeScreen() {
   const { t } = useI18n();
   const pack = useContent();
   const progress = useProgress();
+  const tierName = useTierName();
   const today = localDate();
-  const daily = dailyChallengeFor(pack, today);
-  const dailySession = progress.sessions[sessionKey.daily(today)];
-  const dailyDone = Boolean(progress.daily[today]?.rewarded);
-  const dailyIndex = dailyDone ? daily.steps.length : (dailySession?.index ?? 0);
-
-  const unit = pack.units[0];
-  const topic = findTopic(pack, unit.topicId)!;
-  const next = nextNode(progress, unit);
-  const done = completedCount(progress, unit);
   const name = progress.profile.name.trim();
+  const tier = progress.difficulty.selected;
+
+  // The one primary action.
+  const rec = recommend(progress, pack);
+  const topic = findTopic(pack, pack.units[0].topicId)!;
+  let title: string;
+  let eyebrow: string;
+  let meta: string | null = null;
+  let cta: string;
+  let route: Route;
+  if (rec.kind === "intro") {
+    title = topic.intro.title;
+    eyebrow = t("home.nextUp");
+    cta = t("home.read");
+    route = { name: "intro", introId: rec.introId };
+  } else {
+    const activity = findActivity(pack, rec.activityId)!;
+    title = t(`modes.${activity.mode}.name`);
+    eyebrow = {
+      continue: t("home.continueUp"),
+      path: t("home.nextUp"),
+      clear: t("home.practiceUp", { tier: tierName(tier) }),
+      practice: t("home.practiceMore", { tier: tierName(tier) }),
+    }[rec.kind];
+    const n = SESSION_SIZE[activity.mode];
+    meta = n === 1 ? t("home.question") : t("home.questions", { n });
+    cta = rec.kind === "continue" ? t("home.continue") : t("home.play");
+    route = { name: "play", activityId: activity.id };
+  }
+  const RecIcon = rec.kind === "intro" ? MODE_STYLE.intro.icon : MODE_STYLE[findActivity(pack, rec.activityId)!.mode].icon;
+
+  // Difficulty progress, compact.
+  const status = promotionStatus(progress.difficulty);
+
+  // Daily challenge, as a single quiet row.
+  const dailyDone = Boolean(progress.daily[today]?.rewarded);
+  const dailySession = progress.sessions[sessionKey.daily(today)];
+  const dailyTier = dailySession?.tier ?? tier;
+  const daily = dailyChallengeFor(pack, today, dailyTier);
 
   return (
     <Screen withTabs>
       <AppHeader />
-      <h1 className="home__greeting">{name ? t("home.greeting", { name }) : t("home.greetingGuest")}</h1>
+      <p className="home__greeting">{name ? t("home.greeting", { name }) : t("home.greetingGuest")}</p>
 
-      {/* Daily challenge: the hero of the home screen. */}
-      <section className="daily-card" aria-labelledby="daily-title">
-        <div className="daily-card__glow" aria-hidden="true" />
-        <div className="daily-card__text">
-          <span className="eyebrow eyebrow--light">
-            <CalendarDays size={16} strokeWidth={2.6} aria-hidden="true" />
-            {t("home.dailyTitle")}
-          </span>
-          <h2 id="daily-title" className="daily-card__title">{daily.theme}</h2>
-          <p className="daily-card__meta">{t("home.dailyActivities", { n: daily.steps.length })}</p>
-          <ProgressBar value={dailyIndex} max={daily.steps.length} label={t("common.stepOf", { n: dailyIndex, total: daily.steps.length })} tone="yellow" size="sm" />
-          {dailyDone ? (
-            <p className="daily-card__done">
-              <Check size={18} strokeWidth={3} aria-hidden="true" /> {t("home.dailyDone")}
-            </p>
-          ) : (
-            <Button variant="secondary" className="daily-card__btn" onClick={() => navigate({ name: "daily" })}>
-              {dailySession && dailySession.index > 0 ? t("home.dailyContinue") : t("home.dailyStart")}
-            </Button>
-          )}
-        </div>
-        <Mascot mood={dailyDone ? "celebrating" : "happy"} size={118} className="daily-card__mascot" />
-      </section>
-      {dailyDone && <p className="home__hint">{t("home.dailyDoneHint")}</p>}
-
-      {/* Path */}
-      <a className="card card--link path-card" href={href({ name: "path" })}>
-        <div className="path-card__top">
-          <span className="eyebrow">{t("path.unit", { n: unit.number })} · {topic.passage}</span>
-          <ChevronRight size={22} className="muted" aria-hidden="true" />
-        </div>
-        <h2 className="card__title card__title--lg">{unit.title}</h2>
-        <ProgressBar value={done} max={unit.nodes.length} label={t("path.lessonsDone", { n: done, total: unit.nodes.length })} />
-        <div className="path-card__row">
-          <div className="mini-nodes" aria-hidden="true">
-            {unit.nodes.map((node, i) => {
-              const status = nodeStatus(progress, unit, i);
-              const mode = node.kind === "intro" ? "intro" : findActivity(pack, node.activityId)!.mode;
-              const Icon = MODE_STYLE[mode].icon;
-              return (
-                <span key={node.id} className={`mini-node mini-node--${status}`}>
-                  {status === "completed" ? <Check size={14} strokeWidth={3.2} /> : status === "locked" ? <Lock size={12} strokeWidth={2.8} /> : <Icon size={14} strokeWidth={2.8} />}
-                </span>
-              );
-            })}
+      <section className="quest" aria-labelledby="quest-title">
+        <div className="quest__top">
+          <div className="quest__text">
+            <span className="eyebrow">
+              <RecIcon size={15} strokeWidth={2.6} aria-hidden="true" />
+              {eyebrow}
+            </span>
+            <h1 id="quest-title" className="quest__title">{title}</h1>
+            <div className="quest__meta">
+              {rec.kind !== "intro" && <TierBadge tier={tier} />}
+              <span>{meta ?? `${topic.passage}`}</span>
+            </div>
           </div>
-          <span className="muted small">{t("home.pathLessons", { n: done, total: unit.nodes.length })}</span>
+          <Mascot mood="happy" size={104} className="quest__mascot" />
         </div>
-        <p className="path-card__next">{next ? t("home.pathNext", { name: nodeLabel(t, pack, next.node) }) : t("home.pathDone")}</p>
+        <Button block onClick={() => navigate(route)}>
+          {cta}
+        </Button>
+      </section>
+
+      <a className={`climb tier-${status.next ?? status.tier}`} href={href({ name: "difficulty" })}>
+        <span className="climb__row">
+          <span className="climb__label">
+            {status.next ? t("home.tierToNext", { tier: tierName(status.tier), next: tierName(status.next) }) : t("home.tierMaster")}
+          </span>
+          <span className="climb__meta">
+            {status.next
+              ? `${Math.min(status.answered, PROMOTION.minAnswered)}/${PROMOTION.minAnswered} · ${status.accuracy === null ? "–" : Math.round(status.accuracy * 100)}%`
+              : ""}
+            <ChevronRight size={16} style={{ verticalAlign: "-3px" }} aria-hidden="true" />
+          </span>
+        </span>
+        {status.next && (
+          <ProgressBar
+            value={Math.min(status.answered, PROMOTION.minAnswered)}
+            max={PROMOTION.minAnswered}
+            label={t("difficulty.working", { next: tierName(status.next) })}
+            tone="tier"
+            size="sm"
+          />
+        )}
       </a>
 
-      <div className="home__grid">
-        <a className="card card--link tile tile--blue" href={href({ name: "free" })}>
-          <div className="tile__icons" aria-hidden="true">
-            {GAME_MODES.map((m) => {
-              const Icon = MODE_STYLE[m].icon;
-              return (
-                <span key={m} className={`tile__icon accent-${MODE_STYLE[m].accent}`}>
-                  <Icon size={16} strokeWidth={2.6} />
-                </span>
-              );
-            })}
-          </div>
-          <h2 className="card__title">{t("home.freeTitle")}</h2>
-          <p className="muted small">{t("home.freeBody")}</p>
-        </a>
-        <a className="card card--link tile tile--violet" href={href({ name: "multiplayer" })}>
-          <span className="tile__badge">{t("common.comingSoon")}</span>
-          <span className="tile__big-icon accent-violet" aria-hidden="true">
-            <Swords size={26} strokeWidth={2.4} />
+      <a className={`row-link${dailyDone ? " is-done" : ""}`} href={href({ name: "daily" })}>
+        <span className="row-link__icon" aria-hidden="true">
+          {dailyDone ? <Check size={20} strokeWidth={3} /> : <CalendarDays size={20} strokeWidth={2.4} />}
+        </span>
+        <span className="row-link__text">
+          <span className="row-link__title">{t("home.dailyTitle")}</span>
+          <span className="row-link__meta">
+            {dailyDone ? t("home.dailyDone") : t("home.dailyMeta", { n: daily.steps.length, tier: tierName(dailyTier) })}
           </span>
-          <h2 className="card__title">{t("home.multiplayerTitle")}</h2>
-          <p className="muted small">{t("home.multiplayerBody")}</p>
-        </a>
-      </div>
+        </span>
+        <ChevronRight size={20} className="faint" aria-hidden="true" />
+      </a>
+
       <TabBar current="home" />
     </Screen>
   );

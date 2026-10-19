@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import source from "./sources/web-genesis-1-3.json";
-import { allSteps, dailyChallengeFor, getContent } from "./index";
-import type { BibleRef } from "./types";
-import { scrambleLetters } from "../games/formWordLogic";
+import { allSteps, dailyChallengeFor, drawSteps, getContent, SESSION_SIZE, stepsAtTier } from "./index";
+import { TIERS, type BibleRef } from "./types";
+import { decoyCount, scrambleLetters } from "../games/formWordLogic";
 
 const web = source as Record<string, string>;
 const pack = getContent("en");
@@ -65,12 +65,22 @@ describe("literal quotations match the World English Bible", () => {
     }
   });
 
-  it("clues and prompts never pose as quotations", () => {
+  it("quoted wording in questions and pair cards appears in the referenced passages", () => {
+    for (const s of steps) {
+      const texts: string[] = [];
+      if (s.mode === "quiz") texts.push(s.question);
+      if (s.mode === "match-pairs") texts.push(...s.pairs.flatMap((p) => [p.left, p.right]));
+      for (const t of texts)
+        for (const fragment of quotedFragments(t)) expect(passageText(s.references), `${s.id}: ${fragment}`).toContain(fragment);
+    }
+  });
+
+  it("clues and answer options never pose as quotations", () => {
     for (const s of steps) {
       const texts: string[] = [];
       if (s.mode === "form-word") texts.push(s.clue);
       if (s.mode === "who-am-i") texts.push(...s.clues.map((c) => c.text));
-      if (s.mode === "quiz") texts.push(s.question, ...s.options);
+      if (s.mode === "quiz") texts.push(...s.options);
       for (const t of texts) expect(t, s.id).not.toMatch(/[“”]/);
     }
   });
@@ -82,13 +92,17 @@ describe("step data is playable", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("form-the-word words can be built from their tiles", () => {
+  it("form-the-word words can be built from their tiles, decoys included", () => {
     for (const s of steps) {
       if (s.mode !== "form-word") continue;
       expect(s.word).toMatch(/^[A-Z]+$/);
-      const tiles = scrambleLetters(s.word, s.id);
-      expect(tiles.map((t) => t.letter).sort().join("")).toBe([...s.word].sort().join(""));
-      expect(tiles.map((t) => t.letter).join("")).not.toBe(s.word);
+      expect(s.clue.toUpperCase(), s.id).not.toContain(s.word);
+      const tiles = scrambleLetters(s.word, s.id, decoyCount(s.tier));
+      expect(tiles).toHaveLength(s.word.length + decoyCount(s.tier));
+      const pool = tiles.map((t) => t.letter);
+      for (const letter of s.word) pool.splice(pool.indexOf(letter), 1);
+      expect(pool).toHaveLength(decoyCount(s.tier));
+      expect(tiles.map((t) => t.letter).join("").startsWith(s.word)).toBe(false);
       expect(new Set(tiles.map((t) => t.id)).size).toBe(tiles.length);
     }
   });
@@ -133,7 +147,56 @@ describe("step data is playable", () => {
       expect(s.options.filter((o) => o === s.answer)).toHaveLength(1);
       expect(s.clues.length).toBeGreaterThanOrEqual(2);
       expect(s.clues.length).toBeLessThan(s.options.length);
+      // The clues must not simply name the answer.
+      const name = s.answer.replace(/^(The|A) /, "").toLowerCase();
+      for (const c of s.clues) expect(c.text.toLowerCase(), s.id).not.toContain(name);
     }
+  });
+
+  it("quiz options are never given away by the question", () => {
+    for (const s of steps) {
+      if (s.mode !== "quiz") continue;
+      for (const o of s.options) expect(s.question.toLowerCase(), s.id).not.toContain(o.toLowerCase());
+    }
+  });
+});
+
+describe("difficulty tiers", () => {
+  const topic = pack.topics[0];
+
+  it("every game has a full session of questions at every tier", () => {
+    for (const activity of topic.activities)
+      for (const tier of TIERS) {
+        const own = activity.steps.filter((s) => s.tier === tier);
+        expect(own.length, `${activity.mode} tier ${tier}`).toBeGreaterThanOrEqual(SESSION_SIZE[activity.mode]);
+      }
+  });
+
+  it("tiers do not share questions", () => {
+    for (const activity of topic.activities) {
+      const ids = TIERS.flatMap((tier) => stepsAtTier(activity, tier).map((s) => s.id));
+      expect(new Set(ids).size).toBe(ids.length);
+    }
+  });
+
+  it("harder tiers ask for more: more verse options, more pairs, fewer clues", () => {
+    const avg = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+    const byMode = (mode: string, tier: number) => steps.filter((s) => s.mode === mode && s.tier === tier);
+    const verseOptions = (tier: number) => avg(byMode("complete-verse", tier).map((s) => (s.mode === "complete-verse" ? s.options.length : 0)));
+    const clues = (tier: number) => avg(byMode("who-am-i", tier).map((s) => (s.mode === "who-am-i" ? s.clues.length : 0)));
+    const pairs = (tier: number) => avg(byMode("match-pairs", tier).map((s) => (s.mode === "match-pairs" ? s.pairs.length : 0)));
+    expect(verseOptions(5)).toBeGreaterThan(verseOptions(1));
+    expect(clues(5)).toBeLessThan(clues(1));
+    expect(pairs(5)).toBeGreaterThanOrEqual(pairs(1));
+    expect(decoyCount(5)).toBeGreaterThan(decoyCount(1));
+  });
+
+  it("draws the least-seen questions first", () => {
+    const quiz = topic.activities.find((a) => a.mode === "quiz")!;
+    const pool = stepsAtTier(quiz, 1);
+    const seen = Object.fromEntries(pool.slice(0, 5).map((s) => [s.id, 3]));
+    const drawn = drawSteps(pool, 2, seen, "seed");
+    for (const s of drawn) expect(seen[s.id]).toBeUndefined();
   });
 });
 
@@ -155,8 +218,23 @@ describe("structure", () => {
     }
   });
 
-  it("there is a daily challenge for any date", () => {
-    expect(dailyChallengeFor(pack, "2026-01-01").steps.length).toBeGreaterThan(0);
-    expect(dailyChallengeFor(pack, "1999-12-31").steps.length).toBeGreaterThan(0);
+  it("builds a daily challenge for any date and tier, stable within the day", () => {
+    for (const tier of TIERS) {
+      const daily = dailyChallengeFor(pack, "2026-01-01", tier);
+      expect(daily.steps).toHaveLength(pack.daily.modes.length);
+      expect(daily.steps.every((s) => s.tier === tier)).toBe(true);
+      expect(dailyChallengeFor(pack, "2026-01-01", tier).steps.map((s) => s.id)).toEqual(daily.steps.map((s) => s.id));
+    }
+    const days = new Set(["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04"].map((d) => dailyChallengeFor(pack, d, 1).steps.map((s) => s.id).join()));
+    expect(days.size).toBeGreaterThan(1);
+  });
+});
+
+describe("answer positions", () => {
+  it("quiz answers are spread across positions once shuffled", async () => {
+    const { shuffle } = await import("../lib/random");
+    const positions = new Set<number>();
+    for (const s of steps) if (s.mode === "quiz") positions.add(shuffle([0, 1, 2, 3], s.id).indexOf(s.correctIndex));
+    expect(positions.size).toBe(4);
   });
 });

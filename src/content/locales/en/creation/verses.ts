@@ -1,0 +1,238 @@
+import type { CompleteVerseStep } from "../../../types";
+import { g, TOPIC } from "./shared";
+
+type V = Omit<CompleteVerseStep, "mode" | "topicId" | "translation" | "references"> & { references?: CompleteVerseStep["references"] };
+
+/*
+ * Complete the Verse, World English Bible. Higher tiers use less familiar
+ * verses and offer more options. Wrong options are words no common English
+ * translation uses in that place, so knowing the verse in another version
+ * never leads to a "wrong" right answer.
+ */
+const verses: V[] = [
+  // 1 Beginner
+  {
+    id: "creation.verse.1-1",
+    tier: 1,
+    before: "In the beginning, God created the ",
+    answer: "heavens",
+    after: " and the earth.",
+    options: ["waters", "heavens", "garden", "stars"],
+    ref: g(1, 1),
+    explanation: "The opening words of the Bible introduce God as the Creator of everything that follows.",
+  },
+  {
+    id: "creation.verse.1-3",
+    tier: 1,
+    before: "God said, “Let there be ",
+    answer: "light",
+    after: ",” and there was light.",
+    options: ["life", "water", "light", "land"],
+    ref: g(1, 3),
+    explanation: "God speaks and it happens. This pattern of command and fulfilment repeats through each day of Genesis 1.",
+  },
+  {
+    id: "creation.verse.1-31",
+    tier: 1,
+    before: "God saw everything that he had made, and, behold, it was very ",
+    answer: "good",
+    after: ".",
+    options: ["bright", "good", "holy", "new"],
+    ref: g(1, 31),
+    explanation: "Earlier days end with “God saw that it was good”. Looking at everything together on the sixth day, the verdict becomes “very good”.",
+    references: [g(1, 25), g(1, 31)],
+  },
+  {
+    id: "creation.verse.1-27",
+    tier: 1,
+    before: "God created man in his own ",
+    answer: "image",
+    after: ". In God’s image he created him; male and female he created them.",
+    options: ["house", "image", "glory", "garden"],
+    ref: g(1, 27),
+    explanation: "Being made in God's image sets humankind apart in Genesis 1. Readers have long discussed what the image means.",
+  },
+
+  // 2 Explorer
+  {
+    id: "creation.verse.2-7",
+    tier: 2,
+    before: "Yahweh God formed man from the ",
+    answer: "dust",
+    after: " of the ground, and breathed into his nostrils the breath of life; and man became a living soul.",
+    options: ["water", "dust", "stone", "light"],
+    ref: g(2, 7),
+    explanation: "Genesis 2 zooms in on the making of the man. The World English Bible writes God's personal name as Yahweh.",
+  },
+  {
+    id: "daily.creation.verse.2-2",
+    tier: 2,
+    before: "On the seventh day God finished his work which he had done; and he ",
+    answer: "rested",
+    after: " on the seventh day from all his work which he had done.",
+    options: ["spoke", "rested", "walked", "sang"],
+    ref: g(2, 2),
+    explanation: "The seventh day is set apart. Genesis 2:3 adds that God blessed it and made it holy.",
+    references: [g(2, 2, 3)],
+  },
+  {
+    id: "creation.verse.1-5",
+    tier: 2,
+    before: "God called the light “day”, and the darkness he called “",
+    answer: "night",
+    after: "”.",
+    options: ["evening", "night", "shadow", "deep"],
+    ref: g(1, 5),
+    explanation: "Naming is part of God's ordering of creation: light is called day, darkness night.",
+  },
+  {
+    id: "creation.verse.3-20",
+    tier: 2,
+    before: "The man called his wife Eve because she would be the ",
+    answer: "mother",
+    after: " of all the living.",
+    options: ["mother", "helper", "first", "light"],
+    ref: g(3, 20),
+    explanation: "The man names his wife after the judgment of Genesis 3, looking ahead to the life that will come from her.",
+  },
+
+  // 3 Scholar
+  {
+    id: "creation.verse.2-18",
+    tier: 3,
+    before: "Yahweh God said, “It is not good for the man to be alone. I will make him a ",
+    answer: "helper",
+    after: " comparable to him.”",
+    options: ["servant", "helper", "ruler", "teacher", "keeper", "shepherd"],
+    ref: g(2, 18),
+    explanation: "This is the first thing in the creation accounts called not good. The answer to it is the making of the woman (2:21–22).",
+  },
+  {
+    id: "creation.verse.3-19",
+    tier: 3,
+    before: "You will eat bread by the ",
+    answer: "sweat",
+    after: " of your face until you return to the ground, for you were taken out of it.",
+    options: ["tears", "sweat", "strength", "light", "blood", "wisdom"],
+    ref: g(3, 19),
+    explanation: "Part of God's words to Adam: work will be hard, and life ends in a return to the ground he was taken from.",
+  },
+  {
+    id: "creation.verse.2-24",
+    tier: 3,
+    before: "Therefore a man will leave his father and his mother, and will join with his wife, and they will be one ",
+    answer: "flesh",
+    after: ".",
+    options: ["spirit", "flesh", "family", "people", "heart", "house"],
+    ref: g(2, 24),
+    explanation: "This verse draws a conclusion from the woman being taken from the man, and is quoted again later in Scripture.",
+  },
+  {
+    id: "creation.verse.3-24",
+    tier: 3,
+    before: "So he drove out the man; and he placed cherubim at the east of the garden of Eden, and a flaming ",
+    answer: "sword",
+    after: " which turned every way, to guard the way to the tree of life.",
+    options: ["torch", "sword", "pillar", "gate", "wall", "chariot"],
+    ref: g(3, 24),
+    explanation: "The closing verse of Genesis 3: the way back to the tree of life is guarded.",
+  },
+
+  // 4 Expert
+  {
+    id: "creation.verse.1-16",
+    tier: 4,
+    before: "God made the two great lights: the greater light to rule the day, and the ",
+    answer: "lesser",
+    after: " light to rule the night.",
+    options: ["second", "lesser", "silver", "gentle", "evening", "holy"],
+    ref: g(1, 16),
+    explanation: "Genesis 1 describes the lights by their roles and never uses the names sun and moon.",
+  },
+  {
+    id: "creation.verse.2-6",
+    tier: 4,
+    before: "but a ",
+    answer: "mist",
+    after: " went up from the earth, and watered the whole surface of the ground.",
+    options: ["rain", "mist", "flood", "wind", "cloud", "fire"],
+    ref: g(2, 6),
+    explanation: "Verse 5 says God had not yet caused it to rain, so rain is ruled out by the text itself.",
+    references: [g(2, 5, 6)],
+  },
+  {
+    id: "creation.verse.3-1",
+    tier: 4,
+    before: "Now the serpent was more ",
+    answer: "subtle",
+    after: " than any animal of the field which Yahweh God had made.",
+    options: ["gentle", "subtle", "beautiful", "ancient", "swift", "faithful"],
+    ref: g(3, 1),
+    explanation: "The World English Bible says subtle; other translations use words such as crafty. Either way, the serpent is introduced by its cleverness.",
+  },
+  {
+    id: "creation.verse.2-12",
+    tier: 4,
+    before: "and the gold of that land is good. Bdellium and ",
+    answer: "onyx",
+    after: " stone are also there.",
+    options: ["ruby", "onyx", "jasper", "emerald", "marble", "pearl"],
+    ref: g(2, 12),
+    explanation: "Genesis 2:11–12 describes the riches of Havilah, the land of the first river, Pishon.",
+    references: [g(2, 11, 12)],
+  },
+
+  // 5 Master
+  {
+    id: "creation.verse.2-14",
+    tier: 5,
+    before: "The name of the third river is Hiddekel. This is the one which flows in front of ",
+    answer: "Assyria",
+    after: ".",
+    options: ["Havilah", "Assyria", "Cush", "Egypt", "Eden", "Babylon"],
+    ref: g(2, 14),
+    explanation: "Havilah belongs to the Pishon and Cush to the Gihon. Many translations call the Hiddekel the Tigris.",
+    references: [g(2, 11, 14)],
+  },
+  {
+    id: "creation.verse.2-11",
+    tier: 5,
+    before: "The name of the first is Pishon: it flows through the whole land of ",
+    answer: "Havilah",
+    after: ", where there is gold;",
+    options: ["Cush", "Havilah", "Assyria", "Eden", "Shinar", "Nod"],
+    ref: g(2, 11),
+    explanation: "Cush belongs to the second river and Assyria to the third. Shinar and Nod are places named later in Genesis, not here.",
+    references: [g(2, 11, 14)],
+  },
+  {
+    id: "creation.verse.3-15",
+    tier: 5,
+    before: "I will put hostility between you and the woman, and between your offspring and her offspring. He will bruise your head, and you will bruise his ",
+    answer: "heel",
+    after: ".",
+    options: ["hand", "heel", "side", "back", "eye", "name"],
+    ref: g(3, 15),
+    explanation:
+      "Spoken to the serpent. Many Christian readers have understood this verse as an early promise of victory over evil; others read it more narrowly. The text itself contrasts head and heel.",
+  },
+  {
+    id: "creation.verse.3-22",
+    tier: 5,
+    before: "Now, lest he reach out his hand, and also take of the tree of life, and eat, and live ",
+    answer: "forever",
+    after: "—",
+    options: ["alone", "forever", "freely", "again", "apart", "in peace"],
+    ref: g(3, 22),
+    explanation: "God's reason for sending the man out of the garden. The sentence breaks off in the text, and verse 23 tells what God did.",
+    references: [g(3, 22, 23)],
+  },
+];
+
+export const verseSteps: CompleteVerseStep[] = verses.map((v) => ({
+  ...v,
+  mode: "complete-verse",
+  topicId: TOPIC,
+  translation: "WEB",
+  references: v.references ?? [v.ref],
+}));

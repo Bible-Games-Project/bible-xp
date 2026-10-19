@@ -12,6 +12,7 @@ import {
   Moon,
   Mountain,
   PawPrint,
+  ScrollText,
   Sparkles,
   Sprout,
   Stars,
@@ -40,15 +41,15 @@ export const CONTENT_ICONS: Record<IconName, LucideIcon> = {
   leaf: Leaf,
 };
 
-export type Accent = "green" | "blue" | "yellow" | "coral" | "violet";
+export type Accent = "gold";
 
-/** Visual identity of each game mode, used everywhere a mode is shown. */
+/** Each game mode is told apart by its icon; colour is kept for meaning (tiers, states). */
 export const MODE_STYLE: Record<GameMode | "intro", { icon: LucideIcon; accent: Accent }> = {
-  intro: { icon: BookOpenText, accent: "green" },
-  "form-word": { icon: ALargeSmall, accent: "blue" },
-  "match-pairs": { icon: Link2, accent: "coral" },
-  quiz: { icon: CircleQuestionMark, accent: "violet" },
-  "complete-verse": { icon: BookOpenText, accent: "yellow" },
-  "story-order": { icon: ListOrdered, accent: "green" },
-  "who-am-i": { icon: UserSearch, accent: "blue" },
+  intro: { icon: BookOpenText, accent: "gold" },
+  "form-word": { icon: ALargeSmall, accent: "gold" },
+  "match-pairs": { icon: Link2, accent: "gold" },
+  quiz: { icon: CircleQuestionMark, accent: "gold" },
+  "complete-verse": { icon: ScrollText, accent: "gold" },
+  "story-order": { icon: ListOrdered, accent: "gold" },
+  "who-am-i": { icon: UserSearch, accent: "gold" },
 };

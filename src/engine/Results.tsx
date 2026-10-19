@@ -1,4 +1,9 @@
 import { Award, Gem, RotateCcw, Target, Trophy } from "lucide-react";
+import { ProgressBar } from "../components/ProgressBar";
+import { TierBadge, useTierName } from "../components/Tier";
+import { useProgress } from "../progress/store";
+import { PROMOTION, promotionStatus } from "../progress/tiers";
+import { REWARDS } from "../progress/rewards";
 import { navigate, type Route } from "../app/router";
 import { Button } from "../components/Button";
 import { Mascot } from "../components/Mascot";
@@ -20,6 +25,9 @@ interface ResultsProps {
 export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, nextLabel }: ResultsProps) {
   const { t, language } = useI18n();
   const pack = getContent(language.code);
+  const { difficulty } = useProgress();
+  const tierName = useTierName();
+  const status = promotionStatus(difficulty);
   const ratio = summary.totalSteps ? summary.correctSteps / summary.totalSteps : 0;
   const answers = summary.correctAnswers + summary.incorrectAnswers;
   const accuracy = answers ? Math.round((summary.correctAnswers / answers) * 100) : 0;
@@ -28,7 +36,7 @@ export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, 
   const unit = summary.unitCompleted ? pack.units.find((u) => u.id === summary.unitCompleted) : null;
 
   const rewardNote = {
-    "first-completion": t("results.firstCompletion"),
+    "first-clear": t("results.firstCompletion", { tier: tierName(summary.tier), n: REWARDS.firstClear[summary.tier] }),
     practice: t("results.practiceXp"),
     "practice-already-claimed": t("results.practiceClaimed"),
     daily: t("results.dailyXp"),
@@ -56,23 +64,24 @@ export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, 
         <Mascot mood={ratio >= 0.5 ? "celebrating" : "encouraging"} size={150} />
         <h1 className="results__title">{title}</h1>
         <p className="results__subtitle">{subtitle}</p>
+        <TierBadge tier={summary.tier} />
       </div>
 
       <div className="stat-tiles">
-        <div className="stat-tile stat-tile--green">
+        <div className="stat-tile">
           <span className="stat-tile__label">{t("results.correct")}</span>
           <span className="stat-tile__value">
             <Target size={20} strokeWidth={2.6} aria-hidden="true" />
             {summary.correctSteps}/{summary.totalSteps}
           </span>
         </div>
-        <div className="stat-tile stat-tile--yellow">
+        <div className="stat-tile stat-tile--xp">
           <span className="stat-tile__label">{t("results.xpEarned")}</span>
           <span className="stat-tile__value">
             <Gem size={20} strokeWidth={2.6} aria-hidden="true" />+{xp}
           </span>
         </div>
-        <div className="stat-tile stat-tile--blue">
+        <div className="stat-tile">
           <span className="stat-tile__label">{t("results.accuracy")}</span>
           <span className="stat-tile__value">{accuracy}%</span>
         </div>
@@ -80,17 +89,38 @@ export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, 
 
       <p className="results__note">
         {rewardNote}
-        {summary.reward.bonus > 0 && <strong> · {t("results.perfectBonus", { n: summary.reward.bonus })}</strong>}
+        {summary.reward.reason === "first-clear" && summary.reward.bonus > REWARDS.firstClear[summary.tier] && ` · ${t("results.perfectBonus")}`}
       </p>
 
+      {summary.tierUnlocked ? (
+        <section className={`unlock tier-${summary.tierUnlocked}`} role="status">
+          <span className="unlock__gem" aria-hidden="true" />
+          <h2 className="unlock__title">{t("results.tierUnlocked", { tier: tierName(summary.tierUnlocked) })}</h2>
+          <p className="muted small">{t("results.tierUnlockedBody", { tier: tierName(summary.tierUnlocked) })}</p>
+        </section>
+      ) : (
+        summary.kind !== "review" &&
+        status.next && (
+          <a className={`climb tier-${status.next}`} href="#/difficulty">
+            <span className="climb__row">
+              <span className="climb__label">{t("results.tierProgress", { next: tierName(status.next) })}</span>
+              <span className="climb__meta">
+                {Math.min(status.answered, PROMOTION.minAnswered)}/{PROMOTION.minAnswered} · {status.accuracy === null ? "–" : Math.round(status.accuracy * 100)}%
+              </span>
+            </span>
+            <ProgressBar value={Math.min(status.answered, PROMOTION.minAnswered)} max={PROMOTION.minAnswered} label={t("results.tierProgress", { next: tierName(status.next) })} tone="tier" size="sm" />
+          </a>
+        )
+      )}
+
       {summary.levelAfter > summary.levelBefore && (
-        <div className="banner banner--violet">
+        <div className="banner banner--gold">
           <Award size={24} aria-hidden="true" />
           {t("results.levelUp", { n: summary.levelAfter })}
         </div>
       )}
       {unit && (
-        <div className="banner banner--green">
+        <div className="banner banner--gold">
           <Trophy size={24} aria-hidden="true" />
           {t("results.unitComplete", { n: unit.number, name: unit.title })}
         </div>

@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { playCue } from "../lib/feedback";
 
-type Variant = "primary" | "secondary" | "blue" | "coral" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "blue" | "success" | "coral" | "ghost" | "danger";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;

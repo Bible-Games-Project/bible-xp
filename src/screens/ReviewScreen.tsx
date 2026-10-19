@@ -87,6 +87,7 @@ export function ReviewPlayScreen() {
       kind="review"
       refId="mistakes"
       steps={steps}
+      tier={getProgress().difficulty.selected}
       subtitle={t("results.reviewSubtitle")}
       exitRoute={{ name: "profile" }}
     />

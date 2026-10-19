@@ -1,4 +1,5 @@
-import { BookCheck, ChevronRight, Crown, Flame, Gem, Pencil, RotateCcw, Settings, Target, Trophy } from "lucide-react";
+import { ChevronRight, Crown, Gauge, Pencil, RotateCcw, Settings } from "lucide-react";
+import { useTierName } from "../components/Tier";
 import { useState, type ReactNode } from "react";
 import { href } from "../app/router";
 import { Avatar } from "../components/Avatar";
@@ -25,6 +26,8 @@ export function ProfileScreen() {
   const lessons = Object.values(progress.activities).filter((a) => a.firstCompletedAt).length + Object.keys(progress.intros).length;
   const mistakes = openMistakes(progress).length;
   const name = progress.profile.name.trim();
+  const tierName = useTierName();
+  const levelText = t("profile.levelProgress", { current: level.current, needed: level.needed, next: level.level + 1 });
 
   const saveName = () => {
     progressActions.updateProfile({ name: draft.trim().slice(0, 24) });
@@ -79,25 +82,46 @@ export function ProfileScreen() {
             <Pencil size={18} strokeWidth={2.6} aria-hidden="true" />
           </button>
         )}
-        <span className="pill pill--violet">{t("common.level", { n: level.level })}</span>
-        <div className="profile-hero__level">
-          <ProgressBar value={level.current} max={level.needed} label={t("profile.levelProgress", { current: level.current, needed: level.needed, next: level.level + 1 })} tone="violet" />
-          <span className="muted small">{t("profile.levelProgress", { current: level.current, needed: level.needed, next: level.level + 1 })}</span>
-        </div>
       </section>
+
+      <div className="rank-cards">
+        <a className="rank-card" href={href({ name: "difficulty" })}>
+          <span className="rank-card__label">{t("profile.difficulty")}</span>
+          <span className={`rank-card__value tier-${progress.difficulty.unlocked}`} style={{ color: "var(--tier)" }}>
+            {tierName(progress.difficulty.unlocked)}
+          </span>
+          <span className="rank-card__meta">
+            {progress.difficulty.unlocked} / 5
+          </span>
+        </a>
+        <div className="rank-card">
+          <span className="rank-card__label">{t("common.level", { n: level.level })}</span>
+          <span className="rank-card__value text-gold">{progress.xp} XP</span>
+          <ProgressBar value={level.current} max={level.needed} label={levelText} size="sm" />
+          <span className="rank-card__meta">{levelText}</span>
+        </div>
+      </div>
+      <p className="faint small center">{t("profile.levelExplain")}</p>
 
       <h2 className="section-heading">{t("profile.stats")}</h2>
       <div className="stats-grid">
-        <Stat icon={<Gem size={22} />} accent="blue" label={t("profile.totalXp")} value={progress.xp} />
-        <Stat icon={<Flame size={22} />} accent="coral" label={t("profile.streak")} value={displayedStreak(progress.streak, localDate())} />
-        <Stat icon={<Trophy size={22} />} accent="yellow" label={t("profile.bestStreak")} value={progress.streak.best} />
-        <Stat icon={<BookCheck size={22} />} accent="green" label={t("profile.lessons")} value={lessons} />
-        <Stat icon={<Target size={22} />} accent="violet" label={t("profile.accuracy")} value={acc === null ? t("profile.noAnswers") : `${acc}%`} wide />
+        <Stat label={t("profile.streak")} value={displayedStreak(progress.streak, localDate())} />
+        <Stat label={t("profile.bestStreak")} value={progress.streak.best} />
+        <Stat label={t("profile.lessons")} value={lessons} />
+        <Stat label={t("profile.accuracy")} value={acc === null ? t("profile.noAnswers") : `${acc}%`} />
       </div>
 
       <nav className="menu card" aria-label={t("profile.title")}>
+        <a className="menu__item" href={href({ name: "difficulty" })}>
+          <span className="menu__icon accent-gold" aria-hidden="true">
+            <Gauge size={20} strokeWidth={2.6} />
+          </span>
+          <span className="menu__label">{t("profile.difficulty")}</span>
+          <span className="menu__meta">{tierName(progress.difficulty.selected)}</span>
+          <ChevronRight size={20} className="muted" aria-hidden="true" />
+        </a>
         <a className="menu__item" href={href({ name: "review" })}>
-          <span className="menu__icon accent-coral" aria-hidden="true">
+          <span className="menu__icon accent-gold" aria-hidden="true">
             <RotateCcw size={20} strokeWidth={2.6} />
           </span>
           <span className="menu__label">{t("profile.review")}</span>
@@ -105,14 +129,14 @@ export function ProfileScreen() {
           <ChevronRight size={20} className="muted" aria-hidden="true" />
         </a>
         <a className="menu__item" href={href({ name: "settings" })}>
-          <span className="menu__icon accent-blue" aria-hidden="true">
+          <span className="menu__icon accent-gold" aria-hidden="true">
             <Settings size={20} strokeWidth={2.6} />
           </span>
           <span className="menu__label">{t("profile.settings")}</span>
           <ChevronRight size={20} className="muted" aria-hidden="true" />
         </a>
         <a className="menu__item" href={href({ name: "plus" })}>
-          <span className="menu__icon accent-violet" aria-hidden="true">
+          <span className="menu__icon accent-gold" aria-hidden="true">
             <Crown size={20} strokeWidth={2.6} />
           </span>
           <span className="menu__label">{t("profile.plus")}</span>
@@ -148,16 +172,11 @@ export function ProfileScreen() {
   );
 }
 
-function Stat({ icon, label, value, accent, wide }: { icon: ReactNode; label: string; value: ReactNode; accent: string; wide?: boolean }) {
+function Stat({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div className={`stat card${wide ? " stat--wide" : ""}`}>
-      <span className={`stat__icon accent-${accent}`} aria-hidden="true">
-        {icon}
-      </span>
-      <span className="stat__text">
-        <span className="stat__value">{value}</span>
-        <span className="stat__label">{label}</span>
-      </span>
+    <div className="stat">
+      <span className="stat__value">{value}</span>
+      <span className="stat__label">{label}</span>
     </div>
   );
 }

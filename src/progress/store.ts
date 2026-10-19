@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { getContent } from "../content";
+import type { Tier } from "../content/types";
 import { localDate } from "../lib/date";
 import {
   abandonSession,
@@ -9,6 +10,7 @@ import {
   migrate,
   PROGRESS_VERSION,
   recordStep,
+  selectTierIn,
   startSession,
   type ProgressData,
   type Profile,
@@ -78,8 +80,11 @@ const now = () => new Date().toISOString();
 const units = () => getContent(state.settings.language).units;
 
 export const progressActions = {
-  startSession(key: string, kind: SessionKind, refId: string, stepIds: string[]) {
-    commit(startSession(state, key, kind, refId, stepIds, now()));
+  startSession(key: string, kind: SessionKind, refId: string, stepIds: string[], tier: Tier) {
+    commit(startSession(state, key, kind, refId, stepIds, tier, now()));
+  },
+  selectTier(tier: Tier) {
+    commit(selectTierIn(state, tier));
   },
   recordStep(key: string, outcome: StepOutcome, meta: StepMeta) {
     commit(recordStep(state, key, outcome, meta, now()));

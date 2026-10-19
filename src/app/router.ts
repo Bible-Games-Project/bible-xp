@@ -10,6 +10,7 @@ export type Route =
   | { name: "path" }
   | { name: "free" }
   | { name: "profile" }
+  | { name: "difficulty" }
   | { name: "settings" }
   | { name: "about" }
   | { name: "privacy" }
@@ -28,6 +29,7 @@ const STATIC: Record<string, Route["name"]> = {
   path: "path",
   free: "free",
   profile: "profile",
+  difficulty: "difficulty",
   settings: "settings",
   about: "about",
   privacy: "privacy",

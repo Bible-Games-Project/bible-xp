@@ -1,3 +1,4 @@
+import { shuffle } from "../lib/random";
 import type {
   Activity,
   BibleRef,
@@ -5,12 +6,13 @@ import type {
   DailyChallenge,
   GameMode,
   Step,
+  Tier,
   Topic,
   TopicIntro,
   TranslationId,
   Unit,
 } from "./types";
-import { creationDailyChallenges, creationTopic, creationUnit } from "./locales/en/creation";
+import { creationDaily, creationTopic, creationUnit } from "./locales/en/creation";
 
 /**
  * Content packs by content locale. Adding a language means adding a pack here
@@ -23,7 +25,7 @@ const packs: Record<string, ContentPack> = {
     translations: { WEB: { name: "World English Bible", abbreviation: "WEB" } },
     topics: [creationTopic],
     units: [creationUnit],
-    dailyChallenges: creationDailyChallenges,
+    daily: creationDaily,
   },
 };
 
@@ -65,7 +67,6 @@ export function freePlayActivity(pack: ContentPack, mode: GameMode): Activity | 
 export function allSteps(pack: ContentPack): Step[] {
   const byId = new Map<string, Step>();
   for (const topic of pack.topics) for (const a of topic.activities) for (const s of a.steps) byId.set(s.id, s);
-  for (const d of pack.dailyChallenges) for (const s of d.steps) byId.set(s.id, s);
   return [...byId.values()];
 }
 
@@ -73,14 +74,49 @@ export function findStep(pack: ContentPack, stepId: string): Step | undefined {
   return allSteps(pack).find((s) => s.id === stepId);
 }
 
+/** Steps drawn from a mode's bank for one session. */
+export const SESSION_SIZE: Record<GameMode, number> = {
+  "form-word": 4,
+  "match-pairs": 2,
+  quiz: 5,
+  "complete-verse": 4,
+  "story-order": 1,
+  "who-am-i": 2,
+};
+
+/** Steps of an activity at a tier; falls back to the nearest lower tier with content. */
+export function stepsAtTier(activity: Activity, tier: Tier): Step[] {
+  for (let t = tier; t >= 1; t--) {
+    const steps = activity.steps.filter((s) => s.tier === t);
+    if (steps.length) return steps;
+  }
+  return activity.steps;
+}
+
 /**
- * The challenge for a local date (YYYY-MM-DD). Rotates deterministically
- * through the pool, so adding challenges needs no code change.
+ * Picks `count` steps, least-seen first so players meet the whole bank before
+ * repeats; ties are broken by a seeded shuffle.
  */
-export function dailyChallengeFor(pack: ContentPack, date: string): DailyChallenge {
-  const pool = pack.dailyChallenges;
-  const dayNumber = Math.floor(Date.parse(`${date}T00:00:00Z`) / 86_400_000);
-  return pool[((dayNumber % pool.length) + pool.length) % pool.length];
+export function drawSteps(pool: Step[], count: number, seen: Record<string, number>, seed: string): Step[] {
+  return shuffle(pool, seed)
+    .map((step, order) => ({ step, order }))
+    .sort((a, b) => (seen[a.step.id] ?? 0) - (seen[b.step.id] ?? 0) || a.order - b.order)
+    .slice(0, count)
+    .map((x) => x.step);
+}
+
+/**
+ * The daily challenge for a local date (YYYY-MM-DD) and tier: one step of each
+ * mode in the recipe, chosen deterministically so it stays the same all day.
+ */
+export function dailyChallengeFor(pack: ContentPack, date: string, tier: Tier): DailyChallenge {
+  const { topicId, theme, modes } = pack.daily;
+  const topic = findTopic(pack, topicId)!;
+  const steps = modes.flatMap((mode) => {
+    const activity = topic.activities.find((a) => a.mode === mode);
+    return activity ? shuffle(stepsAtTier(activity, tier), `${date}:${tier}:${mode}`).slice(0, 1) : [];
+  });
+  return { id: `daily.${topicId}.${date}.t${tier}`, topicId, theme, tier, steps };
 }
 
 export function unitFor(pack: ContentPack, unitId: string): Unit | undefined {

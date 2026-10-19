@@ -7,6 +7,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  background: var(--bg);
 }
 
 body {
@@ -32,8 +33,14 @@ h1,
 h2,
 h3 {
   font-weight: 850;
-  letter-spacing: -0.01em;
   line-height: 1.2;
+  text-wrap: balance;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
 button,
@@ -54,7 +61,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid var(--blue);
+  outline: 3px solid var(--cyan);
   outline-offset: 3px;
 }
 
@@ -77,6 +84,9 @@ a {
 .muted {
   color: var(--text-2);
 }
+.faint {
+  color: var(--text-3);
+}
 .small {
   font-size: var(--fs-sm);
 }
@@ -84,37 +94,37 @@ a {
   text-align: center;
 }
 .text-green {
-  color: var(--green-dark);
+  color: var(--success);
 }
-.text-violet {
-  color: var(--violet-dark);
+.text-gold {
+  color: var(--gold);
 }
 
-/* Accent helpers: soft background + strong foreground. */
-.accent-green {
-  --accent: var(--green);
-  --accent-dark: var(--green-dark);
-  --accent-soft: var(--green-soft);
+/* Accent helpers for icon tiles: a strong colour and its soft wash. */
+.accent-gold {
+  --accent: var(--gold);
+  --accent-soft: var(--gold-soft);
 }
+.accent-cyan,
 .accent-blue {
-  --accent: var(--blue);
-  --accent-dark: var(--blue-dark);
-  --accent-soft: var(--blue-soft);
+  --accent: var(--cyan);
+  --accent-soft: var(--cyan-soft);
 }
-.accent-yellow {
-  --accent: var(--yellow);
-  --accent-dark: var(--yellow-dark);
-  --accent-soft: var(--yellow-soft);
+.accent-green {
+  --accent: var(--success);
+  --accent-soft: var(--success-soft);
 }
 .accent-coral {
-  --accent: var(--coral);
-  --accent-dark: var(--coral-dark);
-  --accent-soft: var(--coral-soft);
+  --accent: var(--danger);
+  --accent-soft: var(--danger-soft);
 }
 .accent-violet {
-  --accent: var(--violet);
-  --accent-dark: var(--violet-dark);
-  --accent-soft: var(--violet-soft);
+  --accent: var(--tier-3);
+  --accent-soft: rgb(162 118 255 / 0.16);
+}
+.accent-yellow {
+  --accent: var(--gold);
+  --accent-soft: var(--gold-soft);
 }
 
 /* Reduced motion: from the OS or from Settings. */

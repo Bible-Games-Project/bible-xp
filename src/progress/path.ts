@@ -8,7 +8,7 @@ export function nodeStatus(data: ProgressData, unit: Unit, index: number): NodeS
   const node = unit.nodes[index];
   if (isNodeCompleted(data, node)) return "completed";
   if (index > 0 && !isNodeCompleted(data, unit.nodes[index - 1])) return "locked";
-  if (node.kind === "activity" && data.sessions[sessionKey.activity(node.activityId)]) return "in-progress";
+  if (node.kind === "activity" && data.sessions[sessionKey.activity(node.activityId, data.difficulty.selected)]) return "in-progress";
   return "available";
 }
 

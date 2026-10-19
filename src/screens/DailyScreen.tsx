@@ -3,7 +3,8 @@ import { navigate } from "../app/router";
 import { Button } from "../components/Button";
 import { Screen, TopBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
-import { dailyChallengeFor } from "../content";
+import { dailyChallengeFor, findStep } from "../content";
+import type { Step } from "../content/types";
 import { useContent } from "../content/useContent";
 import { GameSession } from "../engine/GameSession";
 import { useI18n } from "../i18n";
@@ -17,8 +18,12 @@ export function DailyScreen() {
   const progress = useProgress();
   // The date is fixed when the screen opens, so a session never jumps days mid-play.
   const [today] = useState(localDate);
-  const challenge = dailyChallengeFor(pack, today);
   const key = sessionKey.daily(today);
+  // A started challenge keeps its tier and questions; a new one uses the current tier.
+  const [tier] = useState(() => progress.sessions[key]?.tier ?? progress.difficulty.selected);
+  const challenge = dailyChallengeFor(pack, today, tier);
+  const saved = progress.sessions[key]?.stepIds.map((id) => findStep(pack, id));
+  const steps = saved && saved.every((s) => s !== undefined) ? (saved as Step[]) : challenge.steps;
   // Decided once: finishing the challenge must not swap the results screen away.
   const [playing, setPlaying] = useState(() => !progress.daily[today]?.rewarded || Boolean(progress.sessions[key]));
 
@@ -46,7 +51,8 @@ export function DailyScreen() {
       sessionKey={key}
       kind="daily"
       refId={challenge.id}
-      steps={challenge.steps}
+      steps={steps}
+      tier={tier}
       subtitle={t("results.dailySubtitle", { topic: challenge.theme })}
       exitRoute={{ name: "home" }}
     />

@@ -7,7 +7,8 @@ import { Mascot, type MascotMood } from "../components/Mascot";
 import { Dialog } from "../components/Overlay";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatRefs, getContent } from "../content";
-import type { GameMode, Step } from "../content/types";
+import type { GameMode, Step, Tier } from "../content/types";
+import { TierBadge } from "../components/Tier";
 import { BibleQuiz } from "../games/BibleQuiz";
 import { CompleteVerse } from "../games/CompleteVerse";
 import { FormTheWord } from "../games/FormTheWord";
@@ -35,6 +36,9 @@ export interface GameSessionProps {
   kind: SessionKind;
   refId: string;
   steps: Step[];
+  tier: Tier;
+  /** Draws a fresh set of steps for "Play again"; without it the same steps replay. */
+  onPlayAgain?: () => void;
   /** Shown on the results screen, e.g. "The Creation · Bible Quiz". */
   subtitle: string;
   exitRoute: Route;
@@ -46,7 +50,7 @@ export interface GameSessionProps {
  * Runs any sequence of steps, of one mode or mixed: progress bar, mascot,
  * feedback, persistence after every step, and the final results.
  */
-export function GameSession({ sessionKey, kind, refId, steps, subtitle, exitRoute, nextRoute, nextLabel }: GameSessionProps) {
+export function GameSession({ sessionKey, kind, refId, steps, tier, onPlayAgain, subtitle, exitRoute, nextRoute, nextLabel }: GameSessionProps) {
   const { t, language, messages } = useI18n();
   const pack = getContent(language.code);
   const progress = useProgress();
@@ -59,8 +63,8 @@ export function GameSession({ sessionKey, kind, refId, steps, subtitle, exitRout
   const finishing = useRef(false);
 
   useEffect(() => {
-    if (!summary) progressActions.startSession(sessionKey, kind, refId, stepIds);
-  }, [sessionKey, kind, refId, stepIds, run, summary]);
+    if (!summary) progressActions.startSession(sessionKey, kind, refId, stepIds, tier);
+  }, [sessionKey, kind, refId, stepIds, tier, run, summary]);
 
   const session = progress.sessions[sessionKey];
   const recordedIndex = session?.stepIds.join() === stepIds.join() ? session.index : 0;
@@ -102,6 +106,7 @@ export function GameSession({ sessionKey, kind, refId, steps, subtitle, exitRout
   };
 
   const playAgain = () => {
+    if (onPlayAgain) return onPlayAgain();
     setSummary(null);
     setPending(null);
     setMood("thinking");
@@ -139,11 +144,12 @@ export function GameSession({ sessionKey, kind, refId, steps, subtitle, exitRout
       </header>
 
       <div className="game__guide">
-        <Mascot mood={mood} size={68} />
+        <Mascot mood={mood} size={60} />
         <div className="speech">
           <span className="speech__mode">
             <modeStyle.icon size={16} strokeWidth={2.6} aria-hidden="true" />
             {t(`modes.${step.mode}.name`)}
+            <TierBadge tier={step.tier} />
           </span>
           <span className="speech__text">{t(`game.instructions.${step.mode}`)}</span>
         </div>
@@ -169,7 +175,7 @@ export function GameSession({ sessionKey, kind, refId, steps, subtitle, exitRout
             <p className="feedback__explanation">{step.explanation}</p>
             <p className="feedback__ref">{formatRefs(pack, step.references)}</p>
           </div>
-          <Button block variant={resolution.correct ? "primary" : "coral"} onClick={onContinue} autoFocus>
+          <Button block variant={resolution.correct ? "success" : "coral"} onClick={onContinue} autoFocus>
             {t("common.continue")}
           </Button>
         </section>

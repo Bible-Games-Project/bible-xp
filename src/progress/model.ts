@@ -1,15 +1,23 @@
-import type { GameMode, Unit } from "../content/types";
+import type { GameMode, Tier, Unit } from "../content/types";
 import { levelForXp } from "./levels";
 import { REWARDS, type RewardResult } from "./rewards";
 import { EMPTY_STREAK, recordActiveDay, type StreakState } from "./streak";
+import { applyPromotion, defaultDifficulty, recordTierOutcome, type DifficultyState } from "./tiers";
 
 /*
  * The whole player state, kept as one plain JSON object so it can be saved
  * locally today and synced to a server later. Every mutation is a pure
  * function below; `store.ts` only wires them to React and storage.
+ *
+ * How the parts fit together:
+ * - Difficulty tier (tiers.ts) is earned by accuracy and decides which
+ *   questions you get.
+ * - XP comes from correct answers, scaled by tier, plus first-clear bonuses.
+ *   It drives the player level (levels.ts), which is a measure of effort.
+ * - The streak counts days with at least one finished session.
  */
 
-export const PROGRESS_VERSION = 1;
+export const PROGRESS_VERSION = 2;
 
 export type AvatarId = "dawn" | "sky" | "leaf" | "flame" | "wave" | "star";
 export const AVATARS: AvatarId[] = ["dawn", "sky", "leaf", "flame", "wave", "star"];
@@ -28,10 +36,16 @@ export interface Profile {
   avatar: AvatarId;
 }
 
+/** A game on the path: finished at least once, at any tier. */
 export interface ActivityRecord {
   startedAt: string;
   firstCompletedAt?: string;
   completions: number;
+}
+
+/** A game finished at one tier. Keyed by `activityId@tier`. */
+export interface TierClear {
+  firstClearedAt: string;
   bestCorrect: number;
   total: number;
   /** Local date on which replay XP was last granted. */
@@ -53,6 +67,7 @@ export interface SessionProgress {
   kind: SessionKind;
   /** Activity id, daily challenge id, or "mistakes". */
   refId: string;
+  tier: Tier;
   stepIds: string[];
   index: number;
   outcomes: StepOutcome[];
@@ -82,6 +97,7 @@ export interface ProgressData {
   settings: Settings;
   xp: number;
   streak: StreakState;
+  difficulty: DifficultyState;
   stats: {
     correctAnswers: number;
     incorrectAnswers: number;
@@ -90,6 +106,9 @@ export interface ProgressData {
     lastActivity: { kind: SessionKind | "intro"; refId: string; at: string } | null;
   };
   activities: Record<string, ActivityRecord>;
+  tierClears: Record<string, TierClear>;
+  /** How often each step has been shown; drives question rotation. */
+  seen: Record<string, number>;
   intros: Record<string, { completedAt: string }>;
   unitsCompleted: Record<string, string>;
   daily: Record<string, DailyRecord>;
@@ -105,8 +124,11 @@ export function defaultProgress(): ProgressData {
     settings: { language: "en", sound: true, vibration: true, reduceMotion: null, largeText: false },
     xp: 0,
     streak: { ...EMPTY_STREAK },
+    difficulty: defaultDifficulty(),
     stats: { correctAnswers: 0, incorrectAnswers: 0, activitiesStarted: 0, sessionsCompleted: 0, lastActivity: null },
     activities: {},
+    tierClears: {},
+    seen: {},
     intros: {},
     unitsCompleted: {},
     daily: {},
@@ -116,10 +138,12 @@ export function defaultProgress(): ProgressData {
 }
 
 export const sessionKey = {
-  activity: (activityId: string) => `activity:${activityId}`,
+  activity: (activityId: string, tier: Tier) => `activity:${activityId}@${tier}`,
   daily: (date: string) => `daily:${date}`,
   review: () => "review",
 };
+
+export const clearKey = (activityId: string, tier: Tier) => `${activityId}@${tier}`;
 
 export function startSession(
   data: ProgressData,
@@ -127,19 +151,18 @@ export function startSession(
   kind: SessionKind,
   refId: string,
   stepIds: string[],
+  tier: Tier,
   nowIso: string,
 ): ProgressData {
-  const existing = data.sessions[key];
-  const sameSteps = existing && existing.stepIds.join() === stepIds.join();
   // Resume an unfinished session (or one whose last step is recorded but not yet finalised).
-  if (existing && sameSteps) return data;
+  if (data.sessions[key]) return data;
 
-  const session: SessionProgress = { key, kind, refId, stepIds, index: 0, outcomes: [], startedAt: nowIso };
+  const session: SessionProgress = { key, kind, refId, tier, stepIds, index: 0, outcomes: [], startedAt: nowIso };
   const next: ProgressData = { ...data, sessions: { ...data.sessions, [key]: session } };
   if (kind === "activity") {
     next.stats = { ...data.stats, activitiesStarted: data.stats.activitiesStarted + 1 };
     if (!data.activities[refId]) {
-      next.activities = { ...data.activities, [refId]: { startedAt: nowIso, completions: 0, bestCorrect: 0, total: stepIds.length } };
+      next.activities = { ...data.activities, [refId]: { startedAt: nowIso, completions: 0 } };
     }
   }
   return next;
@@ -150,13 +173,7 @@ export interface StepMeta {
   topicId: string;
 }
 
-export function recordStep(
-  data: ProgressData,
-  key: string,
-  outcome: StepOutcome,
-  meta: StepMeta,
-  nowIso: string,
-): ProgressData {
+export function recordStep(data: ProgressData, key: string, outcome: StepOutcome, meta: StepMeta, nowIso: string): ProgressData {
   const session = data.sessions[key];
   // Ignore duplicates (double taps, re-renders): only the current step can be recorded.
   if (!session || session.stepIds[session.index] !== outcome.stepId || session.outcomes.length !== session.index) {
@@ -178,9 +195,16 @@ export function recordStep(
     // A right answer in a review clears the mistake; elsewhere it is just noted.
     mistakes[outcome.stepId] = { ...previous, lastCorrectAt: nowIso, resolved: previous.resolved || session.kind === "review" };
   }
+  // Reviews are second attempts at known questions, so they do not count toward promotion.
+  const difficulty =
+    session.kind === "review"
+      ? data.difficulty
+      : recordTierOutcome(data.difficulty, session.tier, { stepId: outcome.stepId, mode: meta.mode, correct: outcome.correct });
   return {
     ...data,
     mistakes,
+    difficulty,
+    seen: { ...data.seen, [outcome.stepId]: (data.seen[outcome.stepId] ?? 0) + 1 },
     stats: {
       ...data.stats,
       correctAnswers: data.stats.correctAnswers + outcome.correctCount,
@@ -203,6 +227,7 @@ export function abandonSession(data: ProgressData, key: string): ProgressData {
 export interface SessionSummary {
   kind: SessionKind;
   refId: string;
+  tier: Tier;
   correctSteps: number;
   totalSteps: number;
   correctAnswers: number;
@@ -212,11 +237,14 @@ export interface SessionSummary {
   levelAfter: number;
   firstCompletion: boolean;
   unitCompleted: string | null;
+  /** The tier unlocked by this session, if any. */
+  tierUnlocked: Tier | null;
 }
 
 /**
- * Finishes a session, grants XP once, and removes it from in-progress state.
- * Returns null when there is nothing to finish, so it is safe to call twice.
+ * Finishes a session, grants XP once, checks for a tier promotion, and removes
+ * the session from in-progress state. Returns null when there is nothing to
+ * finish, so it is safe to call twice.
  */
 export function completeSession(
   data: ProgressData,
@@ -228,33 +256,39 @@ export function completeSession(
   const session = data.sessions[key];
   if (!session || session.index < session.stepIds.length) return null;
 
+  const tier = session.tier;
   const correctSteps = session.outcomes.filter((o) => o.correct).length;
   const totalSteps = session.stepIds.length;
   const perfect = correctSteps === totalSteps;
+  const answerXp = correctSteps * REWARDS.stepXp[tier];
   let next: ProgressData = abandonSession(data, key);
   let reward: RewardResult;
   let firstCompletion = false;
 
   if (session.kind === "activity") {
-    const record = next.activities[session.refId] ?? { startedAt: nowIso, completions: 0, bestCorrect: 0, total: totalSteps };
-    firstCompletion = !record.firstCompletedAt;
-    if (firstCompletion) {
-      reward = { xp: REWARDS.activityFirstCompletion, bonus: perfect ? REWARDS.perfectBonus : 0, reason: "first-completion" };
-    } else if (record.lastPracticeRewardDate !== today) {
-      reward = { xp: REWARDS.practice, bonus: 0, reason: "practice" };
+    const ck = clearKey(session.refId, tier);
+    const clear = next.tierClears[ck];
+    firstCompletion = !clear;
+    if (!clear) {
+      reward = { xp: answerXp, bonus: REWARDS.firstClear[tier] + (perfect ? REWARDS.perfect[tier] : 0), reason: "first-clear" };
+    } else if (clear.lastPracticeRewardDate !== today) {
+      reward = { xp: answerXp, bonus: 0, reason: "practice" };
     } else {
       reward = { xp: 0, bonus: 0, reason: "practice-already-claimed" };
     }
+    next.tierClears = {
+      ...next.tierClears,
+      [ck]: {
+        firstClearedAt: clear?.firstClearedAt ?? nowIso,
+        bestCorrect: Math.max(clear?.bestCorrect ?? 0, correctSteps),
+        total: totalSteps,
+        lastPracticeRewardDate: reward.reason === "practice" ? today : clear?.lastPracticeRewardDate,
+      },
+    };
+    const record = next.activities[session.refId] ?? { startedAt: nowIso, completions: 0 };
     next.activities = {
       ...next.activities,
-      [session.refId]: {
-        ...record,
-        firstCompletedAt: record.firstCompletedAt ?? nowIso,
-        completions: record.completions + 1,
-        bestCorrect: Math.max(record.bestCorrect, correctSteps),
-        total: totalSteps,
-        lastPracticeRewardDate: reward.reason === "practice" ? today : record.lastPracticeRewardDate,
-      },
+      [session.refId]: { ...record, firstCompletedAt: record.firstCompletedAt ?? nowIso, completions: record.completions + 1 },
     };
   } else if (session.kind === "daily") {
     // The session key carries the date the challenge belongs to.
@@ -264,7 +298,7 @@ export function completeSession(
     firstCompletion = !rewarded;
     reward = rewarded
       ? { xp: 0, bonus: 0, reason: "daily-already-claimed" }
-      : { xp: REWARDS.dailyChallenge, bonus: 0, reason: "daily" };
+      : { xp: answerXp, bonus: REWARDS.daily[tier], reason: "daily" };
     next.daily = pruneDaily({
       ...next.daily,
       [date]: { challengeId: session.refId, completedAt: record?.completedAt ?? nowIso, rewarded: true },
@@ -284,6 +318,9 @@ export function completeSession(
     lastActivity: { kind: session.kind, refId: session.refId, at: nowIso },
   };
 
+  const promotion = applyPromotion(next.difficulty, nowIso);
+  next.difficulty = promotion.state;
+
   const unitCompleted = markCompletedUnits(next, units, nowIso);
   next = unitCompleted.data;
 
@@ -292,6 +329,7 @@ export function completeSession(
     summary: {
       kind: session.kind,
       refId: session.refId,
+      tier,
       correctSteps,
       totalSteps,
       correctAnswers: session.outcomes.reduce((n, o) => n + o.correctCount, 0),
@@ -301,6 +339,7 @@ export function completeSession(
       levelAfter: levelForXp(next.xp),
       firstCompletion,
       unitCompleted: unitCompleted.newlyCompleted,
+      tierUnlocked: promotion.unlocked,
     },
   };
 }
@@ -324,8 +363,20 @@ export function completeIntro(
   return { data: next, xp: REWARDS.introFirstCompletion };
 }
 
+export function selectTierIn(data: ProgressData, tier: Tier): ProgressData {
+  if (tier > data.difficulty.unlocked || tier === data.difficulty.selected) return data;
+  return { ...data, difficulty: { ...data.difficulty, selected: tier } };
+}
+
 export function isNodeCompleted(data: ProgressData, node: Unit["nodes"][number]): boolean {
   return node.kind === "intro" ? Boolean(data.intros[node.introId]) : Boolean(data.activities[node.activityId]?.firstCompletedAt);
+}
+
+/** Highest tier at which an activity has been cleared, or 0. */
+export function bestClearedTier(data: ProgressData, activityId: string): number {
+  let best = 0;
+  for (let t = 1; t <= 5; t++) if (data.tierClears[clearKey(activityId, t as Tier)]) best = t;
+  return best;
 }
 
 function markCompletedUnits(data: ProgressData, units: Unit[], nowIso: string) {
@@ -360,6 +411,8 @@ export function openMistakes(data: ProgressData): MistakeRecord[] {
     .sort((a, b) => b.lastWrongAt.localeCompare(a.lastWrongAt));
 }
 
+const isTier = (v: unknown): v is Tier => v === 1 || v === 2 || v === 3 || v === 4 || v === 5;
+
 /**
  * Turns whatever was saved into a valid current-version object. Unknown or
  * missing fields fall back to defaults instead of discarding the player's data.
@@ -367,24 +420,37 @@ export function openMistakes(data: ProgressData): MistakeRecord[] {
 export function migrate(raw: unknown): ProgressData {
   const base = defaultProgress();
   if (!raw || typeof raw !== "object") return base;
-  const saved = raw as Partial<ProgressData>;
-  // Version 1 is the first schema. Future versions add steps here, e.g.
-  // `if (saved.version === 1) saved = migrateV1toV2(saved)`.
+  const saved = raw as Partial<ProgressData> & { version?: number };
   const obj = <T extends object>(value: unknown, fallback: T): T =>
     value && typeof value === "object" && !Array.isArray(value) ? { ...fallback, ...(value as T) } : fallback;
   const avatar = AVATARS.includes(saved.profile?.avatar as AvatarId) ? (saved.profile!.avatar as AvatarId) : base.profile.avatar;
+
+  // v1 → v2: sessions had no tier and question banks changed, so unfinished
+  // sessions are dropped. XP, streak, path progress and mistakes are kept.
+  const sessions = Object.fromEntries(
+    Object.entries(obj(saved.sessions, {} as Record<string, SessionProgress>)).filter(([, s]) => s && isTier(s.tier)),
+  );
+  const difficulty = obj(saved.difficulty, base.difficulty);
+  if (!isTier(difficulty.unlocked)) difficulty.unlocked = 1;
+  if (!isTier(difficulty.selected) || difficulty.selected > difficulty.unlocked) difficulty.selected = difficulty.unlocked;
+  difficulty.recent = obj(difficulty.recent, {});
+  difficulty.unlockedAt = obj(difficulty.unlockedAt, {});
+
   return {
     version: PROGRESS_VERSION,
     profile: { ...obj(saved.profile, base.profile), avatar },
     settings: obj(saved.settings, base.settings),
     xp: typeof saved.xp === "number" && saved.xp >= 0 ? saved.xp : 0,
     streak: obj(saved.streak, base.streak),
+    difficulty,
     stats: obj(saved.stats, base.stats),
     activities: obj(saved.activities, {}),
+    tierClears: obj(saved.tierClears, {}),
+    seen: obj(saved.seen, {}),
     intros: obj(saved.intros, {}),
     unitsCompleted: obj(saved.unitsCompleted, {}),
     daily: obj(saved.daily, {}),
-    sessions: obj(saved.sessions, {}),
+    sessions,
     mistakes: obj(saved.mistakes, {}),
     lastReviewRewardDate: typeof saved.lastReviewRewardDate === "string" ? saved.lastReviewRewardDate : undefined,
   };

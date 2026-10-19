@@ -44,13 +44,18 @@ export interface Quote {
   translation: TranslationId;
 }
 
-export type Difficulty = 1 | 2 | 3;
+/**
+ * Difficulty tier of a question: 1 Beginner, 2 Explorer, 3 Scholar, 4 Expert,
+ * 5 Master. Independent of the player's XP level.
+ */
+export type Tier = 1 | 2 | 3 | 4 | 5;
+export const TIERS: Tier[] = [1, 2, 3, 4, 5];
 
 interface StepBase {
   /** Globally unique and stable: progress and mistake review are keyed by it. */
   id: string;
   topicId: string;
-  difficulty: Difficulty;
+  tier: Tier;
   /** Explanation written for this app. Never presented as Bible text. */
   explanation: string;
   /** Passages the step and its explanation are based on. */
@@ -67,6 +72,7 @@ export interface FormWordStep extends StepBase {
 
 export interface MatchPair {
   id: string;
+  /** May hold a literal quote in curly quotes; it is then checked against the source. */
   left: string;
   right: string;
   icon?: IconName;
@@ -151,7 +157,10 @@ export type IconName =
   | "sparkles"
   | "leaf";
 
-/** A playable session of one game mode on one topic. */
+/**
+ * One game mode on one topic. `steps` is the whole question bank across all
+ * tiers; a session draws a few steps of the player's tier from it.
+ */
 export interface Activity {
   id: string;
   topicId: string;
@@ -197,11 +206,18 @@ export interface Unit {
   nodes: PathNode[];
 }
 
+/** How a daily challenge is assembled: one step of each mode, at the player's tier. */
+export interface DailyRecipe {
+  topicId: string;
+  theme: string;
+  modes: GameMode[];
+}
+
 export interface DailyChallenge {
   id: string;
   topicId: string;
-  title: string;
   theme: string;
+  tier: Tier;
   steps: Step[];
 }
 
@@ -211,5 +227,5 @@ export interface ContentPack {
   translations: Record<TranslationId, { name: string; abbreviation: string }>;
   topics: Topic[];
   units: Unit[];
-  dailyChallenges: DailyChallenge[];
+  daily: DailyRecipe;
 }

@@ -3,6 +3,7 @@ import { useApplySettings } from "./app/preferences";
 import { useI18n } from "./i18n";
 import { useProgress } from "./progress/store";
 import { DailyScreen } from "./screens/DailyScreen";
+import { DifficultyScreen } from "./screens/DifficultyScreen";
 import { FreePlayScreen } from "./screens/FreePlayScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { AboutScreen, MultiplayerScreen, NotFoundScreen, PlusScreen, PrivacyScreen, TermsScreen } from "./screens/InfoScreens";
@@ -29,6 +30,8 @@ export function App() {
       return <FreePlayScreen />;
     case "profile":
       return <ProfileScreen />;
+    case "difficulty":
+      return <DifficultyScreen />;
     case "settings":
       return <SettingsScreen />;
     case "about":

@@ -1,50 +1,78 @@
+/*
+ * Bible XP design tokens: a single dark theme.
+ * Deep navy base; gold is the one dominant accent (primary actions, rewards,
+ * progress); cyan is the secondary accent (selection, information). Success
+ * and danger are semantic only. Each difficulty tier owns one colour, used
+ * only where that tier is shown.
+ */
 :root {
-  /* Palette */
-  --bg: #fffdf7;
-  --surface: #ffffff;
-  --surface-2: #f3f4f6;
-  --surface-warm: #fbf6ea;
-  --line: #ece7da;
-  --line-strong: #ddd6c4;
-  --text: #263238;
-  --text-2: #5d6b73;
-  --text-3: #8a969c;
+  color-scheme: dark;
 
-  --green: #58cc82;
-  --green-dark: #299b61;
-  --green-soft: #e3f7ea;
-  --blue: #49b9e8;
-  --blue-dark: #1f8fc0;
-  --blue-soft: #e2f4fc;
-  --yellow: #ffc857;
-  --yellow-dark: #d99a1c;
-  --yellow-soft: #fff4d9;
-  --coral: #ff8066;
-  --coral-dark: #db5a40;
-  --coral-soft: #ffebe5;
-  --violet: #9b83e8;
-  --violet-dark: #7258c9;
-  --violet-soft: #efeafd;
+  /* Base */
+  --bg: #0b0f1c;
+  --bg-2: #10162a;
+  --surface: #161d33;
+  --surface-2: #1e2743;
+  --surface-3: #283255;
+  --line: #273152;
+  --line-strong: #36436d;
+  --text: #f4f6fb;
+  --text-2: #b0b9d2;
+  --text-3: #7783a6;
+
+  /* Accents */
+  --gold: #ffc42e;
+  --gold-dark: #c98a00;
+  --gold-soft: rgb(255 196 46 / 0.14);
+  --on-gold: #1f1500;
+  --cyan: #2cc5ff;
+  --cyan-dark: #0a83bd;
+  --cyan-soft: rgb(44 197 255 / 0.14);
+
+  /* Semantic */
+  --success: #2edb8a;
+  --success-dark: #14965a;
+  --success-soft: rgb(46 219 138 / 0.14);
+  --danger: #ff5a5f;
+  --danger-dark: #c2282f;
+  --danger-soft: rgb(255 90 95 / 0.14);
+
+  /* Difficulty tiers */
+  --tier-1: #2edb8a;
+  --tier-2: #2cc5ff;
+  --tier-3: #a276ff;
+  --tier-4: #ff8c2b;
+  --tier-5: #ff4f8b;
 
   /* Shape */
-  --radius-sm: 12px;
-  --radius: 18px;
-  --radius-lg: 26px;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 22px;
   --ledge: 0 4px 0;
 
   /* Type */
   --font: "Nunito Variable", "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Lilita One", "Nunito Variable", ui-rounded, system-ui, sans-serif;
+  --font-scripture: Georgia, "Times New Roman", serif;
   --fs-xs: 0.8125rem;
   --fs-sm: 0.9375rem;
   --fs-md: 1.0625rem;
   --fs-lg: 1.25rem;
   --fs-xl: 1.625rem;
-  --fs-2xl: 2rem;
+  --fs-2xl: 2.125rem;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
 
   /* Layout */
   --gutter: 16px;
   --max-width: 560px;
-  --tabbar-h: 68px;
+  --tabbar-h: 66px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
@@ -55,3 +83,10 @@
 :root[data-large-text="true"] {
   font-size: 112.5%;
 }
+
+/* Tier colour as a local variable: class="tier-3" sets --tier. */
+.tier-1 { --tier: var(--tier-1); }
+.tier-2 { --tier: var(--tier-2); }
+.tier-3 { --tier: var(--tier-3); }
+.tier-4 { --tier: var(--tier-4); }
+.tier-5 { --tier: var(--tier-5); }

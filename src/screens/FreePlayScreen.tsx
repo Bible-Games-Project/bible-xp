@@ -1,56 +1,77 @@
-import { Check, ChevronRight } from "lucide-react";
+import { ChevronRight, Lock, Swords } from "lucide-react";
 import { href } from "../app/router";
 import { MODE_STYLE } from "../components/icons";
 import { AppHeader, Screen, TabBar } from "../components/Layout";
-import { findTopic, freePlayActivity } from "../content";
-import { GAME_MODES } from "../content/types";
+import { TierPips, useTierName } from "../components/Tier";
+import { freePlayActivity } from "../content";
+import { GAME_MODES, TIERS } from "../content/types";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
-import { useProgress } from "../progress/store";
+import { clearKey } from "../progress/model";
+import { progressActions, useProgress } from "../progress/store";
 
 export function FreePlayScreen() {
   const { t } = useI18n();
   const pack = useContent();
   const progress = useProgress();
-  const topic = findTopic(pack, pack.units[0].topicId)!;
+  const tierName = useTierName();
+  const { selected, unlocked } = progress.difficulty;
 
   return (
     <Screen withTabs>
       <AppHeader />
       <h1 className="screen-title">{t("free.title")}</h1>
-      <p className="screen-subtitle">{t("free.subtitle", { topic: topic.title })}</p>
-      <div className="mode-list">
+      <p className="screen-subtitle">{t("free.subtitle")}</p>
+
+      <div className="tier-tabs" role="radiogroup" aria-label={t("free.tier")}>
+        {TIERS.map((tier) => (
+          <button
+            key={tier}
+            type="button"
+            role="radio"
+            aria-checked={tier === selected}
+            disabled={tier > unlocked}
+            className={`tier-tab tier-${tier}${tier === selected ? " is-selected" : ""}`}
+            onClick={() => progressActions.selectTier(tier)}
+          >
+            {tier > unlocked && <Lock size={14} aria-hidden="true" />}
+            {tierName(tier)}
+          </button>
+        ))}
+      </div>
+
+      <nav className="mode-list" aria-label={t("free.title")}>
         {GAME_MODES.map((mode) => {
           const activity = freePlayActivity(pack, mode);
           if (!activity) return null;
-          const style = MODE_STYLE[mode];
-          const Icon = style.icon;
-          const record = progress.activities[activity.id];
-          const completed = Boolean(record?.firstCompletedAt);
+          const Icon = MODE_STYLE[mode].icon;
+          const cleared = TIERS.filter((tr) => progress.tierClears[clearKey(activity.id, tr)]);
           return (
-            <a key={mode} className={`card card--link mode-card accent-${style.accent}`} href={href({ name: "play", activityId: activity.id, from: "free" })}>
+            <a key={mode} className="mode-card" href={href({ name: "play", activityId: activity.id, from: "free" })}>
               <span className="mode-card__icon" aria-hidden="true">
-                <Icon size={30} strokeWidth={2.5} />
+                <Icon size={24} strokeWidth={2.4} />
               </span>
               <span className="mode-card__body">
                 <span className="mode-card__name">{t(`modes.${mode}.name`)}</span>
                 <span className="mode-card__desc">{t(`modes.${mode}.description`)}</span>
-                <span className="mode-card__status">
-                  {completed ? (
-                    <span className="pill pill--green">
-                      <Check size={14} strokeWidth={3} aria-hidden="true" /> {t("free.best", { n: record!.bestCorrect, total: record!.total })}
-                    </span>
-                  ) : (
-                    <span className="pill">{t("common.available")}</span>
-                  )}
-                  <span className="muted small">{activity.title}</span>
-                </span>
               </span>
-              <ChevronRight size={22} className="muted" aria-hidden="true" />
+              <TierPips cleared={(tr) => cleared.includes(tr)} label={cleared.map(tierName).join(", ") || t("free.tier")} />
+              <ChevronRight size={20} className="faint" aria-hidden="true" />
             </a>
           );
         })}
-      </div>
+      </nav>
+
+      <a className="row-link" href={href({ name: "multiplayer" })}>
+        <span className="row-link__icon" aria-hidden="true">
+          <Swords size={20} strokeWidth={2.4} />
+        </span>
+        <span className="row-link__text">
+          <span className="row-link__title">{t("free.duels")}</span>
+          <span className="row-link__meta">{t("free.duelsBody")}</span>
+        </span>
+        <span className="pill">{t("common.comingSoon")}</span>
+      </a>
       <TabBar current="free" />
     </Screen>
   );

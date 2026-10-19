@@ -1,9 +1,10 @@
-import { ChevronLeft, Flame, Gem, Gamepad2, House, Map, CircleUser, Crown } from "lucide-react";
+import { ChevronLeft, CircleUser, Flame, Gamepad2, Gem, House, Map } from "lucide-react";
 import type { ReactNode } from "react";
 import { href, navigate, type Route } from "../app/router";
 import { useI18n } from "../i18n";
 import { localDate } from "../lib/date";
 import { useProgress } from "../progress/store";
+import { levelForXp } from "../progress/levels";
 import { displayedStreak } from "../progress/streak";
 import { Avatar } from "./Avatar";
 
@@ -25,31 +26,27 @@ export function TopBar({ title, back, right }: { title: string; back: Route; rig
   );
 }
 
-/** Header for the main tabs: profile, streak, XP and a discreet Plus entry. */
+/** Compact status row for the main tabs: profile and level, streak, XP. */
 export function AppHeader() {
   const { t } = useI18n();
   const progress = useProgress();
-  const streak = displayedStreak(progress.streak, localDate());
-  const activeToday = progress.streak.lastActiveDate === localDate();
+  const today = localDate();
+  const streak = displayedStreak(progress.streak, today);
+  const activeToday = progress.streak.lastActiveDate === today;
   return (
-    <header className="app-header">
-      <a className="app-header__avatar" href={href({ name: "profile" })} aria-label={t("header.profileLabel")}>
-        <Avatar id={progress.profile.avatar} size={40} />
+    <header className="statusbar">
+      <a className="statusbar__avatar" href={href({ name: "profile" })} aria-label={t("header.profileLabel")}>
+        <Avatar id={progress.profile.avatar} size={36} />
+        <span className="statusbar__level">{t("home.levelShort", { n: levelForXp(progress.xp) })}</span>
       </a>
-      <div className="app-header__stats">
-        <span className={`chip chip--streak${activeToday ? " is-active" : ""}`} aria-label={t("header.streakLabel", { n: streak })}>
-          <Flame size={20} strokeWidth={2.6} fill={activeToday ? "currentColor" : "none"} aria-hidden="true" />
-          {streak}
-        </span>
-        <span className="chip chip--xp" aria-label={t("header.xpLabel", { n: progress.xp })}>
-          <Gem size={19} strokeWidth={2.6} aria-hidden="true" />
-          {progress.xp}
-        </span>
-      </div>
-      <a className="chip chip--plus" href={href({ name: "plus" })} aria-label={t("header.plusLabel")}>
-        <Crown size={17} strokeWidth={2.6} aria-hidden="true" />
-        {t("header.plus")}
-      </a>
+      <span className={`stat-chip${activeToday ? " is-hot" : ""}`} aria-label={t("header.streakLabel", { n: streak })}>
+        <Flame size={17} strokeWidth={2.6} fill={activeToday ? "currentColor" : "none"} aria-hidden="true" />
+        {streak}
+      </span>
+      <span className="stat-chip" aria-label={t("header.xpLabel", { n: progress.xp })}>
+        <Gem size={16} strokeWidth={2.6} aria-hidden="true" />
+        {progress.xp}
+      </span>
     </header>
   );
 }
