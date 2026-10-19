@@ -1,0 +1,133 @@
+.mascot {
+  overflow: visible;
+  display: block;
+}
+.mascot__float {
+  transform-origin: 100px 130px;
+  animation: lumi-float 3.2s ease-in-out infinite;
+}
+.mascot__glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lumi-glow 3.2s ease-in-out infinite;
+}
+.mascot__shadow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lumi-shadow 3.2s ease-in-out infinite;
+}
+.mascot__eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lumi-blink 4.6s infinite;
+}
+.mascot--happy .mascot__arm--right {
+  animation: lumi-wave 1.4s ease-in-out infinite;
+}
+.mascot--celebrating .mascot__float {
+  animation: lumi-hop 0.9s var(--ease-spring) infinite;
+}
+.mascot--celebrating .mascot__arm--left {
+  animation: lumi-cheer-l 0.9s ease-in-out infinite;
+}
+.mascot--celebrating .mascot__arm--right {
+  animation: lumi-cheer-r 0.9s ease-in-out infinite;
+}
+.mascot__sparkle {
+  animation: lumi-twinkle 1.4s ease-in-out infinite;
+}
+.mascot__sparkle--delay {
+  animation-delay: 0.7s;
+}
+.mascot__thought circle {
+  animation: lumi-think 1.8s ease-in-out infinite;
+}
+.mascot__thought circle:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.mascot__thought circle:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.mascot--encouraging .mascot__float {
+  animation: lumi-nod 1.6s ease-in-out infinite;
+}
+
+@keyframes lumi-float {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes lumi-glow {
+  50% {
+    transform: scale(1.06);
+    opacity: 0.8;
+  }
+}
+@keyframes lumi-shadow {
+  50% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+}
+@keyframes lumi-blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+@keyframes lumi-wave {
+  50% {
+    transform: rotate(-14deg);
+  }
+}
+@keyframes lumi-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-14px);
+  }
+}
+@keyframes lumi-cheer-l {
+  50% {
+    transform: rotate(12deg);
+  }
+}
+@keyframes lumi-cheer-r {
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+@keyframes lumi-twinkle {
+  0%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+@keyframes lumi-think {
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes lumi-nod {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  30% {
+    transform: translateY(-3px) rotate(-3deg);
+  }
+  60% {
+    transform: translateY(0) rotate(2deg);
+  }
+}

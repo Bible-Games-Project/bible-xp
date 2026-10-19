@@ -74,3 +74,33 @@ the next sync; if a rule you are adding applies to every game, it belongs in
 bgp-admin at `templates/agent-docs/`, so ask before adding it.
 
 <!-- BGP-ADMIN:END -->
+
+## Bible XP — project notes
+
+- Stack: Vite + React 19 + TypeScript, plain CSS (`src/theme/`), lucide-react
+  icons, self-hosted Nunito via `@fontsource-variable/nunito`. No router or state
+  library: a small hash router (`src/app/router.ts`) and a `useSyncExternalStore`
+  store (`src/progress/store.ts`). Hash routes need no server rewrites and no base
+  path, which keeps the Capacitor shell happy without touching build config.
+- The maintainer's spec asked for React Native/Expo; we stayed on the web stack
+  because bgp-admin owns the native wrapping. Do not add Expo or Capacitor code.
+- Commands: `bun run build` (runs `tsc -b` first), `bun run test` (vitest),
+  `bun run preview`. Playwright is not a dependency; for screenshots use the
+  globally installed one at `/opt/node-tools/node_modules/playwright` against
+  `bun run preview`.
+- Bible text: every literal quote must be verbatim World English Bible.
+  `src/content/content.test.ts` checks quotes, `“…”` fragments inside
+  explanations, and that every reference exists, against
+  `src/content/sources/web-genesis-1-3.json`. Curly quotes `“ ”` are reserved for
+  Bible wording; clues/questions must not contain them (also tested). WEB writes
+  “Yahweh God” and only names Adam from Genesis 3:17 on.
+- Progress is one JSON object (`src/progress/model.ts`), all mutations are pure
+  functions with tests. Bump `PROGRESS_VERSION` and extend `migrate()` when the
+  shape changes; never drop saved data.
+- XP amounts live only in `src/progress/rewards.ts`. Replays give XP once per
+  activity per day; the daily challenge once per date.
+- All UI text goes through `src/i18n/locales/en.ts`; only English exists. Do not
+  list languages that are not fully translated (the 12 planned languages were
+  not specified).
+- Multiplayer and Plus are intentionally "coming soon" (`src/config/features.ts`);
+  never show fake players, scores or completed payments.
