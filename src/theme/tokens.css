@@ -1,48 +1,54 @@
 /*
- * Bible XP design tokens: a single dark theme.
- * Deep navy base; gold is the one dominant accent (primary actions, rewards,
- * progress); cyan is the secondary accent (selection, information). Success
- * and danger are semantic only. Each difficulty tier owns one colour, used
- * only where that tier is shown.
+ * Bible XP design tokens: a light, vibrant theme.
+ * Warm light base with white cards and deep navy text. Indigo is the brand
+ * colour (headers, selection, navigation); gold marks the main action and
+ * rewards. Success and danger are semantic only. Each difficulty tier owns one
+ * colour, used only where that tier is shown.
  */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   /* Base */
-  --bg: #0b0f1c;
-  --bg-2: #10162a;
-  --surface: #161d33;
-  --surface-2: #1e2743;
-  --surface-3: #283255;
-  --line: #273152;
-  --line-strong: #36436d;
-  --text: #f4f6fb;
-  --text-2: #b0b9d2;
-  --text-3: #7783a6;
+  --bg: #fff7ec;
+  --bg-2: #fdeedb;
+  --surface: #ffffff;
+  --surface-2: #f6efe4;
+  --surface-3: #ebe2d3;
+  --line: #efe3d0;
+  --line-strong: #e0d0b8;
+  --text: #1d2042;
+  --text-2: #565a7c;
+  --text-3: #8a8ca6;
 
   /* Accents */
-  --gold: #ffc42e;
-  --gold-dark: #c98a00;
-  --gold-soft: rgb(255 196 46 / 0.14);
-  --on-gold: #1f1500;
-  --cyan: #2cc5ff;
-  --cyan-dark: #0a83bd;
-  --cyan-soft: rgb(44 197 255 / 0.14);
+  --gold: #ffbf1f;
+  --gold-dark: #e09200;
+  --gold-soft: #fff1c9;
+  --gold-text: #a86b00;
+  --on-gold: #2a1b00;
+  --brand: #5b47f5;
+  --brand-dark: #3d2bc7;
+  --brand-soft: #ece9ff;
+  --on-brand: #ffffff;
 
   /* Semantic */
-  --success: #2edb8a;
-  --success-dark: #14965a;
-  --success-soft: rgb(46 219 138 / 0.14);
-  --danger: #ff5a5f;
-  --danger-dark: #c2282f;
-  --danger-soft: rgb(255 90 95 / 0.14);
+  --success: #19b863;
+  --success-dark: #0f8a48;
+  --success-soft: #def7e8;
+  --danger: #f2404f;
+  --danger-dark: #b81f2d;
+  --danger-soft: #ffe4e6;
 
   /* Difficulty tiers */
-  --tier-1: #2edb8a;
-  --tier-2: #2cc5ff;
-  --tier-3: #a276ff;
-  --tier-4: #ff8c2b;
-  --tier-5: #ff4f8b;
+  --tier-1: #19b863;
+  --tier-2: #0b9fe0;
+  --tier-3: #7c4dff;
+  --tier-4: #f26b0f;
+  --tier-5: #e2367f;
+
+  /* Elevation */
+  --shadow: 0 2px 0 var(--line), 0 8px 24px rgb(29 32 66 / 0.06);
+  --shadow-lift: 0 12px 30px rgb(29 32 66 / 0.18);
 
   /* Shape */
   --radius-sm: 10px;

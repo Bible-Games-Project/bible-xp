@@ -84,14 +84,20 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   (`src/progress/store.ts`). Hash routes need no server rewrites and no base path.
 - The maintainer's first spec asked for React Native/Expo; we stayed on the web
   stack because bgp-admin owns the native wrapping. Do not add Expo or Capacitor.
-- Visual identity (maintainer decision): dark only. Navy base, gold is the single
-  dominant accent (primary actions, rewards), cyan the secondary (selection).
-  Each difficulty tier has one colour (`--tier-1..5`), used only where a tier is
-  shown. Game modes are told apart by icon, not colour. Tokens in
+- Visual identity (maintainer decision, replaces an earlier dark theme the
+  maintainer found too dark and uninviting): light and vibrant. Warm light
+  background, white cards, deep navy text, indigo `--brand` for headers and
+  selection, gold for the main action and rewards (use `--gold-text` for gold
+  text/icons on light surfaces). Each difficulty tier has one colour
+  (`--tier-1..5`), used only where a tier is shown. Tokens in
   `src/theme/tokens.css`; never hard-code colours in components.
-- The path must not look like Duolingo (maintainer decision): it is the
-  "Atlas" — a region map (`src/components/EdenMap.tsx`) plus an expedition log.
-  No winding trail of round buttons.
+- The learning path is called "Journey" (maintainer decision; "Atlas" and an
+  Eden river map were rejected). Every Bible story is a chapter with its own
+  winding road of square milestone stones with labels beside them
+  (`src/components/JourneyRoad.tsx`). It must stay generic for any story and
+  look Duolingo-like in spirit but not a copy: no round buttons, no popovers.
+- Match the Pairs must make the left-to-right linking obvious: column titles,
+  a changing hint line, highlighted waiting column, numbered matched pairs.
 - Commands: `bun run build` (runs `tsc -b` first), `bun run test` (vitest),
   `bun run preview`. Playwright is not a dependency; for screenshots use the
   global one at `/opt/node-tools/node_modules/playwright` against
@@ -117,5 +123,5 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   not specified).
 - Multiplayer (Duels) and Plus are intentionally "coming soon"
   (`src/config/features.ts`); never show fake players, scores or payments.
-- CSS trap: a selector like `.atlas-map svg` also hits icon SVGs nested in the
-  map; scope with `>`.
+- CSS trap: a selector like `.foo svg` also hits icon SVGs nested inside an
+  illustration; scope with `>`.

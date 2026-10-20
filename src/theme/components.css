@@ -118,7 +118,7 @@
   white-space: nowrap;
 }
 .stat-chip.is-hot {
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .stat-chip svg {
   flex: none;
@@ -136,7 +136,7 @@
   justify-content: center;
   gap: 4px;
   padding: 6px max(var(--gutter), calc((100% - var(--max-width)) / 2 + var(--gutter))) calc(var(--safe-bottom) + 6px);
-  background: rgb(11 15 28 / 0.92);
+  background: rgb(255 255 255 / 0.95);
   backdrop-filter: blur(14px);
   border-top: 1px solid var(--line);
 }
@@ -161,7 +161,7 @@
   transition: transform 0.2s var(--ease-spring);
 }
 .tabbar__item.is-active {
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .tabbar__item.is-active .tabbar__icon {
   background: var(--gold-soft);
@@ -225,14 +225,14 @@
   --b-text: var(--text);
 }
 .btn--blue {
-  --b: var(--cyan);
-  --b-dark: var(--cyan-dark);
-  --b-text: #00121c;
+  --b: var(--brand);
+  --b-dark: var(--brand-dark);
+  --b-text: var(--on-brand);
 }
 .btn--success {
   --b: var(--success);
   --b-dark: var(--success-dark);
-  --b-text: #00170b;
+  --b-text: #fff;
 }
 .btn--coral {
   --b: var(--danger);
@@ -243,7 +243,7 @@
   --b: transparent;
   --b-dark: transparent;
   --b-text: var(--danger);
-  border: 1.5px solid rgb(255 90 95 / 0.45);
+  border: 1.5px solid rgb(242 64 79 / 0.4);
 }
 .btn--ghost {
   --b: transparent;
@@ -308,14 +308,14 @@
 }
 .pill--gold {
   background: var(--gold-soft);
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .pill--coral {
   background: var(--danger-soft);
   color: var(--danger);
 }
 .pill--light {
-  background: rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.2);
   color: var(--text);
 }
 
@@ -372,18 +372,18 @@
 .banner--yellow,
 .banner--violet {
   background: var(--gold-soft);
-  color: var(--gold);
-  border-color: rgb(255 196 46 / 0.3);
+  color: var(--gold-text);
+  border-color: #ffe08a;
 }
 .banner--green {
   background: var(--success-soft);
   color: var(--success);
-  border-color: rgb(46 219 138 / 0.3);
+  border-color: #b5ebcc;
 }
 .banner--coral {
   background: var(--danger-soft);
   color: var(--danger);
-  border-color: rgb(255 90 95 / 0.3);
+  border-color: #ffc2c7;
 }
 
 /* ---------------------------------------------------------------- Progress */
@@ -409,7 +409,7 @@
   background: var(--success);
 }
 .progress--blue .progress__fill {
-  background: var(--cyan);
+  background: var(--brand);
 }
 .progress--tier .progress__fill {
   background: var(--tier);
@@ -427,7 +427,7 @@
   display: grid;
   place-items: center;
   padding: var(--gutter);
-  background: rgb(3 5 12 / 0.7);
+  background: rgb(29 32 66 / 0.45);
   animation: fade-in 0.2s;
 }
 .overlay--sheet {
@@ -599,7 +599,7 @@
 }
 .input:focus {
   outline: none;
-  border-color: var(--cyan);
+  border-color: var(--brand);
 }
 
 /* ---------------------------------------------------------------- Empty states */

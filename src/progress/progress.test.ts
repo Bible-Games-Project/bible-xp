@@ -331,7 +331,7 @@ describe("home recommendation", async () => {
   const { recommend } = await import("./recommend");
   const pack = getContent("en");
 
-  it("follows the Atlas, then asks for clears at the current tier, then practice", () => {
+  it("follows the Journey, then asks for clears at the current tier, then practice", () => {
     let data = defaultProgress();
     expect(recommend(data, pack)).toEqual({ kind: "intro", introId: "creation.intro" });
     data = completeIntro(data, "creation.intro", TODAY, NOW, units).data;

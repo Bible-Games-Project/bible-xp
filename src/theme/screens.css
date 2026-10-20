@@ -9,17 +9,14 @@
 
 /* The one primary action. */
 .quest {
-  position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   padding: var(--space-5) var(--space-5) var(--space-4);
   border-radius: var(--radius-lg);
-  background:
-    radial-gradient(90% 70% at 85% 30%, rgb(255 196 46 / 0.16), transparent 60%),
-    var(--surface);
-  border: 1px solid var(--line);
+  background: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 6px 0 var(--brand-dark);
 }
 .quest__top {
   display: flex;
@@ -33,6 +30,16 @@
   flex-direction: column;
   gap: var(--space-2);
 }
+.quest__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+}
 .quest__title {
   font-family: var(--font-display);
   font-weight: 400;
@@ -45,45 +52,33 @@
   align-items: center;
   gap: var(--space-2);
   flex-wrap: wrap;
-  color: var(--text-2);
   font-size: var(--fs-sm);
   font-weight: 750;
+}
+.quest__meta .tier-badge {
+  background: var(--surface);
+}
+.quest__story {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  opacity: 0.95;
+}
+.quest__story .progress {
+  flex: none;
+  background: rgb(255 255 255 / 0.25);
 }
 .quest__mascot {
   flex: none;
   margin: -12px -10px -20px 0;
 }
 
-/* Compact tier progress line under the hero. */
-.climb {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius);
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-}
-.climb__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-.climb__label {
-  font-weight: 850;
-  font-size: var(--fs-sm);
-}
-.climb__meta {
-  font-size: var(--fs-xs);
-  font-weight: 800;
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-}
-
 .row-link {
   display: flex;
   align-items: center;
+  box-shadow: var(--shadow);
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius);
@@ -101,8 +96,19 @@
   height: 40px;
   border-radius: 12px;
   background: var(--gold-soft);
-  color: var(--gold);
+  color: var(--gold-text);
   flex: none;
+}
+.row-link__icon--tier {
+  background: color-mix(in srgb, var(--tier) 14%, transparent);
+  color: var(--tier);
+}
+.row-link--stack .row-link__text {
+  gap: 4px;
+}
+.row-link--stack .progress {
+  flex: none;
+  margin-top: 4px;
 }
 .row-link.is-done .row-link__icon {
   background: var(--success-soft);
@@ -123,296 +129,236 @@
   font-weight: 700;
 }
 
-/* ---------------------------------------------------------------- Atlas */
+/* ---------------------------------------------------------------- Journey */
 
-.region {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-.region__head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-.region__title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--fs-2xl);
-  line-height: 1;
-}
-.region__stats {
-  text-align: right;
-  font-size: var(--fs-xs);
-  font-weight: 800;
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-}
-
-.atlas-map {
+.story-head {
   position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
   border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--line);
-  background: var(--bg-2);
+  background: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 5px 0 var(--brand-dark);
 }
-.atlas-map > svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.atlas-map__caption {
-  margin-top: calc(var(--space-2) * -1);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  color: var(--text-3);
-}
-.map-site {
-  cursor: pointer;
-  outline: none;
-}
-.map-site__ring {
-  fill: none;
-  stroke: var(--cyan);
-  stroke-width: 2.5;
-  opacity: 0;
-}
-.map-site.is-selected .map-site__ring {
-  opacity: 1;
-}
-.map-site:focus-visible .map-site__ring {
-  opacity: 1;
-  stroke-dasharray: 4 3;
-}
-.map-site__gem {
-  stroke-width: 2;
-  transform: rotate(45deg);
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform 0.15s var(--ease-spring);
-}
-.map-site:active .map-site__gem {
-  transform: rotate(45deg) scale(0.88);
-}
-.map-site--locked .map-site__gem {
-  fill: var(--surface-2);
-  stroke: var(--line-strong);
-}
-.map-site--available .map-site__gem,
-.map-site--in-progress .map-site__gem {
-  fill: var(--bg);
-  stroke: var(--gold);
-}
-.map-site--completed .map-site__gem {
-  fill: var(--gold);
-  stroke: var(--gold);
-}
-.map-site__icon {
-  pointer-events: none;
-}
-.map-site--locked .map-site__icon {
-  color: var(--text-3);
-}
-.map-site--available .map-site__icon,
-.map-site--in-progress .map-site__icon {
-  color: var(--gold);
-}
-.map-site--completed .map-site__icon {
-  color: var(--on-gold);
-}
-.map-site__num {
-  font-family: var(--font-display);
-  font-size: 11px;
-  fill: var(--text-3);
-  letter-spacing: 0.05em;
-}
-.map-site.is-selected .map-site__num {
-  fill: var(--cyan);
-}
-.map-site__pulse {
-  fill: none;
-  stroke: var(--gold);
-  stroke-width: 2;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: site-pulse 1.8s ease-out infinite;
-}
-@keyframes site-pulse {
-  from {
-    opacity: 0.8;
-    transform: rotate(45deg) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: rotate(45deg) scale(1.8);
-  }
-}
-.map-bg {
-  fill: var(--bg-2);
-}
-.map-contour {
-  fill: none;
-  stroke: var(--line);
-  stroke-width: 1;
-  stroke-dasharray: 2 5;
-}
-.map-river {
-  fill: none;
-  stroke: var(--cyan);
-  stroke-width: 3;
-  stroke-linecap: round;
-  opacity: 0.45;
-}
-.map-river-label {
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  fill: var(--cyan);
-  opacity: 0.75;
-}
-.map-land-label {
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.2em;
-  fill: var(--text-3);
-}
-.map-garden {
-  fill: rgb(46 219 138 / 0.12);
-  stroke: rgb(46 219 138 / 0.35);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 3;
-}
-.map-garden-label {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.25em;
-  fill: var(--success);
-  opacity: 0.85;
-}
-.map-route {
-  fill: none;
-  stroke: var(--text-3);
-  stroke-width: 1.5;
-  stroke-dasharray: 4 5;
-  opacity: 0.7;
-}
-.map-route--done {
-  stroke: var(--gold);
-  stroke-dasharray: none;
-  opacity: 0.8;
-}
-
-.site-panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--line);
-}
-.site-panel__head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-.site-panel__icon {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: var(--gold-soft);
-  color: var(--gold);
-  flex: none;
-}
-.site-panel__title {
-  font-size: var(--fs-lg);
-}
-.site-panel__sub {
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-}
-.site-panel__foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  font-size: var(--fs-xs);
-  font-weight: 800;
-  color: var(--text-3);
-}
-.site-panel__locked {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: var(--bg-2);
-  color: var(--text-2);
-  font-weight: 800;
-  font-size: var(--fs-sm);
-}
-
-.log {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  overflow: hidden;
-}
-.log__item + .log__item {
-  border-top: 1px solid var(--line);
-}
-.log__btn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 56px;
-  padding: 8px 14px;
-  border: 0;
-  background: var(--surface);
-  text-align: left;
-}
-.log__btn.is-selected {
-  background: var(--surface-2);
-  box-shadow: inset 3px 0 0 var(--cyan);
-}
-.log__num {
-  width: 28px;
-  font-family: var(--font-display);
-  font-size: var(--fs-md);
-  color: var(--text-3);
-  text-align: center;
-  flex: none;
-}
-.log__name {
+.story-head__text {
   flex: 1;
   min-width: 0;
-  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
-.log__btn.is-locked .log__name {
-  color: var(--text-3);
-}
-.status {
+.story-head__eyebrow {
   font-size: var(--fs-xs);
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
+  letter-spacing: 0.1em;
+  opacity: 0.85;
 }
-.status--locked {
+.story-head__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-2xl);
+  line-height: 1.05;
+}
+.story-head__meta {
+  font-size: var(--fs-sm);
+  font-weight: 750;
+  opacity: 0.9;
+}
+.story-head .progress {
+  flex: none;
+  margin-top: 6px;
+  background: rgb(255 255 255 / 0.25);
+}
+.story-head .mascot {
+  flex: none;
+  margin: -10px -6px -14px 0;
+}
+
+/* The road: a fixed-width column so the drawn path and the stops line up. */
+.road {
+  position: relative;
+  width: 340px;
+  max-width: 100%;
+  margin: var(--space-2) auto 0;
+}
+.road__svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.road__bed {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 18;
+  stroke-linecap: round;
+}
+.road__dash {
+  fill: none;
+  stroke: var(--surface);
+  stroke-width: 3;
+  stroke-dasharray: 2 12;
+  stroke-linecap: round;
+}
+.road__done {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 18;
+  stroke-linecap: round;
+}
+.stop {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  padding: 0;
+  background: none;
+  text-align: left;
+}
+.stop--left {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+.stop__stone {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 3px solid var(--line-strong);
+  color: var(--text-3);
+  box-shadow: 0 5px 0 var(--line-strong);
+  transition: transform 0.1s;
+}
+.stop:active .stop__stone {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--line-strong);
+}
+.stop--completed .stop__stone {
+  background: var(--gold);
+  border-color: var(--gold-dark);
+  color: var(--on-gold);
+  box-shadow: 0 5px 0 var(--gold-dark);
+}
+.stop--available .stop__stone,
+.stop--in-progress .stop__stone {
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+  background: var(--brand);
+  border-color: var(--brand-dark);
+  color: var(--on-brand);
+  box-shadow: 0 6px 0 var(--brand-dark);
+}
+.stop--available .stop__stone::after,
+.stop--in-progress .stop__stone::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 30px;
+  border: 3px solid var(--brand);
+  opacity: 0.35;
+  animation: stop-ring 1.8s ease-in-out infinite;
+}
+@keyframes stop-ring {
+  50% {
+    transform: scale(1.06);
+    opacity: 0.12;
+  }
+}
+.stop__label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 146px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.stop--locked .stop__label {
+  background: transparent;
+  box-shadow: none;
+}
+.stop__name {
+  font-weight: 900;
+  font-size: var(--fs-sm);
+  line-height: 1.2;
+  color: var(--text);
+}
+.stop--locked .stop__name {
   color: var(--text-3);
 }
-.status--available,
-.status--in-progress {
-  color: var(--gold);
+.stop__state {
+  font-size: var(--fs-xs);
+  font-weight: 850;
+  color: var(--text-3);
 }
-.status--completed {
+.stop--completed .stop__state {
   color: var(--success);
+}
+.stop__go {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--on-gold);
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 3px 0 var(--gold-dark);
+}
+.stop--left .stop__go {
+  align-self: flex-end;
+}
+.stop__hint {
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  color: var(--danger);
+}
+.stop.is-shaking .stop__stone {
+  animation: shake 0.4s;
+}
+.stop--finish .stop__stone {
+  background: var(--surface-2);
+  border-style: dashed;
+  box-shadow: none;
+}
+.stop--finish.is-won .stop__stone {
+  background: var(--gold);
+  border: 3px solid var(--gold-dark);
+  color: var(--on-gold);
+  box-shadow: 0 5px 0 var(--gold-dark);
+}
+
+.soon-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  border: 2px dashed var(--line-strong);
+  color: var(--text-2);
+}
+.soon-card__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--text-3);
+  flex: none;
 }
 
 /* ---------------------------------------------------------------- Difficulty */
@@ -581,7 +527,7 @@
   height: 48px;
   border-radius: 14px;
   background: var(--gold-soft);
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .mode-card__body {
   flex: 1;
@@ -758,7 +704,7 @@
   font-weight: 400;
   font-size: 2.5rem;
   line-height: 1;
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .results__subtitle {
   color: var(--text-2);
@@ -803,7 +749,7 @@
   font-variant-numeric: tabular-nums;
 }
 .stat-tile--xp .stat-tile__value {
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .results__note {
   text-align: center;
@@ -894,7 +840,7 @@
   height: 40px;
   border-radius: 12px;
   background: var(--gold-soft);
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .intro-card p {
   color: var(--text-2);
@@ -1022,7 +968,7 @@
 }
 .feature-list svg {
   flex: none;
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .price-card {
   display: flex;
@@ -1030,7 +976,7 @@
   gap: 12px;
 }
 .price-card svg {
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .price-card__price {
   font-weight: 900;

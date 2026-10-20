@@ -23,8 +23,9 @@ bun run test       # unit and content tests (vitest)
 
 - **Home** — one primary action (the next thing to play), a compact line
   showing progress toward the next difficulty tier, and the Daily Challenge.
-- **Atlas** — the learning path as a region map. Region I, Eden (Genesis 1–3),
-  has seven sites: an introduction and the six games, unlocked in order.
+- **Journey** — the learning path. Each Bible story is a chapter with a
+  winding road of stops; Story 1, The Creation (Genesis 1–3), has seven stops:
+  an introduction and the six games, unlocked in order.
 - **Six games** — Form the Word, Match the Pairs, Bible Quiz, Complete the
   Verse, Put the Story in Order (drag or arrow buttons), Who Am I?
 - **Difficulty tiers** — Beginner, Explorer, Scholar, Expert, Master. Each game

@@ -13,7 +13,7 @@ export type Recommendation =
 
 /**
  * 1. Finish a game already under way at the current tier.
- * 2. Otherwise follow the Atlas to the next unexplored site.
+ * 2. Otherwise follow the Journey to the next stop.
  * 3. Otherwise clear a game not yet cleared at the current tier.
  * 4. Otherwise practise the game played least at this tier.
  */

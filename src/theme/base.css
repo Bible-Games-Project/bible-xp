@@ -61,7 +61,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid var(--cyan);
+  outline: 3px solid var(--brand);
   outline-offset: 3px;
 }
 
@@ -97,18 +97,18 @@ a {
   color: var(--success);
 }
 .text-gold {
-  color: var(--gold);
+  color: var(--gold-text);
 }
 
 /* Accent helpers for icon tiles: a strong colour and its soft wash. */
 .accent-gold {
-  --accent: var(--gold);
+  --accent: var(--gold-text);
   --accent-soft: var(--gold-soft);
 }
 .accent-cyan,
 .accent-blue {
-  --accent: var(--cyan);
-  --accent-soft: var(--cyan-soft);
+  --accent: var(--brand);
+  --accent-soft: var(--brand-soft);
 }
 .accent-green {
   --accent: var(--success);
@@ -120,10 +120,10 @@ a {
 }
 .accent-violet {
   --accent: var(--tier-3);
-  --accent-soft: rgb(162 118 255 / 0.16);
+  --accent-soft: #efe8ff;
 }
 .accent-yellow {
-  --accent: var(--gold);
+  --accent: var(--gold-text);
   --accent-soft: var(--gold-soft);
 }
 

@@ -1,4 +1,4 @@
-import { ChevronLeft, CircleUser, Flame, Gamepad2, Gem, House, Map } from "lucide-react";
+import { ChevronLeft, CircleUser, Flame, Gamepad2, Gem, House, Route as RouteIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { href, navigate, type Route } from "../app/router";
 import { useI18n } from "../i18n";
@@ -53,7 +53,7 @@ export function AppHeader() {
 
 const TABS = [
   { route: { name: "home" } as Route, icon: House, key: "nav.home" as const },
-  { route: { name: "path" } as Route, icon: Map, key: "nav.path" as const },
+  { route: { name: "path" } as Route, icon: RouteIcon, key: "nav.path" as const },
   { route: { name: "free" } as Route, icon: Gamepad2, key: "nav.free" as const },
   { route: { name: "profile" } as Route, icon: CircleUser, key: "nav.profile" as const },
 ];
