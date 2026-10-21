@@ -62,7 +62,8 @@ export function HomeScreen() {
   const daily = dailyChallengeFor(pack, today, dailyTier);
 
   return (
-    <Screen withTabs>
+    <Screen withTabs className={progress.settings.homeScene ? "screen--scene" : ""}>
+      {progress.settings.homeScene && <div className="home-scene" aria-hidden="true" />}
       <AppHeader />
       <h1 className="sr-only">{name ? t("home.greeting", { name }) : t("home.greetingGuest")}</h1>
 

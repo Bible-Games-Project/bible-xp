@@ -98,6 +98,10 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   winding road of square milestone stones with labels beside them
   (`src/components/JourneyRoad.tsx`). It must stay generic for any story and
   look Duolingo-like in spirit but not a copy: no round buttons, no popovers.
+- Home can show an illustrated landscape (`src/assets/home-background.webp`,
+  supplied by the maintainer) instead of the plain background. It is a setting
+  (`settings.homeScene`, Settings → Preferences, on by default) added so the
+  maintainer can compare both; drop the setting once they decide.
 - Match the Pairs must make the left-to-right linking obvious: column titles,
   a changing hint line, highlighted waiting column, numbered matched pairs.
 - Commands: `bun run build` (runs `tsc -b` first), `bun run test` (vitest),

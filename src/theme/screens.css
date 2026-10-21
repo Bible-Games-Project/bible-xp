@@ -1098,3 +1098,32 @@
   font-weight: 800;
   color: var(--text-3);
 }
+
+/* Optional illustrated background behind Home (Settings → Preferences). */
+.home-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--bg) url("../assets/home-background.webp") center bottom / cover no-repeat;
+}
+.screen--scene > :not(.home-scene) {
+  position: relative;
+  z-index: 1;
+}
+.screen--scene > .tabbar {
+  position: fixed;
+  z-index: 20;
+}
+.screen--scene .statusbar__avatar {
+  padding: 2px 12px 2px 2px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.85);
+  flex: none;
+}
+.screen--scene .statusbar {
+  justify-content: flex-start;
+}
+.screen--scene .statusbar__avatar + .stat-chip {
+  margin-left: auto;
+}

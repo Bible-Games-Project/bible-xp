@@ -270,6 +270,8 @@ const en = {
     reduceMotion: "Reduce motion",
     reduceMotionSystem: "Following your device setting",
     largeText: "Larger text",
+    homeScene: "Illustrated Home background",
+    homeSceneHint: "A landscape behind Home instead of a plain colour",
     accessibility: "Accessibility",
     preferences: "Preferences",
     about: "About Bible XP",
