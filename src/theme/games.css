@@ -139,15 +139,15 @@
   border-top: 2px solid;
   background: var(--surface);
   animation: sheet-in 0.3s var(--ease-out);
-  box-shadow: 0 -12px 40px rgb(29 32 66 / 0.18);
+  box-shadow: var(--shadow-lift);
 }
 .feedback--correct {
   border-color: var(--success);
-  background: linear-gradient(to bottom, rgb(46 219 138 / 0.1), transparent 120px), var(--surface);
+  background: linear-gradient(to bottom, var(--success-soft), var(--surface) 120px);
 }
 .feedback--incorrect {
   border-color: var(--danger);
-  background: linear-gradient(to bottom, rgb(255 90 95 / 0.1), transparent 120px), var(--surface);
+  background: linear-gradient(to bottom, var(--danger-soft), var(--surface) 120px);
 }
 .feedback__head {
   display: flex;
@@ -484,9 +484,9 @@
     opacity 0.3s;
 }
 .match-card--left {
-  background: #f4f2ff;
-  border-color: #d7d0ff;
-  box-shadow: 0 4px 0 #d7d0ff;
+  background: var(--brand-tint);
+  border-color: var(--brand-line);
+  box-shadow: 0 4px 0 var(--brand-line);
 }
 .match-card:active:not(:disabled) {
   transform: translateY(4px);
@@ -678,8 +678,8 @@
   width: 30px;
   height: 30px;
   border-radius: 9px;
-  background: var(--surface-2);
-  color: var(--gold-text);
+  background: var(--gold-soft);
+  color: var(--warm-icon);
   font-family: var(--font-display);
   font-size: var(--fs-md);
 }

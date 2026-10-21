@@ -87,7 +87,7 @@ export function ProfileScreen() {
       <div className="rank-cards">
         <a className="rank-card" href={href({ name: "settings" })}>
           <span className="rank-card__label">{t("profile.difficulty")}</span>
-          <span className={`rank-card__value tier-${progress.difficulty.selected}`} style={{ color: "var(--tier)" }}>
+          <span className="rank-card__value">
             {tierName(progress.difficulty.selected)}
           </span>
           <span className="rank-card__meta">{t("train.change")}</span>

@@ -48,9 +48,6 @@
   font-size: var(--fs-sm);
   font-weight: 750;
 }
-.quest__meta .tier-badge {
-  background: var(--surface);
-}
 .quest__story {
   display: flex;
   flex-direction: column;
@@ -89,7 +86,7 @@
   height: 40px;
   border-radius: 12px;
   background: var(--gold-soft);
-  color: var(--gold-text);
+  color: var(--warm-icon);
   flex: none;
 }
 .row-link--stack .row-link__text {
@@ -386,15 +383,20 @@
   background: var(--surface-3);
 }
 .tier-plate.is-selected {
-  border-color: var(--tier);
-  background: color-mix(in srgb, var(--tier) 8%, var(--surface));
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  box-shadow: 0 0 0 1px var(--brand);
 }
 .tier-plate__num {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--tier);
+  color: var(--on-tier);
   font-family: var(--font-display);
-  font-size: var(--fs-xl);
-  color: var(--tier);
-  width: 28px;
-  text-align: center;
+  font-size: var(--fs-lg);
   flex: none;
 }
 .tier-plate.is-locked .tier-plate__num {
@@ -433,9 +435,9 @@
   flex: none;
 }
 .tier-plate.is-selected .tier-plate__check {
-  background: var(--tier);
-  border-color: var(--tier);
-  color: #fff;
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
 }
 
 /* ---------------------------------------------------------------- Play (Free Play) */
@@ -500,7 +502,7 @@
   height: 48px;
   border-radius: 14px;
   background: var(--gold-soft);
-  color: var(--gold-text);
+  color: var(--warm-icon);
 }
 .mode-card__body {
   flex: 1;
@@ -677,7 +679,7 @@
   font-weight: 400;
   font-size: 2.5rem;
   line-height: 1;
-  color: var(--gold-text);
+  color: var(--warm-icon);
 }
 .results__subtitle {
   color: var(--text-2);
@@ -799,7 +801,7 @@
   height: 40px;
   border-radius: 12px;
   background: var(--gold-soft);
-  color: var(--gold-text);
+  color: var(--warm-icon);
 }
 .intro-card p {
   color: var(--text-2);
@@ -848,7 +850,7 @@
   padding: 22px 20px 24px;
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(80% 60% at 50% 0%, rgb(255 196 46 / 0.14), transparent 70%),
+    radial-gradient(80% 60% at 50% 0%, color-mix(in srgb, var(--flame-2) 20%, transparent), transparent 70%),
     var(--surface);
   border: 1px solid var(--line);
 }
@@ -927,7 +929,7 @@
 }
 .feature-list svg {
   flex: none;
-  color: var(--gold-text);
+  color: var(--warm-icon);
 }
 .price-card {
   display: flex;
@@ -935,7 +937,7 @@
   gap: 12px;
 }
 .price-card svg {
-  color: var(--gold-text);
+  color: var(--warm-icon);
 }
 .price-card__price {
   font-weight: 900;

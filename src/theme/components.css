@@ -118,7 +118,7 @@
   white-space: nowrap;
 }
 .stat-chip.is-hot {
-  color: var(--gold-text);
+  color: var(--warm-icon);
 }
 .stat-chip svg {
   flex: none;
@@ -161,10 +161,10 @@
   transition: transform 0.2s var(--ease-spring);
 }
 .tabbar__item.is-active {
-  color: var(--gold-text);
+  color: var(--brand);
 }
 .tabbar__item.is-active .tabbar__icon {
-  background: var(--gold-soft);
+  background: var(--brand-soft);
 }
 .tabbar__item:active .tabbar__icon {
   transform: scale(0.92);
@@ -243,7 +243,7 @@
   --b: transparent;
   --b-dark: transparent;
   --b-text: var(--danger);
-  border: 1.5px solid rgb(242 64 79 / 0.4);
+  border: 1.5px solid color-mix(in srgb, var(--danger) 40%, transparent);
 }
 .btn--ghost {
   --b: transparent;
@@ -326,8 +326,8 @@
   gap: 6px;
   padding: 3px 10px 3px 8px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--tier) 16%, transparent);
-  color: var(--tier);
+  background: var(--tier);
+  color: var(--on-tier);
   font-size: var(--fs-xs);
   font-weight: 900;
   text-transform: uppercase;
@@ -337,7 +337,7 @@
 .tier-badge__gem {
   width: 9px;
   height: 9px;
-  background: var(--tier);
+  background: var(--on-tier);
   transform: rotate(45deg);
   border-radius: 2px;
 }
@@ -373,17 +373,17 @@
 .banner--violet {
   background: var(--gold-soft);
   color: var(--gold-text);
-  border-color: #ffe08a;
+  border-color: var(--flame-2);
 }
 .banner--green {
   background: var(--success-soft);
   color: var(--success);
-  border-color: #b5ebcc;
+  border-color: color-mix(in srgb, var(--success) 30%, transparent);
 }
 .banner--coral {
   background: var(--danger-soft);
   color: var(--danger);
-  border-color: #ffc2c7;
+  border-color: color-mix(in srgb, var(--danger) 30%, transparent);
 }
 
 /* ---------------------------------------------------------------- Progress */
@@ -427,7 +427,7 @@
   display: grid;
   place-items: center;
   padding: var(--gutter);
-  background: rgb(29 32 66 / 0.45);
+  background: rgb(0 22 117 / 0.4);
   animation: fade-in 0.2s;
 }
 .overlay--sheet {

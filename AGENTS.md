@@ -84,13 +84,15 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   (`src/progress/store.ts`). Hash routes need no server rewrites and no base path.
 - The maintainer's first spec asked for React Native/Expo; we stayed on the web
   stack because bgp-admin owns the native wrapping. Do not add Expo or Capacitor.
-- Visual identity (maintainer decision, replaces an earlier dark theme the
-  maintainer found too dark and uninviting): light and vibrant. Warm light
-  background, white cards, deep navy text, indigo `--brand` for headers and
-  selection, gold for the main action and rewards (use `--gold-text` for gold
-  text/icons on light surfaces). Each difficulty tier has one colour
-  (`--tier-1..5`), used only where a tier is shown. Tokens in
+- Visual identity (maintainer decision): light and vibrant, built from the
+  mascot. Warm colours are Lumi's own flame colours (`--flame-1..7`, `--ember`)
+  and every blue is the exact complement (RGB inverse) of a flame colour
+  (`--sky-1..3`): navy text, blue for headers/navigation/selection, gold for the
+  main action and rewards, the flame ramp for difficulty tiers (hotter = harder).
+  Green/red only mark right and wrong answers. Tokens live in
   `src/theme/tokens.css`; never hard-code colours in components.
+  `src/theme/palette.test.ts` checks the flame↔complement pairs and contrast,
+  so if the mascot's colours change, change the tokens with them.
 - The learning path is called "Journey" (maintainer decision; "Atlas" and an
   Eden river map were rejected). Every Bible story is a chapter with its own
   winding road of square milestone stones with labels beside them

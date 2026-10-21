@@ -102,7 +102,7 @@ a {
 
 /* Accent helpers for icon tiles: a strong colour and its soft wash. */
 .accent-gold {
-  --accent: var(--gold-text);
+  --accent: var(--warm-icon);
   --accent-soft: var(--gold-soft);
 }
 .accent-cyan,
@@ -120,10 +120,10 @@ a {
 }
 .accent-violet {
   --accent: var(--tier-3);
-  --accent-soft: #efe8ff;
+  --accent-soft: var(--brand-soft);
 }
 .accent-yellow {
-  --accent: var(--gold-text);
+  --accent: var(--warm-icon);
   --accent-soft: var(--gold-soft);
 }
 
