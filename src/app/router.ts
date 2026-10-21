@@ -8,9 +8,8 @@ import { useEffect, useSyncExternalStore } from "react";
 export type Route =
   | { name: "home" }
   | { name: "path" }
-  | { name: "free" }
+  | { name: "train" }
   | { name: "profile" }
-  | { name: "difficulty" }
   | { name: "settings" }
   | { name: "about" }
   | { name: "privacy" }
@@ -27,9 +26,8 @@ export type Route =
 const STATIC: Record<string, Route["name"]> = {
   "": "home",
   path: "path",
-  free: "free",
+  train: "train",
   profile: "profile",
-  difficulty: "difficulty",
   settings: "settings",
   about: "about",
   privacy: "privacy",

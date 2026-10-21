@@ -9,10 +9,13 @@ import { LANGUAGES, useI18n } from "../i18n";
 import { canVibrate } from "../lib/feedback";
 import { getStorageStatus, progressActions, useProgress } from "../progress/store";
 import { prefersReducedMotion } from "../app/preferences";
+import { tierKey } from "../components/Tier";
+import { TIERS } from "../content/types";
+import { REWARDS } from "../progress/rewards";
 
 export function SettingsScreen() {
   const { t } = useI18n();
-  const { settings } = useProgress();
+  const { settings, difficulty } = useProgress();
   const [resetOpen, setResetOpen] = useState(false);
   const vibrationSupported = canVibrate();
   const systemReduced = prefersReducedMotion();
@@ -28,6 +31,34 @@ export function SettingsScreen() {
           {t("settings.storageError")}
         </div>
       )}
+
+      <h2 className="section-heading">{t("difficulty.title")}</h2>
+      <p className="muted small">{t("difficulty.intro")}</p>
+      <div className="tier-list" role="radiogroup" aria-label={t("difficulty.title")}>
+        {TIERS.map((tier) => {
+          const selected = tier === difficulty.selected;
+          return (
+            <button
+              key={tier}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              className={`tier-plate tier-${tier}${selected ? " is-selected" : ""}`}
+              onClick={() => progressActions.selectTier(tier)}
+            >
+              <span className="tier-plate__num">{tier}</span>
+              <span className="tier-plate__text">
+                <span className="tier-plate__name">{t(tierKey(tier, "name"))}</span>
+                <span className="tier-plate__desc">{t(tierKey(tier, "description"))}</span>
+                <span className="tier-plate__xp">{t("difficulty.xp", { n: REWARDS.stepXp[tier] })}</span>
+              </span>
+              <span className="tier-plate__check" aria-hidden="true">
+                {selected && <Check size={18} strokeWidth={3.2} />}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       <h2 className="section-heading">{t("settings.language")}</h2>
       <div className="card list" role="radiogroup" aria-label={t("settings.language")}>

@@ -19,7 +19,6 @@ import {
 import { nextNode, nodeStatus } from "./path";
 import { REWARDS } from "./rewards";
 import { displayedStreak, EMPTY_STREAK, recordActiveDay } from "./streak";
-import { applyPromotion, defaultDifficulty, PROMOTION, promotionStatus, recordTierOutcome, selectTier } from "./tiers";
 
 const NOW = "2026-10-19T10:00:00.000Z";
 const TODAY = "2026-10-19";
@@ -84,93 +83,23 @@ describe("streak", () => {
 });
 
 describe("difficulty tiers", () => {
-  const outcome = (i: number, correct: boolean, mode: (typeof MODES)[number] = MODES[i % 3]) => ({ stepId: `s${i}`, mode, correct });
-
-  it("starts at Beginner", () => {
-    expect(defaultProgress().difficulty).toMatchObject({ selected: 1, unlocked: 1 });
+  it("starts at Beginner with every tier open", () => {
+    const data = defaultProgress();
+    expect(data.difficulty).toEqual({ selected: 1 });
+    for (const tier of [1, 2, 3, 4, 5] as Tier[]) expect(selectTierIn(data, tier).difficulty.selected).toBe(tier);
   });
 
-  it("does not promote before enough answers", () => {
-    let d = defaultDifficulty();
-    for (let i = 0; i < PROMOTION.minAnswered - 1; i++) d = recordTierOutcome(d, 1, outcome(i, true));
-    expect(promotionStatus(d).ready).toBe(false);
-    expect(applyPromotion(d, NOW).unlocked).toBeNull();
+  it("ignores an invalid tier", () => {
+    const data = defaultProgress();
+    expect(selectTierIn(data, 9 as Tier)).toBe(data);
   });
 
-  it("promotes after enough accurate answers across several games", () => {
-    let d = defaultDifficulty();
-    for (let i = 0; i < PROMOTION.minAnswered; i++) d = recordTierOutcome(d, 1, outcome(i, i % 10 !== 0));
-    const status = promotionStatus(d);
-    expect(status.accuracy).toBeGreaterThanOrEqual(PROMOTION.minAccuracy);
-    expect(status.ready).toBe(true);
-    const promoted = applyPromotion(d, NOW);
-    expect(promoted.unlocked).toBe(2);
-    expect(promoted.state).toMatchObject({ unlocked: 2, selected: 2 });
-  });
-
-  it("requires accuracy, not just volume", () => {
-    let d = defaultDifficulty();
-    for (let i = 0; i < 40; i++) d = recordTierOutcome(d, 1, outcome(i, i % 3 !== 0));
-    expect(promotionStatus(d).accuracy).toBeLessThan(PROMOTION.minAccuracy);
-    expect(promotionStatus(d).ready).toBe(false);
-  });
-
-  it("requires several different games", () => {
-    let d = defaultDifficulty();
-    for (let i = 0; i < 20; i++) d = recordTierOutcome(d, 1, outcome(i, true, "quiz"));
-    expect(promotionStatus(d).ready).toBe(false);
-  });
-
-  it("only counts the most recent answers, so improvement is rewarded", () => {
-    let d = defaultDifficulty();
-    for (let i = 0; i < 20; i++) d = recordTierOutcome(d, 1, outcome(i, false));
-    expect(promotionStatus(d).ready).toBe(false);
-    for (let i = 0; i < 20; i++) d = recordTierOutcome(d, 1, outcome(i, true));
-    expect(d.recent[1]).toHaveLength(PROMOTION.window);
-    expect(promotionStatus(d).ready).toBe(true);
-  });
-
-  it("answers at a lower tier do not promote", () => {
-    let d = { ...defaultDifficulty(), unlocked: 2 as Tier, selected: 1 as Tier };
-    for (let i = 0; i < 20; i++) d = recordTierOutcome(d, 1, outcome(i, true));
-    expect(promotionStatus(d).ready).toBe(false);
-  });
-
-  it("stops at Master", () => {
-    let d = { ...defaultDifficulty(), unlocked: 5 as Tier, selected: 5 as Tier };
-    for (let i = 0; i < 20; i++) d = recordTierOutcome(d, 5, outcome(i, true));
-    expect(promotionStatus(d).next).toBeNull();
-    expect(applyPromotion(d, NOW).unlocked).toBeNull();
-  });
-
-  it("flags a struggling player without demoting them", () => {
-    let d = { ...defaultDifficulty(), unlocked: 3 as Tier, selected: 3 as Tier };
-    for (let i = 0; i < 10; i++) d = recordTierOutcome(d, 3, outcome(i, i % 4 === 0));
-    expect(promotionStatus(d).struggling).toBe(true);
-    expect(d.unlocked).toBe(3);
-  });
-
-  it("lets the player pick only unlocked tiers", () => {
-    const d = { ...defaultDifficulty(), unlocked: 3 as Tier, selected: 3 as Tier };
-    expect(selectTier(d, 1).selected).toBe(1);
-    expect(selectTier(d, 4).selected).toBe(3);
-  });
-
-  it("promotes through completed sessions and saves the new tier", () => {
-    let data = defaultProgress();
-    let unlocked = null;
-    for (const [i, mode] of MODES.entries()) {
-      const id = `creation.${mode}`;
-      const key = sessionKey.activity(id, 1);
-      data = play(data, key, "activity", id, [`${mode}.a`, `${mode}.b`, `${mode}.c`, `${mode}.d`], { mode });
-      const r = finish(data, key);
-      data = r.data;
-      if (r.summary.tierUnlocked) unlocked = { at: i, tier: r.summary.tierUnlocked };
-    }
-    expect(unlocked).toEqual({ at: 3, tier: 2 });
-    expect(migrate(JSON.parse(JSON.stringify(data))).difficulty).toMatchObject({ unlocked: 2, selected: 2 });
-    expect(selectTierIn(data, 1).difficulty.selected).toBe(1);
-    expect(selectTierIn(data, 3)).toBe(data);
+  it("plays sessions at the tier they were started with and saves it", () => {
+    let data = selectTierIn(defaultProgress(), 4);
+    const key = sessionKey.activity("creation.quiz", 4);
+    data = finish(play(data, key, "activity", "creation.quiz", ["a"], { tier: 4 }), key).data;
+    expect(data.tierClears["creation.quiz@4"]).toBeTruthy();
+    expect(migrate(JSON.parse(JSON.stringify(data))).difficulty.selected).toBe(4);
   });
 });
 
@@ -217,7 +146,6 @@ describe("sessions and rewards", () => {
     expect(recordStep(data, "k", outcome, { mode: "quiz", topicId: "creation" }, NOW)).toBe(data);
     expect(data.stats.correctAnswers).toBe(1);
     expect(data.seen.a).toBe(1);
-    expect(data.difficulty.recent[1]).toHaveLength(1);
   });
 
   it("resumes an unfinished session instead of redrawing it", () => {
@@ -235,15 +163,13 @@ describe("sessions and rewards", () => {
     expect(second.summary.reward.xp + second.summary.reward.bonus).toBe(0);
   });
 
-  it("records mistakes, clears them through review, and keeps reviews out of promotion", () => {
+  it("records mistakes and clears them through review", () => {
     const key = sessionKey.activity(id, 1);
     let data = play(defaultProgress(), key, "activity", id, ["a", "b"], { wrong: ["b"] });
     expect(openMistakes(data).map((m) => m.stepId)).toEqual(["b"]);
     data = finish(data, key).data;
-    const before = data.difficulty.recent[1]?.length;
     data = play(data, sessionKey.review(), "review", "mistakes", ["b"]);
     expect(openMistakes(data)).toHaveLength(0);
-    expect(data.difficulty.recent[1]?.length).toBe(before);
     expect(finish(data, sessionKey.review()).summary.reward.xp).toBe(REWARDS.review);
   });
 
@@ -312,18 +238,19 @@ describe("saved progress", () => {
       sessions: { "activity:creation.quiz": { key: "activity:creation.quiz", kind: "activity", refId: "creation.quiz", stepIds: ["x"], index: 0, outcomes: [], startedAt: NOW } },
     };
     const migrated = migrate(v1);
-    expect(migrated.version).toBe(2);
+    expect(migrated.version).toBe(3);
     expect(migrated.xp).toBe(120);
     expect(migrated.profile).toEqual({ name: "Ruth", avatar: "dawn" });
     expect(migrated.settings).toMatchObject({ sound: false, language: "en" });
     expect(migrated.activities["creation.quiz"].firstCompletedAt).toBe(NOW);
     expect(migrated.mistakes["creation.quiz.sky"]).toBeTruthy();
     expect(migrated.sessions).toEqual({});
-    expect(migrated.difficulty).toMatchObject({ unlocked: 1, selected: 1 });
+    expect(migrated.difficulty).toEqual({ selected: 1 });
   });
 
-  it("repairs an impossible selected tier", () => {
-    expect(migrate({ difficulty: { unlocked: 2, selected: 4 } }).difficulty.selected).toBe(2);
+  it("upgrades version 2 saves, keeping the selected tier and dropping unlock data", () => {
+    expect(migrate({ version: 2, difficulty: { unlocked: 2, selected: 2, recent: {}, unlockedAt: {} } }).difficulty).toEqual({ selected: 2 });
+    expect(migrate({ difficulty: { selected: 7 } }).difficulty).toEqual({ selected: 1 });
   });
 });
 
@@ -346,7 +273,7 @@ describe("home recommendation", async () => {
       data = abandonForTest(data, k);
       data = finish(play(data, k, "activity", a.id, ["x"]), k).data;
     }
-    data = { ...data, difficulty: { ...data.difficulty, unlocked: 2, selected: 2 } };
+    data = selectTierIn(data, 2);
     expect(recommend(data, pack)).toMatchObject({ kind: "clear", tier: 2 });
   });
 });

@@ -1,12 +1,5 @@
 /* ---------------------------------------------------------------- Home */
 
-.home__greeting {
-  font-size: var(--fs-sm);
-  font-weight: 800;
-  color: var(--text-3);
-  margin-top: var(--space-2);
-}
-
 /* The one primary action. */
 .quest {
   display: flex;
@@ -98,10 +91,6 @@
   background: var(--gold-soft);
   color: var(--gold-text);
   flex: none;
-}
-.row-link__icon--tier {
-  background: color-mix(in srgb, var(--tier) 14%, transparent);
-  color: var(--tier);
 }
 .row-link--stack .row-link__text {
   gap: 4px;
@@ -428,41 +417,25 @@
   font-size: var(--fs-sm);
   color: var(--text-2);
 }
-.tier-plate__state {
+.tier-plate__xp {
+  margin-top: 2px;
   font-size: var(--fs-xs);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-3);
-  white-space: nowrap;
+  font-weight: 850;
+  color: var(--gold-text);
 }
-.tier-plate.is-selected .tier-plate__state {
-  color: var(--tier);
+.tier-plate__check {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  flex: none;
 }
-
-.meters {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-.meter {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.meter__row {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-3);
-  font-size: var(--fs-sm);
-  font-weight: 800;
-}
-.meter__value {
-  color: var(--text-2);
-  font-variant-numeric: tabular-nums;
-}
-.meter.is-met .meter__value {
-  color: var(--success);
+.tier-plate.is-selected .tier-plate__check {
+  background: var(--tier);
+  border-color: var(--tier);
+  color: #fff;
 }
 
 /* ---------------------------------------------------------------- Play (Free Play) */
@@ -768,20 +741,6 @@
   text-align: center;
   animation: pop-in 0.4s var(--ease-spring);
 }
-.unlock__gem {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  transform: rotate(45deg);
-  background: var(--tier);
-  margin-bottom: 6px;
-}
-.unlock__title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--fs-xl);
-  color: var(--tier);
-}
 .results__refs {
   display: flex;
   flex-direction: column;
@@ -1021,4 +980,119 @@
   color: var(--success);
   font-weight: 800;
   font-size: var(--fs-sm);
+}
+
+.row-link__action {
+  font-size: var(--fs-sm);
+  font-weight: 900;
+  color: var(--brand);
+}
+
+/* Daily challenge card on Home. */
+.daily-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 2px solid var(--gold);
+  box-shadow: 0 5px 0 var(--gold-dark);
+}
+.daily-card:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--gold-dark);
+}
+.daily-card.is-done {
+  border-color: var(--success);
+  box-shadow: 0 5px 0 var(--success-dark);
+}
+.daily-card__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--gold);
+  color: var(--on-gold);
+  flex: none;
+}
+.daily-card.is-done .daily-card__icon {
+  background: var(--success);
+  color: #fff;
+}
+.daily-card__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.daily-card__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  line-height: 1.15;
+}
+.daily-card__meta {
+  font-size: var(--fs-sm);
+  font-weight: 750;
+  color: var(--text-2);
+}
+.daily-card__reward {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: var(--gold-text);
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+/* Daily tab */
+.daily-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 2px solid var(--gold);
+  box-shadow: 0 6px 0 var(--gold-dark);
+}
+.daily-hero.is-done {
+  border-color: var(--success);
+  box-shadow: 0 6px 0 var(--success-dark);
+}
+.daily-hero__eyebrow {
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold-text);
+}
+.daily-hero__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-2xl);
+  line-height: 1.1;
+}
+.daily-hero__meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--text-2);
+}
+.daily-streak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--text-3);
 }

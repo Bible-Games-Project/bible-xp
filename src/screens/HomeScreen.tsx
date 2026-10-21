@@ -1,4 +1,4 @@
-import { CalendarDays, Check, ChevronRight, Gauge } from "lucide-react";
+import { CalendarDays, Check, ChevronRight } from "lucide-react";
 import { href, navigate, type Route } from "../app/router";
 import { Button } from "../components/Button";
 import { MODE_STYLE } from "../components/icons";
@@ -14,7 +14,7 @@ import { sessionKey } from "../progress/model";
 import { completedCount } from "../progress/path";
 import { recommend } from "../progress/recommend";
 import { useProgress } from "../progress/store";
-import { PROMOTION, promotionStatus } from "../progress/tiers";
+import { REWARDS } from "../progress/rewards";
 
 export function HomeScreen() {
   const { t } = useI18n();
@@ -57,7 +57,6 @@ export function HomeScreen() {
   const RecIcon = rec.kind === "intro" ? MODE_STYLE.intro.icon : MODE_STYLE[findActivity(pack, rec.activityId)!.mode].icon;
   const done = completedCount(progress, unit);
 
-  const status = promotionStatus(progress.difficulty);
   const dailyDone = Boolean(progress.daily[today]?.rewarded);
   const dailyTier = progress.sessions[sessionKey.daily(today)]?.tier ?? tier;
   const daily = dailyChallengeFor(pack, today, dailyTier);
@@ -65,10 +64,7 @@ export function HomeScreen() {
   return (
     <Screen withTabs>
       <AppHeader />
-      <div>
-        <h1 className="screen-title">{name ? t("home.greeting", { name }) : t("home.greetingGuest")}</h1>
-        <p className="muted">{t("home.ready")}</p>
-      </div>
+      <h1 className="sr-only">{name ? t("home.greeting", { name }) : t("home.greetingGuest")}</h1>
 
       <section className="quest" aria-labelledby="quest-title">
         <div className="quest__top">
@@ -94,47 +90,18 @@ export function HomeScreen() {
         </Button>
       </section>
 
-      <a className={`row-link${dailyDone ? " is-done" : ""}`} href={href({ name: "daily" })}>
-        <span className="row-link__icon" aria-hidden="true">
-          {dailyDone ? <Check size={20} strokeWidth={3} /> : <CalendarDays size={20} strokeWidth={2.4} />}
+      <a className={`daily-card${dailyDone ? " is-done" : ""}`} href={href({ name: "daily" })}>
+        <span className="daily-card__icon" aria-hidden="true">
+          {dailyDone ? <Check size={26} strokeWidth={3} /> : <CalendarDays size={26} strokeWidth={2.4} />}
         </span>
-        <span className="row-link__text">
-          <span className="row-link__title">{t("home.dailyTitle")}</span>
-          <span className="row-link__meta">
+        <span className="daily-card__text">
+          <span className="daily-card__title">{t("home.dailyTitle")}</span>
+          <span className="daily-card__meta">
             {dailyDone ? t("home.dailyDone") : t("home.dailyMeta", { n: daily.steps.length, tier: tierName(dailyTier) })}
           </span>
         </span>
-        <ChevronRight size={20} className="faint" aria-hidden="true" />
-      </a>
-
-      <a className={`row-link row-link--stack tier-${status.next ?? status.tier}`} href={href({ name: "difficulty" })}>
-        <span className="row-link__icon row-link__icon--tier" aria-hidden="true">
-          <Gauge size={20} strokeWidth={2.4} />
-        </span>
-        <span className="row-link__text">
-          <span className="row-link__title">{t("home.difficultyTitle", { tier: tierName(progress.difficulty.unlocked) })}</span>
-          <span className="row-link__meta">
-            {status.next
-              ? t("home.difficultyNext", {
-                  next: tierName(status.next),
-                  n: Math.min(status.answered, PROMOTION.minAnswered),
-                  min: PROMOTION.minAnswered,
-                  pct: status.accuracy === null ? 0 : Math.round(status.accuracy * 100),
-                  need: PROMOTION.minAccuracy * 100,
-                })
-              : t("home.difficultyMax")}
-          </span>
-          {status.next && (
-            <ProgressBar
-              value={Math.min(status.answered, PROMOTION.minAnswered)}
-              max={PROMOTION.minAnswered}
-              label={t("difficulty.working", { next: tierName(status.next) })}
-              tone="tier"
-              size="sm"
-            />
-          )}
-        </span>
-        <ChevronRight size={20} className="faint" aria-hidden="true" />
+        {!dailyDone && <span className="daily-card__reward">+{REWARDS.daily[dailyTier]} XP</span>}
+        <ChevronRight size={22} className="faint" aria-hidden="true" />
       </a>
 
       <TabBar current="home" />

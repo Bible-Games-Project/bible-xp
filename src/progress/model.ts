@@ -2,7 +2,7 @@ import type { GameMode, Tier, Unit } from "../content/types";
 import { levelForXp } from "./levels";
 import { REWARDS, type RewardResult } from "./rewards";
 import { EMPTY_STREAK, recordActiveDay, type StreakState } from "./streak";
-import { applyPromotion, defaultDifficulty, recordTierOutcome, type DifficultyState } from "./tiers";
+import { defaultDifficulty, isTier, type DifficultyState } from "./tiers";
 
 /*
  * The whole player state, kept as one plain JSON object so it can be saved
@@ -10,14 +10,14 @@ import { applyPromotion, defaultDifficulty, recordTierOutcome, type DifficultySt
  * function below; `store.ts` only wires them to React and storage.
  *
  * How the parts fit together:
- * - Difficulty tier (tiers.ts) is earned by accuracy and decides which
- *   questions you get.
+ * - Difficulty tier (tiers.ts) is chosen freely in Settings and decides
+ *   which questions you get.
  * - XP comes from correct answers, scaled by tier, plus first-clear bonuses.
  *   It drives the player level (levels.ts), which is a measure of effort.
  * - The streak counts days with at least one finished session.
  */
 
-export const PROGRESS_VERSION = 2;
+export const PROGRESS_VERSION = 3;
 
 export type AvatarId = "dawn" | "sky" | "leaf" | "flame" | "wave" | "star";
 export const AVATARS: AvatarId[] = ["dawn", "sky", "leaf", "flame", "wave", "star"];
@@ -195,15 +195,9 @@ export function recordStep(data: ProgressData, key: string, outcome: StepOutcome
     // A right answer in a review clears the mistake; elsewhere it is just noted.
     mistakes[outcome.stepId] = { ...previous, lastCorrectAt: nowIso, resolved: previous.resolved || session.kind === "review" };
   }
-  // Reviews are second attempts at known questions, so they do not count toward promotion.
-  const difficulty =
-    session.kind === "review"
-      ? data.difficulty
-      : recordTierOutcome(data.difficulty, session.tier, { stepId: outcome.stepId, mode: meta.mode, correct: outcome.correct });
   return {
     ...data,
     mistakes,
-    difficulty,
     seen: { ...data.seen, [outcome.stepId]: (data.seen[outcome.stepId] ?? 0) + 1 },
     stats: {
       ...data.stats,
@@ -237,13 +231,11 @@ export interface SessionSummary {
   levelAfter: number;
   firstCompletion: boolean;
   unitCompleted: string | null;
-  /** The tier unlocked by this session, if any. */
-  tierUnlocked: Tier | null;
 }
 
 /**
- * Finishes a session, grants XP once, checks for a tier promotion, and removes
- * the session from in-progress state. Returns null when there is nothing to
+ * Finishes a session, grants XP once, and removes the session from
+ * in-progress state. Returns null when there is nothing to
  * finish, so it is safe to call twice.
  */
 export function completeSession(
@@ -318,9 +310,6 @@ export function completeSession(
     lastActivity: { kind: session.kind, refId: session.refId, at: nowIso },
   };
 
-  const promotion = applyPromotion(next.difficulty, nowIso);
-  next.difficulty = promotion.state;
-
   const unitCompleted = markCompletedUnits(next, units, nowIso);
   next = unitCompleted.data;
 
@@ -339,7 +328,6 @@ export function completeSession(
       levelAfter: levelForXp(next.xp),
       firstCompletion,
       unitCompleted: unitCompleted.newlyCompleted,
-      tierUnlocked: promotion.unlocked,
     },
   };
 }
@@ -364,7 +352,7 @@ export function completeIntro(
 }
 
 export function selectTierIn(data: ProgressData, tier: Tier): ProgressData {
-  if (tier > data.difficulty.unlocked || tier === data.difficulty.selected) return data;
+  if (!isTier(tier) || tier === data.difficulty.selected) return data;
   return { ...data, difficulty: { ...data.difficulty, selected: tier } };
 }
 
@@ -411,8 +399,6 @@ export function openMistakes(data: ProgressData): MistakeRecord[] {
     .sort((a, b) => b.lastWrongAt.localeCompare(a.lastWrongAt));
 }
 
-const isTier = (v: unknown): v is Tier => v === 1 || v === 2 || v === 3 || v === 4 || v === 5;
-
 /**
  * Turns whatever was saved into a valid current-version object. Unknown or
  * missing fields fall back to defaults instead of discarding the player's data.
@@ -427,14 +413,12 @@ export function migrate(raw: unknown): ProgressData {
 
   // v1 → v2: sessions had no tier and question banks changed, so unfinished
   // sessions are dropped. XP, streak, path progress and mistakes are kept.
+  // v2 → v3: tiers are no longer unlocked; only the selected tier is kept.
   const sessions = Object.fromEntries(
     Object.entries(obj(saved.sessions, {} as Record<string, SessionProgress>)).filter(([, s]) => s && isTier(s.tier)),
   );
-  const difficulty = obj(saved.difficulty, base.difficulty);
-  if (!isTier(difficulty.unlocked)) difficulty.unlocked = 1;
-  if (!isTier(difficulty.selected) || difficulty.selected > difficulty.unlocked) difficulty.selected = difficulty.unlocked;
-  difficulty.recent = obj(difficulty.recent, {});
-  difficulty.unlockedAt = obj(difficulty.unlockedAt, {});
+  const savedTier = (saved.difficulty as Partial<DifficultyState> | undefined)?.selected;
+  const difficulty: DifficultyState = { selected: isTier(savedTier) ? savedTier : 1 };
 
   return {
     version: PROGRESS_VERSION,

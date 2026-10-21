@@ -6,6 +6,15 @@
   transform-origin: 100px 130px;
   animation: lumi-float 3.2s ease-in-out infinite;
 }
+.mascot__flame {
+  transform-origin: 100px 183px;
+}
+.mascot__flame--outer {
+  animation: lumi-flicker 1.6s ease-in-out infinite;
+}
+.mascot__flame--middle {
+  animation: lumi-flicker 1.3s ease-in-out infinite reverse;
+}
 .mascot__glow {
   transform-box: fill-box;
   transform-origin: center;
@@ -129,5 +138,18 @@
   }
   60% {
     transform: translateY(0) rotate(2deg);
+  }
+}
+
+@keyframes lumi-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1) skewX(0deg);
+  }
+  35% {
+    transform: scale(0.985, 1.035) skewX(-1.5deg);
+  }
+  70% {
+    transform: scale(1.01, 0.985) skewX(1.2deg);
   }
 }

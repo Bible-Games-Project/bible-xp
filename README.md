@@ -21,31 +21,31 @@ bun run test       # unit and content tests (vitest)
 
 ## What's inside
 
-- **Home** — one primary action (the next thing to play), a compact line
-  showing progress toward the next difficulty tier, and the Daily Challenge.
+- **Home** — just two things: the next step on your Journey (one big Play
+  button) and the Daily Challenge.
 - **Journey** — the learning path. Each Bible story is a chapter with a
   winding road of stops; Story 1, The Creation (Genesis 1–3), has seven stops:
   an introduction and the six games, unlocked in order.
+- **Daily** — one question from five games at your difficulty, chosen by
+  date; rewarded once per day and resumable.
+- **Train** — any of the six games, any time, plus a "coming soon" Duels entry.
 - **Six games** — Form the Word, Match the Pairs, Bible Quiz, Complete the
   Verse, Put the Story in Order (drag or arrow buttons), Who Am I?
-- **Difficulty tiers** — Beginner, Explorer, Scholar, Expert, Master. Each game
-  has its own questions at every tier, and the mechanics tighten too (decoy
-  letters, more verse options, more pairs, fewer clues). A tier unlocks with
-  accuracy, never with XP.
-- **Daily Challenge** — one question from five games at the player's tier,
-  chosen by date; rewarded once per day and resumable.
-- **Play** — any game at any unlocked tier, plus a "coming soon" Duels entry.
-- **Profile** — level (from XP) and difficulty (from accuracy) shown side by
-  side, stats, mistakes review, settings and Bible XP Plus (informational).
+- **Difficulty** — Beginner, Explorer, Scholar, Expert, Master, all open and
+  chosen in Settings. Each game has its own questions at every level, and the
+  mechanics tighten too (decoy letters, more verse options, more pairs, fewer
+  clues). Harder levels pay more XP.
+- **Profile** (avatar, top left) — level, XP, stats, mistakes review, Settings
+  and Bible XP Plus (informational).
+- **Lumi** — the mascot, a friendly flame with five moods.
 
 ## Progression in one paragraph
 
-Correct first-try answers earn XP scaled by tier (2–6 per answer); the first
-clear of a game at a tier adds a bonus (10–30, plus a perfect bonus). Replays
-pay once per game, tier and day; the daily challenge once per date. XP only
-drives the player level. To unlock the next tier the player needs, at their
-highest tier, at least 15 answers with 80% accuracy over the last 20, across
-3 different games (`src/progress/tiers.ts`). Tiers are never taken away.
+Correct first-try answers earn XP scaled by difficulty (2–6 per answer); the
+first clear of a game at a difficulty adds a bonus (10–30, plus a perfect
+bonus). Replays pay once per game, difficulty and day; the daily challenge once
+per date. XP drives the player level; the streak counts days with a finished
+game.
 
 ## Project layout
 

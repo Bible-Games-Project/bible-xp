@@ -48,7 +48,7 @@ export function MultiplayerScreen() {
         </li>
       </ul>
       <p className="muted small center">{t("multiplayer.notice")}</p>
-      <Button block onClick={() => navigate({ name: "free" })}>
+      <Button block onClick={() => navigate({ name: "train" })}>
         {t("multiplayer.cta")}
       </Button>
     </Screen>

@@ -110,11 +110,18 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   names Adam from Genesis 3:17 on. Only Genesis 1–3 is verified; do not write
   questions from other passages without adding and testing their source text.
 - Difficulty: questions carry `tier` 1–5 (Beginner…Master); a session draws
-  `SESSION_SIZE[mode]` least-seen steps of the selected tier. Promotion rules
-  live in `src/progress/tiers.ts`; XP never unlocks a tier. Wrong options must be
-  real details from the text (other days, rivers, speakers), never absurd, and
-  never a synonym another translation uses for the right answer.
-- Progress is one JSON object (`src/progress/model.ts`, version 2), all
+  `SESSION_SIZE[mode]` least-seen steps of the selected tier. Maintainer
+  decision: every tier is open and chosen freely in Settings (an earlier
+  accuracy-based unlock system was removed); harder tiers pay more XP. Wrong
+  options must be real details from the text (other days, rivers, speakers),
+  never absurd, and never a synonym another translation uses for the right answer.
+- Navigation (maintainer decision): bottom tabs are Home, Journey, Daily, Train.
+  Profile is not a tab; it opens from the avatar at the top left and holds
+  Settings. Home shows only the main "next step" card and the daily challenge.
+- Mascot (maintainer decision): Lumi is a friendly flame in the red, orange
+  and yellow of the Bible Games Project logo (not white), drawn in SVG in
+  `src/components/Mascot.tsx`, with five moods.
+- Progress is one JSON object (`src/progress/model.ts`, version 3), all
   mutations are pure functions with tests. Bump `PROGRESS_VERSION` and extend
   `migrate()` when the shape changes; never drop XP, path progress or mistakes.
 - XP amounts live only in `src/progress/rewards.ts`.

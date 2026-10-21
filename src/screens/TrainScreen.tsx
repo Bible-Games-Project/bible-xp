@@ -1,46 +1,42 @@
-import { ChevronRight, Lock, Swords } from "lucide-react";
+import { ChevronRight, Swords } from "lucide-react";
 import { href } from "../app/router";
 import { MODE_STYLE } from "../components/icons";
 import { AppHeader, Screen, TabBar } from "../components/Layout";
-import { TierPips, useTierName } from "../components/Tier";
+import { TierBadge, TierPips, useTierName } from "../components/Tier";
 import { freePlayActivity } from "../content";
 import { GAME_MODES, TIERS } from "../content/types";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
 import { clearKey } from "../progress/model";
-import { progressActions, useProgress } from "../progress/store";
+import { useProgress } from "../progress/store";
 
-export function FreePlayScreen() {
+/** Train: any game, any time, at the difficulty chosen in Settings. */
+export function TrainScreen() {
   const { t } = useI18n();
   const pack = useContent();
   const progress = useProgress();
   const tierName = useTierName();
-  const { selected, unlocked } = progress.difficulty;
 
   return (
     <Screen withTabs>
       <AppHeader />
-      <h1 className="screen-title">{t("free.title")}</h1>
-      <p className="screen-subtitle">{t("free.subtitle")}</p>
-
-      <div className="tier-tabs" role="radiogroup" aria-label={t("free.tier")}>
-        {TIERS.map((tier) => (
-          <button
-            key={tier}
-            type="button"
-            role="radio"
-            aria-checked={tier === selected}
-            disabled={tier > unlocked}
-            className={`tier-tab tier-${tier}${tier === selected ? " is-selected" : ""}`}
-            onClick={() => progressActions.selectTier(tier)}
-          >
-            {tier > unlocked && <Lock size={14} aria-hidden="true" />}
-            {tierName(tier)}
-          </button>
-        ))}
+      <div>
+        <h1 className="screen-title">{t("train.title")}</h1>
+        <p className="muted">{t("train.subtitle")}</p>
       </div>
 
-      <nav className="mode-list" aria-label={t("free.title")}>
+      <a className="row-link" href={href({ name: "settings" })}>
+        <span className="row-link__text">
+          <span className="row-link__meta">{t("difficulty.title")}</span>
+          <span>
+            <TierBadge tier={progress.difficulty.selected} />
+          </span>
+        </span>
+        <span className="row-link__action">{t("train.change")}</span>
+        <ChevronRight size={20} className="faint" aria-hidden="true" />
+      </a>
+
+      <nav className="mode-list" aria-label={t("train.title")}>
         {GAME_MODES.map((mode) => {
           const activity = freePlayActivity(pack, mode);
           if (!activity) return null;
@@ -55,7 +51,7 @@ export function FreePlayScreen() {
                 <span className="mode-card__name">{t(`modes.${mode}.name`)}</span>
                 <span className="mode-card__desc">{t(`modes.${mode}.description`)}</span>
               </span>
-              <TierPips cleared={(tr) => cleared.includes(tr)} label={cleared.map(tierName).join(", ") || t("free.tier")} />
+              <TierPips cleared={(tr) => cleared.includes(tr)} label={cleared.map(tierName).join(", ") || t("difficulty.title")} />
               <ChevronRight size={20} className="faint" aria-hidden="true" />
             </a>
           );
@@ -67,12 +63,12 @@ export function FreePlayScreen() {
           <Swords size={20} strokeWidth={2.4} />
         </span>
         <span className="row-link__text">
-          <span className="row-link__title">{t("free.duels")}</span>
-          <span className="row-link__meta">{t("free.duelsBody")}</span>
+          <span className="row-link__title">{t("train.duels")}</span>
+          <span className="row-link__meta">{t("train.duelsBody")}</span>
         </span>
         <span className="pill">{t("common.comingSoon")}</span>
       </a>
-      <TabBar current="free" />
+      <TabBar current="train" />
     </Screen>
   );
 }

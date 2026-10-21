@@ -1,8 +1,5 @@
 import { Award, Gem, RotateCcw, Target, Trophy } from "lucide-react";
-import { ProgressBar } from "../components/ProgressBar";
 import { TierBadge, useTierName } from "../components/Tier";
-import { useProgress } from "../progress/store";
-import { PROMOTION, promotionStatus } from "../progress/tiers";
 import { REWARDS } from "../progress/rewards";
 import { navigate, type Route } from "../app/router";
 import { Button } from "../components/Button";
@@ -25,9 +22,7 @@ interface ResultsProps {
 export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, nextLabel }: ResultsProps) {
   const { t, language } = useI18n();
   const pack = getContent(language.code);
-  const { difficulty } = useProgress();
   const tierName = useTierName();
-  const status = promotionStatus(difficulty);
   const ratio = summary.totalSteps ? summary.correctSteps / summary.totalSteps : 0;
   const answers = summary.correctAnswers + summary.incorrectAnswers;
   const accuracy = answers ? Math.round((summary.correctAnswers / answers) * 100) : 0;
@@ -91,27 +86,6 @@ export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, 
         {rewardNote}
         {summary.reward.reason === "first-clear" && summary.reward.bonus > REWARDS.firstClear[summary.tier] && ` · ${t("results.perfectBonus")}`}
       </p>
-
-      {summary.tierUnlocked ? (
-        <section className={`unlock tier-${summary.tierUnlocked}`} role="status">
-          <span className="unlock__gem" aria-hidden="true" />
-          <h2 className="unlock__title">{t("results.tierUnlocked", { tier: tierName(summary.tierUnlocked) })}</h2>
-          <p className="muted small">{t("results.tierUnlockedBody", { tier: tierName(summary.tierUnlocked) })}</p>
-        </section>
-      ) : (
-        summary.kind !== "review" &&
-        status.next && (
-          <a className={`climb tier-${status.next}`} href="#/difficulty">
-            <span className="climb__row">
-              <span className="climb__label">{t("results.tierProgress", { next: tierName(status.next) })}</span>
-              <span className="climb__meta">
-                {Math.min(status.answered, PROMOTION.minAnswered)}/{PROMOTION.minAnswered} · {status.accuracy === null ? "–" : Math.round(status.accuracy * 100)}%
-              </span>
-            </span>
-            <ProgressBar value={Math.min(status.answered, PROMOTION.minAnswered)} max={PROMOTION.minAnswered} label={t("results.tierProgress", { next: tierName(status.next) })} tone="tier" size="sm" />
-          </a>
-        )
-      )}
 
       {summary.levelAfter > summary.levelBefore && (
         <div className="banner banner--gold">

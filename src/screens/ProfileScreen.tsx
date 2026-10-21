@@ -1,10 +1,10 @@
-import { ChevronRight, Crown, Gauge, Pencil, RotateCcw, Settings } from "lucide-react";
+import { ChevronRight, Crown, Pencil, RotateCcw, Settings } from "lucide-react";
 import { useTierName } from "../components/Tier";
 import { useState, type ReactNode } from "react";
 import { href } from "../app/router";
 import { Avatar } from "../components/Avatar";
 import { Button } from "../components/Button";
-import { Screen, TabBar } from "../components/Layout";
+import { Screen, TopBar } from "../components/Layout";
 import { Sheet } from "../components/Overlay";
 import { ProgressBar } from "../components/ProgressBar";
 import { useI18n } from "../i18n";
@@ -35,8 +35,8 @@ export function ProfileScreen() {
   };
 
   return (
-    <Screen withTabs>
-      <h1 className="sr-only">{t("profile.title")}</h1>
+    <Screen>
+      <TopBar title={t("profile.title")} back={{ name: "home" }} />
       <section className="profile-hero">
         <button type="button" className="profile-hero__avatar" onClick={() => setAvatarOpen(true)} aria-label={t("profile.chooseAvatar")}>
           <Avatar id={progress.profile.avatar} size={96} />
@@ -85,14 +85,12 @@ export function ProfileScreen() {
       </section>
 
       <div className="rank-cards">
-        <a className="rank-card" href={href({ name: "difficulty" })}>
+        <a className="rank-card" href={href({ name: "settings" })}>
           <span className="rank-card__label">{t("profile.difficulty")}</span>
-          <span className={`rank-card__value tier-${progress.difficulty.unlocked}`} style={{ color: "var(--tier)" }}>
-            {tierName(progress.difficulty.unlocked)}
+          <span className={`rank-card__value tier-${progress.difficulty.selected}`} style={{ color: "var(--tier)" }}>
+            {tierName(progress.difficulty.selected)}
           </span>
-          <span className="rank-card__meta">
-            {progress.difficulty.unlocked} / 5
-          </span>
+          <span className="rank-card__meta">{t("train.change")}</span>
         </a>
         <div className="rank-card">
           <span className="rank-card__label">{t("common.level", { n: level.level })}</span>
@@ -112,14 +110,6 @@ export function ProfileScreen() {
       </div>
 
       <nav className="menu card" aria-label={t("profile.title")}>
-        <a className="menu__item" href={href({ name: "difficulty" })}>
-          <span className="menu__icon accent-gold" aria-hidden="true">
-            <Gauge size={20} strokeWidth={2.6} />
-          </span>
-          <span className="menu__label">{t("profile.difficulty")}</span>
-          <span className="menu__meta">{tierName(progress.difficulty.selected)}</span>
-          <ChevronRight size={20} className="muted" aria-hidden="true" />
-        </a>
         <a className="menu__item" href={href({ name: "review" })}>
           <span className="menu__icon accent-gold" aria-hidden="true">
             <RotateCcw size={20} strokeWidth={2.6} />
@@ -167,7 +157,6 @@ export function ProfileScreen() {
           ))}
         </div>
       </Sheet>
-      <TabBar current="profile" />
     </Screen>
   );
 }

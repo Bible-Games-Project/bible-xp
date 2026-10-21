@@ -1,4 +1,4 @@
-import { ChevronLeft, CircleUser, Flame, Gamepad2, Gem, House, Route as RouteIcon } from "lucide-react";
+import { CalendarDays, ChevronLeft, Dumbbell, Flame, Gem, House, Route as RouteIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { href, navigate, type Route } from "../app/router";
 import { useI18n } from "../i18n";
@@ -26,7 +26,7 @@ export function TopBar({ title, back, right }: { title: string; back: Route; rig
   );
 }
 
-/** Compact status row for the main tabs: profile and level, streak, XP. */
+/** Compact status row for the main tabs: profile and settings (avatar), level, streak, XP. */
 export function AppHeader() {
   const { t } = useI18n();
   const progress = useProgress();
@@ -54,8 +54,8 @@ export function AppHeader() {
 const TABS = [
   { route: { name: "home" } as Route, icon: House, key: "nav.home" as const },
   { route: { name: "path" } as Route, icon: RouteIcon, key: "nav.path" as const },
-  { route: { name: "free" } as Route, icon: Gamepad2, key: "nav.free" as const },
-  { route: { name: "profile" } as Route, icon: CircleUser, key: "nav.profile" as const },
+  { route: { name: "daily" } as Route, icon: CalendarDays, key: "nav.daily" as const },
+  { route: { name: "train" } as Route, icon: Dumbbell, key: "nav.train" as const },
 ];
 
 export function TabBar({ current }: { current: Route["name"] }) {
