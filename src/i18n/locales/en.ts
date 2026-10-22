@@ -75,9 +75,17 @@ const en = {
     intro: "Pick how hard the questions are. You can change it at any time; harder levels earn more XP.",
     xp: "{n} XP per right answer",
   },
+  library: {
+    title: "Bible Library",
+    subtitle: "Every book of the Bible and the stories you have finished.",
+    summary: "Stories finished: {n}",
+    storiesDone: "{n}/{total}",
+    storyFinished: "{story} finished! Open your Bible Library",
+    bookProgress: "{book}: {done} of {total} stories finished",
+  },
   path: {
     title: "Journey",
-    subtitle: "Walk through the whole Bible, book by book.",
+    subtitle: "Walk through the whole Bible, story by story.",
     oldTestament: "Old Testament",
     newTestament: "New Testament",
     otRange: "Genesis to Malachi",

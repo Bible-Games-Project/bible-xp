@@ -1012,13 +1012,9 @@
     url("../assets/journey-old-testament.webp");
   background-position: center top;
 }
-.screen--scene > :not(.scene) {
+.screen--scene {
   position: relative;
   z-index: 1;
-}
-.screen--scene > .tabbar {
-  position: fixed;
-  z-index: 20;
 }
 .screen--scene .statusbar__avatar,
 .screen--scene .topbar .icon-btn {
@@ -1137,7 +1133,7 @@
   color: var(--gold);
 }
 .big-btn--journey .big-btn__meta {
-  color: var(--ember);
+  color: var(--gold-text);
 }
 .big-btn--daily {
   background: var(--brand);
@@ -1161,58 +1157,94 @@
 .journey {
   min-height: 100dvh;
 }
-.journey__testaments {
+.journey__go {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+}
+.journey__go .big-btn {
+  align-self: stretch;
+}
+
+/* Bible Library */
+.library__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.library__count {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  color: var(--text);
+}
+.library__testament {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
-.testament {
+.library__heading {
+  align-self: flex-start;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-lg);
+}
+.book.is-complete a {
+  background: var(--success);
+  color: #fff;
+  box-shadow: 0 4px 0 var(--success-dark);
+}
+
+/* End of a story's road: the way into the Library. */
+.library-card {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--surface);
-  box-shadow: 0 5px 0 var(--gold-dark), var(--shadow-lift);
-  border: 2px solid var(--gold);
+  border: 2px solid var(--line-strong);
+  box-shadow: 0 5px 0 var(--line-strong);
 }
-.testament.is-soon {
-  background: rgb(255 255 255 / 0.9);
-  border-color: var(--sky-5);
-  box-shadow: 0 5px 0 var(--sky-5), var(--shadow-lift);
+.library-card.is-won {
+  border-color: var(--gold);
+  box-shadow: 0 5px 0 var(--gold-dark);
 }
-.testament:active {
+.library-card:active {
   transform: translateY(3px);
 }
-.testament__icon {
+.library-card__icon {
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background: var(--gold);
-  color: var(--on-gold);
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--gold-soft);
+  color: var(--warm-icon);
   flex: none;
 }
-.testament.is-soon .testament__icon {
-  background: var(--sky-6);
-  color: var(--brand);
+.library-card.is-won .library-card__icon {
+  background: var(--gold);
+  color: var(--on-gold);
 }
-.testament__text {
+.library-card__text {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
 }
-.testament__name {
+.library-card__title {
   font-family: var(--font-display);
-  font-size: var(--fs-xl);
-  line-height: 1.1;
+  font-size: var(--fs-lg);
+  line-height: 1.15;
 }
-.testament__meta {
+.library-card__meta {
   font-size: var(--fs-sm);
   font-weight: 750;
   color: var(--text-2);

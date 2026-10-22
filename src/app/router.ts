@@ -8,7 +8,7 @@ import { useEffect, useSyncExternalStore } from "react";
 export type Route =
   | { name: "home" }
   | { name: "path" }
-  | { name: "testament"; testament: "ot" | "nt" }
+  | { name: "library" }
   | { name: "book"; bookId: string }
   | { name: "story"; unitId: string }
   | { name: "train" }
@@ -30,6 +30,7 @@ const STATIC: Record<string, Route["name"]> = {
   "": "home",
   path: "path",
   train: "train",
+  library: "library",
   profile: "profile",
   settings: "settings",
   about: "about",
@@ -53,7 +54,6 @@ export function parseHash(hash: string): Route {
   }
   if (head === "intro" && param) return { name: "intro", introId: param };
   if (head === "path") {
-    if (param === "ot" || param === "nt") return { name: "testament", testament: param };
     const [kind, id] = rest;
     if (kind === "book" && id) return { name: "book", bookId: id };
     if (kind === "story" && id) return { name: "story", unitId: id };
@@ -71,8 +71,6 @@ export function href(route: Route): string {
       return `#/intro/${encodeURIComponent(route.introId)}`;
     case "review-play":
       return "#/review/play";
-    case "testament":
-      return `#/path/${route.testament}`;
     case "book":
       return `#/path/book/${encodeURIComponent(route.bookId)}`;
     case "story":

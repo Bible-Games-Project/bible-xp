@@ -1,36 +1,32 @@
 /*
  * Bible XP design tokens.
  *
- * The palette comes from the Home background illustration
- * (src/assets/home-background.webp): a sky blue at hue 206° over warm sand,
- * stone and sunlight.
- * - Every blue is that sky hue (206°) at a different lightness, so blues are
- *   monochromatic with the picture. --sky is sampled from the image itself.
- * - Warm colours follow the picture's light, from sun yellow to sand gold to
- *   terracotta; --flame-4, the heart of Lumi's flame, is the exact complement
- *   of the sky (206° + 180° = 26°).
- * - Lumi, the mascot, is drawn with these same --flame colours.
- * `src/theme/palette.test.ts` checks these relationships and text contrast.
- *
- * Roles: blue for headers, navigation and selection; gold for the main action
- * and rewards; the flame ramp for difficulty tiers; green/red only for right
- * and wrong answers.
+ * Every colour of the interface (buttons, text, borders, backgrounds) is
+ * monochromatic with the Home background picture
+ * (src/assets/home-background.webp): it takes one of the picture's own hues
+ * and only changes lightness and saturation.
+ *   sky       206°  blues, navigation, selection, text
+ *   sand      36°   gold buttons, warm text, borders, backgrounds
+ *   cypress   163°  right answers
+ *   terracotta 15°  wrong answers
+ * Lumi, the mascot, keeps a fuller flame (--flame-*) whose heart, --flame-4,
+ * is the exact complement of the sky. `src/theme/palette.test.ts` checks all
+ * of this, plus text contrast.
  */
 :root {
   color-scheme: light;
 
-  /* Warm light of the picture, as used by Lumi's flame. */
-  --flame-1: #fff080; /* sunlight */
+  /* Lumi's flame (mascot and difficulty tiers). */
+  --flame-1: #fff080;
   --flame-2: #ffcf3d;
-  --flame-3: #ffa929; /* sand gold, hue of the path */
+  --flame-3: #ffa929;
   --flame-4: #ff7d1a; /* exact complement of the sky */
   --flame-5: #f55f14;
   --flame-6: #f04419;
-  --flame-7: #c52c1b; /* terracotta */
-  --ember: #5a2418;
+  --flame-7: #c52c1b;
   --ember-dark: #2b0e0a;
 
-  /* The sky of the picture (hue 206°), from deep to light. */
+  /* Sky of the picture (hue 206°), from deep to light. */
   --sky-1: #0d2f4a;
   --sky-2: #0b4f84;
   --sky-3: #0c6cb6;
@@ -39,27 +35,39 @@
   --sky-6: #d8edfd;
   --sky-7: #ecf6fe;
 
-  /* Base: warm whites like the clouds and sand, text in deep sky. */
-  --bg: #fff8eb;
-  --bg-2: #ffeed1;
+  /* Sand of the picture's path (hue 36°), from deep to light. */
+  --sand-1: #3c2607;
+  --sand-2: #593b0d;
+  --sand-3: #915a08;
+  --sand-4: #c77905;
+  --sand: #ffa929;
+  --sand-6: #edca97;
+  --sand-7: #ffe9c7;
+  --sand-8: #ffebcc;
+  --sand-9: #fff3e0;
+  --sand-10: #fff7eb;
+
+  /* Base */
+  --bg: var(--sand-10);
+  --bg-2: #ffedd1;
   --surface: #ffffff;
-  --surface-2: #fff4e0;
-  --surface-3: #ebdccb;
-  --line: #ffe9c7;
-  --line-strong: #edc897;
+  --surface-2: var(--sand-9);
+  --surface-3: #eadecd;
+  --line: var(--sand-7);
+  --line-strong: var(--sand-6);
   --text: var(--sky-1);
   --text-2: #2a516f;
   --text-3: #4b6f8b;
 
-  /* Gold: the main action and rewards. */
-  --gold: var(--flame-3);
-  --gold-dark: var(--flame-5);
-  --gold-soft: #fff1c7;
-  --gold-text: var(--ember);
-  --on-gold: var(--ember-dark);
-  --warm-icon: var(--flame-7);
+  /* Gold (sand): the main action and rewards. */
+  --gold: var(--sand);
+  --gold-dark: var(--sand-4);
+  --gold-soft: var(--sand-8);
+  --gold-text: var(--sand-2);
+  --on-gold: var(--sand-1);
+  --warm-icon: var(--sand-3);
 
-  /* Blue: headers, navigation, selection. */
+  /* Blue (sky): headers, navigation, selection. */
   --brand: var(--sky-3);
   --brand-dark: var(--sky-2);
   --brand-soft: var(--sky-6);
@@ -67,13 +75,13 @@
   --brand-line: var(--sky-5);
   --on-brand: #ffffff;
 
-  /* Semantic: right and wrong answers only. */
-  --success: #19b863;
-  --success-dark: #0f8a48;
-  --success-soft: #def7e8;
-  --danger: var(--flame-7);
-  --danger-dark: #9a1d15;
-  --danger-soft: #f9e5e4;
+  /* Right (cypress, 163°) and wrong (terracotta, 15°) answers only. */
+  --success: #207e64;
+  --success-dark: #15654e;
+  --success-soft: #dff6ef;
+  --danger: #c1481f;
+  --danger-dark: #8f3314;
+  --danger-soft: #fceae3;
 
   /* Difficulty tiers: the flame gets hotter as questions get harder. */
   --tier-1: var(--flame-3);

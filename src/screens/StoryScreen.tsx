@@ -1,17 +1,18 @@
-import { navigate, type Route } from "../app/router";
+import { ChevronRight, Library } from "lucide-react";
+import { href, navigate, type Route } from "../app/router";
 import { MODE_STYLE } from "../components/icons";
 import { JourneyRoad, type RoadStop } from "../components/JourneyRoad";
 import { Screen, TabBar, TopBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
 import { ProgressBar } from "../components/ProgressBar";
 import { useTierName } from "../components/Tier";
-import { findBook, findTopic, unitFor } from "../content";
+import { findBook, findTopic, unitFor, unitsOfBook } from "../content";
 import type { PathNode } from "../content/types";
 import { TIERS } from "../content/types";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
 import { clearKey } from "../progress/model";
-import { completedCount, nodeStatus } from "../progress/path";
+import { bookProgress, completedCount, nodeStatus } from "../progress/path";
 import { useProgress } from "../progress/store";
 import { NotFoundScreen } from "./InfoScreens";
 import { nodeLabel, nodeMode } from "./pathLabels";
@@ -67,7 +68,7 @@ export function StoryScreen({ unitId }: { unitId: string }) {
 
   return (
     <Screen withTabs>
-      <TopBar title={book?.name ?? t("path.title")} back={{ name: "book", bookId: unit.bookId }} />
+      <TopBar title={book?.name ?? t("path.title")} back={{ name: "path" }} />
       <section aria-labelledby={`${unit.id}-title`}>
         <div className="story-head">
           <div className="story-head__text">
@@ -84,6 +85,24 @@ export function StoryScreen({ unitId }: { unitId: string }) {
         </div>
         <JourneyRoad stops={stops} finish={{ name: t("path.storyDone"), won: complete }} />
       </section>
+      <a className={`library-card${complete ? " is-won" : ""}`} href={href({ name: "library" })}>
+        <span className="library-card__icon" aria-hidden="true">
+          <Library size={26} strokeWidth={2.4} />
+        </span>
+        <span className="library-card__text">
+          <span className="library-card__title">
+            {complete ? t("library.storyFinished", { story: topic.title }) : t("library.title")}
+          </span>
+          <span className="library-card__meta">
+            {book &&
+              t("library.bookProgress", {
+                book: book.name,
+                ...bookProgress(progress, unitsOfBook(pack, book.id), pack.plannedStories.filter((s) => s.bookId === book.id).length),
+              })}
+          </span>
+        </span>
+        <ChevronRight size={20} className="faint" aria-hidden="true" />
+      </a>
       <TabBar current="path" />
     </Screen>
   );

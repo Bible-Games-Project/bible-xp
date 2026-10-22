@@ -1,53 +1,49 @@
-import { BookOpen, ChevronRight, Lock } from "lucide-react";
+import { Play } from "lucide-react";
 import { href } from "../app/router";
 import { AppHeader, Screen, TabBar } from "../components/Layout";
-import { Scene } from "../components/Scene";
-import { booksOf, isBookPlayable } from "../content";
-import type { TestamentId } from "../content/types";
+import { findBook, findTopic } from "../content";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
+import { completedCount, currentUnit } from "../progress/path";
+import { useProgress } from "../progress/store";
 
-/** The Journey: the two Testaments over the panorama of the Bible. */
+/** The Journey tab: one button that takes you to the road of the current story. */
 export function JourneyScreen() {
   const { t } = useI18n();
   const pack = useContent();
-
-  const card = (testament: TestamentId) => {
-    const books = booksOf(pack, testament);
-    const open = books.filter((b) => isBookPlayable(pack, b.id)).length;
-    const name = testament === "ot" ? t("path.oldTestament") : t("path.newTestament");
-    const range = testament === "ot" ? t("path.otRange") : t("path.ntRange");
-    return (
-      <a className={`testament${open ? "" : " is-soon"}`} href={href({ name: "testament", testament })}>
-        <span className="testament__icon" aria-hidden="true">
-          {open ? <BookOpen size={26} strokeWidth={2.4} /> : <Lock size={24} strokeWidth={2.4} />}
-        </span>
-        <span className="testament__text">
-          <span className="testament__name">{name}</span>
-          <span className="testament__meta">
-            {t("path.books", { n: books.length })} · {range}
-          </span>
-          <span className={`pill ${open ? "pill--gold" : ""}`}>
-            {open ? t("path.openBooks", { n: open, total: books.length }) : t("path.comingSoon")}
-          </span>
-        </span>
-        <ChevronRight size={22} className="faint" aria-hidden="true" />
-      </a>
-    );
-  };
+  const progress = useProgress();
+  const unit = currentUnit(progress, pack.units, pack.books.map((b) => b.id));
 
   return (
-    <Screen withTabs className="screen--scene journey">
-      <Scene name="bible" />
+    <Screen withTabs scene="bible" className="journey">
       <AppHeader />
       <div className="glass">
         <h1 className="screen-title">{t("path.title")}</h1>
         <p className="muted">{t("path.subtitle")}</p>
       </div>
-      <div className="journey__testaments">
-        {card("ot")}
-        {card("nt")}
-      </div>
+      {unit && (
+        <div className="journey__go">
+          {(() => {
+            const topic = findTopic(pack, unit.topicId)!;
+            const done = completedCount(progress, unit);
+            const fresh = done === 0 && !Object.values(progress.sessions).some((s) => s.kind === "activity");
+            return (
+              <a className="big-btn big-btn--journey" href={href({ name: "story", unitId: unit.id })}>
+                <span className="big-btn__icon" aria-hidden="true">
+                  <Play size={26} strokeWidth={2.6} fill="currentColor" />
+                </span>
+                <span className="big-btn__text">
+                  <span className="big-btn__title">{fresh ? t("home.startJourney") : t("home.continueJourney")}</span>
+                  <span className="big-btn__meta">
+                    {findBook(pack, unit.bookId)?.name} · {t("path.story", { n: unit.number })} · {topic.title}
+                  </span>
+                  <span className="big-btn__meta">{t("path.stops", { n: done, total: unit.nodes.length })}</span>
+                </span>
+              </a>
+            );
+          })()}
+        </div>
+      )}
       <TabBar current="path" />
     </Screen>
   );

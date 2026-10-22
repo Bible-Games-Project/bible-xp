@@ -10,8 +10,7 @@ describe("router", () => {
       { name: "play", activityId: "creation.quiz" },
       { name: "play", activityId: "creation.quiz", from: "free" },
       { name: "intro", introId: "creation.intro" },
-      { name: "testament", testament: "ot" },
-      { name: "testament", testament: "nt" },
+      { name: "library" },
       { name: "book", bookId: "GEN" },
       { name: "story", unitId: "unit-1" },
     ];

@@ -2,7 +2,6 @@ import { CalendarDays, Check, Play } from "lucide-react";
 import { href, type Route } from "../app/router";
 import { AppHeader, Screen, TabBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
-import { Scene } from "../components/Scene";
 import { useTierName } from "../components/Tier";
 import { dailyChallengeFor, findActivity, findBook, findTopic, unitOfActivity } from "../content";
 import { useContent } from "../content/useContent";
@@ -61,8 +60,7 @@ export function HomeScreen() {
   const daily = dailyChallengeFor(pack, today, dailyTier);
 
   return (
-    <Screen withTabs className="screen--scene home">
-      <Scene name="home" />
+    <Screen withTabs scene="home" className="home">
       <AppHeader />
       <h1 className="sr-only">{name ? t("home.greeting", { name }) : t("home.greetingGuest")}</h1>
 

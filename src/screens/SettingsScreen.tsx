@@ -1,4 +1,4 @@
-import { Check, ChevronRight, FileText, Info, Shield, TriangleAlert } from "lucide-react";
+import { Check, ChevronRight, FileText, Info, Library, Shield, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { href } from "../app/router";
 import { Button } from "../components/Button";
@@ -31,6 +31,17 @@ export function SettingsScreen() {
           {t("settings.storageError")}
         </div>
       )}
+
+      <a className="row-link" href={href({ name: "library" })}>
+        <span className="row-link__icon" aria-hidden="true">
+          <Library size={20} strokeWidth={2.4} />
+        </span>
+        <span className="row-link__text">
+          <span className="row-link__title">{t("library.title")}</span>
+          <span className="row-link__meta">{t("library.subtitle")}</span>
+        </span>
+        <ChevronRight size={20} className="faint" aria-hidden="true" />
+      </a>
 
       <h2 className="section-heading">{t("difficulty.title")}</h2>
       <p className="muted small">{t("difficulty.intro")}</p>

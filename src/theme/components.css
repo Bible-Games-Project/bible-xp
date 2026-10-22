@@ -13,10 +13,11 @@
 .screen--tabs {
   padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom) + var(--space-5));
 }
+/* Opacity only: a transform here would make fixed children (tab bar,
+   backgrounds) size themselves to <main> until the animation ends. */
 @keyframes screen-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
   }
 }
 

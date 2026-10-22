@@ -47,34 +47,45 @@ const saturation = (hex: string) => {
 const hueDistance = (a: number, b: number) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
 
 /** Colours sampled from src/assets/home-background.webp. */
-const IMAGE = { sky: "#6abbfb", path: "#fed79e", sun: "#fef9d1", rock: "#cf9977" };
+const IMAGE = { sky: "#6abbfb", path: "#fed79e", cypress: "#386c5d", reflection: "#d1b9b1" };
+const avatar = readFileSync(new URL("../components/Avatar.tsx", import.meta.url), "utf8");
+
+/** Every interface colour and the picture hue it must share. */
+const FAMILIES: Record<string, string[]> = {
+  [IMAGE.sky]: ["sky-1", "sky-2", "sky-3", "sky-5", "sky-6", "sky-7", "text", "text-2", "text-3", "brand", "brand-dark", "brand-soft", "brand-tint", "brand-line"],
+  [IMAGE.path]: ["bg", "bg-2", "surface-2", "surface-3", "line", "line-strong", "gold", "gold-dark", "gold-soft", "gold-text", "on-gold", "warm-icon"],
+  [IMAGE.cypress]: ["success", "success-dark", "success-soft"],
+  [IMAGE.reflection]: ["danger", "danger-dark", "danger-soft"],
+};
 
 describe("palette", () => {
   it("is anchored on the Home picture", () => {
     expect(t.sky).toBe(IMAGE.sky);
   });
 
-  it("every blue has the sky's hue (monochromatic with the picture)", () => {
-    for (const key of ["sky-1", "sky-2", "sky-3", "sky-5", "sky-6", "sky-7", "text-2", "text-3"]) {
-      expect(hueDistance(hue(t[key]), hue(IMAGE.sky)), key).toBeLessThan(2);
+  it("every interface colour is monochromatic with a hue of the picture", () => {
+    for (const [source, keys] of Object.entries(FAMILIES)) {
+      for (const key of keys) expect(hueDistance(hue(t[key]), hue(source)), key).toBeLessThan(3);
     }
-    expect(t.brand).toBe(t["sky-3"]);
-    expect(t.text).toBe(t["sky-1"]);
   });
 
-  it("the heart of the flame is the exact complement of the sky", () => {
+  it("avatars use single hues from the picture or Lumi's flame", () => {
+    const allowed = [...Object.keys(FAMILIES), t["flame-3"]].map(hue);
+    const colours = [...avatar.matchAll(/(?:from|to): "(#[0-9a-f]{6})"/gi)].map((m) => m[1].toLowerCase());
+    expect(colours.length).toBe(12);
+    for (const c of colours) {
+      const nearest = Math.min(...allowed.map((h) => hueDistance(hue(c), h)));
+      const flame = Object.keys(t).filter((k) => k.startsWith("flame-")).some((k) => t[k] === c);
+      expect(flame || nearest < 3, c).toBe(true);
+    }
+  });
+
+  it("the heart of Lumi's flame is the exact complement of the sky", () => {
     expect(hueDistance(hue(t["flame-4"]), hue(IMAGE.sky))).toBeGreaterThan(178.5);
-  });
-
-  it("warm colours follow the picture's light: sun, sand, stone", () => {
-    expect(hueDistance(hue(t["flame-1"]), hue(IMAGE.sun))).toBeLessThan(3);
-    expect(hueDistance(hue(t["flame-3"]), hue(IMAGE.path))).toBeLessThan(3);
-    expect(hueDistance(hue(t["flame-6"]), hue(IMAGE.rock))).toBeLessThan(13);
-    expect(t.gold).toBe(t["flame-3"]);
     for (let i = 1; i <= 6; i++) expect(saturation(t[`flame-${i}`])).toBeGreaterThan(0.85);
   });
 
-  it("Lumi is drawn with the same flame colours", () => {
+  it("Lumi is drawn with the flame colours", () => {
     for (let i = 1; i <= 7; i++) expect(mascot.toLowerCase()).toContain(t[`flame-${i}`]);
   });
 
@@ -87,8 +98,11 @@ describe("palette", () => {
     expect(contrast(t["on-brand"], t.brand)).toBeGreaterThanOrEqual(4.5);
     expect(contrast(t.brand, t["brand-soft"])).toBeGreaterThanOrEqual(4.5);
     expect(contrast(t["on-gold"], t.gold)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(t["gold-text"], t.gold)).toBeGreaterThanOrEqual(4.5);
     expect(contrast(t["gold-text"], t["gold-soft"])).toBeGreaterThanOrEqual(4.5);
     expect(contrast(t["warm-icon"], t["gold-soft"])).toBeGreaterThanOrEqual(3);
+    expect(contrast("#ffffff", t.success)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("#ffffff", t.danger)).toBeGreaterThanOrEqual(4.5);
   });
 
   it("each tier badge is readable on its own colour", () => {

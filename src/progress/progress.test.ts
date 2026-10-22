@@ -283,3 +283,26 @@ function abandonForTest(data: ProgressData, key: string): ProgressData {
   delete sessions[key];
   return { ...data, sessions };
 }
+
+describe("journey position", async () => {
+  const { currentUnit, bookProgress } = await import("./path");
+  const pack = getContent("en");
+  const order = pack.books.map((b) => b.id);
+
+  it("starts at the first story and stays there until it is finished", () => {
+    expect(currentUnit(defaultProgress(), pack.units, order)?.id).toBe("unit-1");
+  });
+
+  it("counts finished stories of a book against open and announced ones", () => {
+    const genesis = pack.units.filter((u) => u.bookId === "GEN");
+    const planned = pack.plannedStories.filter((s) => s.bookId === "GEN").length;
+    expect(bookProgress(defaultProgress(), genesis, planned)).toEqual({ done: 0, total: genesis.length + planned });
+    let data = completeIntro(defaultProgress(), "creation.intro", TODAY, NOW, units).data;
+    for (const node of units[0].nodes) {
+      if (node.kind !== "activity") continue;
+      const k = sessionKey.activity(node.activityId, 1);
+      data = finish(play(data, k, "activity", node.activityId, ["x"]), k).data;
+    }
+    expect(bookProgress(data, genesis, planned).done).toBe(1);
+  });
+});

@@ -2,7 +2,6 @@ import { ChevronRight, Lock } from "lucide-react";
 import { href } from "../app/router";
 import { Screen, TabBar, TopBar } from "../components/Layout";
 import { ProgressBar } from "../components/ProgressBar";
-import { Scene } from "../components/Scene";
 import { findBook, findTopic, unitsOfBook } from "../content";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
@@ -22,9 +21,8 @@ export function BookScreen({ bookId }: { bookId: string }) {
   const total = units.length + planned.length;
 
   return (
-    <Screen withTabs className="screen--scene">
-      <Scene name={book.testament === "ot" ? "old-testament" : "bible"} />
-      <TopBar title={book.testament === "ot" ? t("path.oldTestament") : t("path.newTestament")} back={{ name: "testament", testament: book.testament }} />
+    <Screen withTabs scene={book.testament === "ot" ? "old-testament" : "bible"}>
+      <TopBar title={t("library.title")} back={{ name: "library" }} />
       <div className="glass book-head">
         <span className="eyebrow">{pack.bookGroups[book.group]}</span>
         <h1 className="screen-title">{book.name}</h1>

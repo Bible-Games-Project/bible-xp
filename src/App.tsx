@@ -10,7 +10,7 @@ import { IntroScreen } from "./screens/IntroScreen";
 import { BookScreen } from "./screens/BookScreen";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { StoryScreen } from "./screens/StoryScreen";
-import { TestamentScreen } from "./screens/TestamentScreen";
+import { LibraryScreen } from "./screens/LibraryScreen";
 import { PlayScreen } from "./screens/PlayScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { ReviewPlayScreen, ReviewScreen } from "./screens/ReviewScreen";
@@ -28,8 +28,8 @@ export function App() {
       return <HomeScreen />;
     case "path":
       return <JourneyScreen />;
-    case "testament":
-      return <TestamentScreen testament={route.testament} />;
+    case "library":
+      return <LibraryScreen />;
     case "book":
       return <BookScreen key={route.bookId} bookId={route.bookId} />;
     case "story":

@@ -7,9 +7,23 @@ import { useProgress } from "../progress/store";
 import { levelForXp } from "../progress/levels";
 import { displayedStreak } from "../progress/streak";
 import { Avatar } from "./Avatar";
+import { Scene, type SceneName } from "./Scene";
 
-export function Screen({ children, withTabs, className = "" }: { children: ReactNode; withTabs?: boolean; className?: string }) {
-  return <main className={`screen${withTabs ? " screen--tabs" : ""} ${className}`}>{children}</main>;
+interface ScreenProps {
+  children: ReactNode;
+  withTabs?: boolean;
+  className?: string;
+  /** Illustrated background, drawn outside the screen so it always spans the viewport. */
+  scene?: SceneName;
+}
+
+export function Screen({ children, withTabs, className = "", scene }: ScreenProps) {
+  return (
+    <>
+      {scene && <Scene name={scene} />}
+      <main className={`screen${withTabs ? " screen--tabs" : ""}${scene ? " screen--scene" : ""} ${className}`}>{children}</main>
+    </>
+  );
 }
 
 /** Header for secondary screens: back button and title. */
