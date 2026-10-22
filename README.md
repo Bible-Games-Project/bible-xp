@@ -21,11 +21,12 @@ bun run test       # unit and content tests (vitest)
 
 ## What's inside
 
-- **Home** — just two things: the next step on your Journey (one big Play
-  button) and the Daily Challenge.
-- **Journey** — the learning path. Each Bible story is a chapter with a
-  winding road of stops; Story 1, The Creation (Genesis 1–3), has seven stops:
-  an introduction and the six games, unlocked in order.
+- **Home** — two big buttons over an illustrated landscape: start or continue
+  the Journey, and the Daily Challenge.
+- **Journey** — the whole Bible: Old and New Testament → their books (66) →
+  the stories of each book → a winding road of stops per story. Today Genesis
+  is open with Story 1, The Creation (Genesis 1–3): an introduction and the six
+  games, unlocked in order. Later Genesis stories are listed as coming soon.
 - **Daily** — one question from five games at your difficulty, chosen by
   date; rewarded once per day and resumable.
 - **Train** — any of the six games, any time, plus a "coming soon" Duels entry.

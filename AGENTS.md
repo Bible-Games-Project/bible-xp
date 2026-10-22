@@ -85,23 +85,28 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
 - The maintainer's first spec asked for React Native/Expo; we stayed on the web
   stack because bgp-admin owns the native wrapping. Do not add Expo or Capacitor.
 - Visual identity (maintainer decision): light and vibrant, built from the
-  mascot. Warm colours are Lumi's own flame colours (`--flame-1..7`, `--ember`)
-  and every blue is the exact complement (RGB inverse) of a flame colour
-  (`--sky-1..3`): navy text, blue for headers/navigation/selection, gold for the
-  main action and rewards, the flame ramp for difficulty tiers (hotter = harder).
-  Green/red only mark right and wrong answers. Tokens live in
-  `src/theme/tokens.css`; never hard-code colours in components.
-  `src/theme/palette.test.ts` checks the flame↔complement pairs and contrast,
-  so if the mascot's colours change, change the tokens with them.
+  Home background picture (`src/assets/home-background.webp`): every blue is
+  the picture's sky hue (206°) at another lightness (`--sky-*`, navy text,
+  blue headers/navigation/selection); warm colours follow the picture's light
+  from sun to sand to terracotta (`--flame-1..7`), with `--flame-4` the exact
+  complement of the sky. Lumi is drawn with the same flame colours. Gold is the
+  main action and rewards; the flame ramp marks difficulty tiers; green/red
+  only mark right and wrong answers. Tokens live in `src/theme/tokens.css`;
+  never hard-code colours in components. `src/theme/palette.test.ts` checks
+  these relationships and contrast.
 - The learning path is called "Journey" (maintainer decision; "Atlas" and an
-  Eden river map were rejected). Every Bible story is a chapter with its own
-  winding road of square milestone stones with labels beside them
-  (`src/components/JourneyRoad.tsx`). It must stay generic for any story and
-  look Duolingo-like in spirit but not a copy: no round buttons, no popovers.
-- Home can show an illustrated landscape (`src/assets/home-background.webp`,
-  supplied by the maintainer) instead of the plain background. It is a setting
-  (`settings.homeScene`, Settings → Preferences, on by default) added so the
-  maintainer can compare both; drop the setting once they decide.
+  Eden river map were rejected). Levels: Testaments (`JourneyScreen`, picture
+  `journey-bible.webp`) → books of a Testament, 66-book Protestant canon
+  (`TestamentScreen`; Old Testament uses `journey-old-testament.webp`) → stories
+  of a book (`BookScreen`) → one story's winding road of stops
+  (`StoryScreen`, `JourneyRoad`). Only books with a unit are playable (today:
+  Genesis → The Creation); later Genesis stories are listed as coming soon from
+  `plannedStories` in `src/content/locales/en/books.ts`. The road must look
+  Duolingo-like in spirit but not a copy: no round buttons, no popovers.
+- Home (maintainer decision): only two big buttons over the landscape —
+  "Start/Continue the journey" (goes straight to the next stop) and Daily
+  Challenge — with Lumi above them. Pictures supplied by the maintainer live in
+  `src/assets/` and are shown with `<Scene>` + `screen--scene`.
 - Match the Pairs must make the left-to-right linking obvious: column titles,
   a changing hint line, highlighted waiting column, numbered matched pairs.
 - Commands: `bun run build` (runs `tsc -b` first), `bun run test` (vitest),
@@ -123,10 +128,11 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   never absurd, and never a synonym another translation uses for the right answer.
 - Navigation (maintainer decision): bottom tabs are Home, Journey, Daily, Train.
   Profile is not a tab; it opens from the avatar at the top left and holds
-  Settings. Home shows only the main "next step" card and the daily challenge.
-- Mascot (maintainer decision): Lumi is a friendly flame in the red, orange
-  and yellow of the Bible Games Project logo (not white), drawn in SVG in
-  `src/components/Mascot.tsx`, with five moods.
+  Settings.
+- Mascot (maintainer decision): Lumi is a friendly flame in red, orange and
+  yellow (not white, like the Bible Games Project logo's flame would suggest),
+  drawn in SVG in `src/components/Mascot.tsx` with the `--flame` colours and
+  five moods.
 - Progress is one JSON object (`src/progress/model.ts`, version 3), all
   mutations are pure functions with tests. Bump `PROGRESS_VERSION` and extend
   `migrate()` when the shape changes; never drop XP, path progress or mistakes.

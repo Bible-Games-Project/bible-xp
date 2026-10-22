@@ -2,16 +2,19 @@ import { shuffle } from "../lib/random";
 import type {
   Activity,
   BibleRef,
+  BookEntry,
   ContentPack,
   DailyChallenge,
   GameMode,
   Step,
+  TestamentId,
   Tier,
   Topic,
   TopicIntro,
   TranslationId,
   Unit,
 } from "./types";
+import { bookGroups, books, plannedStories } from "./locales/en/books";
 import { creationDaily, creationTopic, creationUnit } from "./locales/en/creation";
 
 /**
@@ -26,6 +29,9 @@ const packs: Record<string, ContentPack> = {
     topics: [creationTopic],
     units: [creationUnit],
     daily: creationDaily,
+    books,
+    bookGroups,
+    plannedStories,
   },
 };
 
@@ -121,6 +127,33 @@ export function dailyChallengeFor(pack: ContentPack, date: string, tier: Tier): 
 
 export function unitFor(pack: ContentPack, unitId: string): Unit | undefined {
   return pack.units.find((u) => u.id === unitId);
+}
+
+export function findBook(pack: ContentPack, bookId: string): BookEntry | undefined {
+  return pack.books.find((b) => b.id === bookId);
+}
+
+/** Playable stories (units) of a book, in order. */
+export function unitsOfBook(pack: ContentPack, bookId: string): Unit[] {
+  return pack.units.filter((u) => u.bookId === bookId).sort((a, b) => a.number - b.number);
+}
+
+export function booksOf(pack: ContentPack, testament: TestamentId): BookEntry[] {
+  return pack.books.filter((b) => b.testament === testament);
+}
+
+export function isBookPlayable(pack: ContentPack, bookId: string): boolean {
+  return pack.units.some((u) => u.bookId === bookId);
+}
+
+/** The unit an activity belongs to, if any. */
+export function unitOfActivity(pack: ContentPack, activityId: string): Unit | undefined {
+  return pack.units.find((u) => u.nodes.some((n) => n.kind === "activity" && n.activityId === activityId));
+}
+
+/** The unit an intro belongs to, if any. */
+export function unitOfIntro(pack: ContentPack, introId: string): Unit | undefined {
+  return pack.units.find((u) => u.nodes.some((n) => n.kind === "intro" && n.introId === introId));
 }
 
 export function formatRef(pack: ContentPack, ref: BibleRef): string {

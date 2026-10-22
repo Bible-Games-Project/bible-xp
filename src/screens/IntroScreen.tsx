@@ -1,11 +1,11 @@
 import { Gem } from "lucide-react";
 import { useState } from "react";
-import { navigate } from "../app/router";
+import { navigate, type Route } from "../app/router";
 import { Button } from "../components/Button";
 import { CONTENT_ICONS } from "../components/icons";
 import { Screen, TopBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
-import { findIntro, formatRef, translationLabel } from "../content";
+import { findIntro, formatRef, translationLabel, unitOfIntro } from "../content";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
 import { playCue } from "../lib/feedback";
@@ -19,6 +19,8 @@ export function IntroScreen({ introId }: { introId: string }) {
   const intro = findIntro(pack, introId);
   const [earned, setEarned] = useState<number | null>(null);
   if (!intro) return <NotFoundScreen />;
+  const unit = unitOfIntro(pack, introId);
+  const storyRoute: Route = unit ? { name: "story", unitId: unit.id } : { name: "path" };
   const alreadyRead = Boolean(progress.intros[introId]) && earned === null;
 
   const finish = () => {
@@ -26,15 +28,15 @@ export function IntroScreen({ introId }: { introId: string }) {
     if (xp > 0) {
       playCue("complete");
       setEarned(xp);
-      window.setTimeout(() => navigate({ name: "path" }, { replace: true }), 1400);
+      window.setTimeout(() => navigate(storyRoute, { replace: true }), 1400);
     } else {
-      navigate({ name: "path" }, { replace: true });
+      navigate(storyRoute, { replace: true });
     }
   };
 
   return (
     <Screen className="intro">
-      <TopBar title={t("path.introName")} back={{ name: "path" }} />
+      <TopBar title={t("path.introName")} back={storyRoute} />
       <div className="intro__hero">
         <Mascot mood={earned ? "celebrating" : "happy"} size={120} />
         <h1 className="screen-title">{intro.title}</h1>

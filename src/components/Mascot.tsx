@@ -18,7 +18,8 @@ const MIDDLE =
 
 /**
  * Lumi — Bible XP's mascot: a small, friendly flame in the warm red, orange
- * and yellow of the Bible Games Project logo.
+ * and yellow of the Bible Games Project logo, using the app's --flame colours
+ * (src/theme/tokens.css) so it matches the rest of the interface.
  *
  * Drawn as layered SVG (three flame layers, a warm core, a soft highlight) so
  * it reads as a rounded 3D character at any size, with no image assets. The
@@ -42,28 +43,28 @@ export function Mascot({ mood = "normal", size = 120, label, className = "" }: M
     >
       <defs>
         <radialGradient id={id("glow")} cx="50%" cy="60%" r="50%">
-          <stop offset="0%" stopColor="#ffb02e" stopOpacity="0.55" />
-          <stop offset="60%" stopColor="#ff7a1a" stopOpacity="0.14" />
-          <stop offset="100%" stopColor="#ff7a1a" stopOpacity="0" />
+          <stop offset="0%" stopColor="#ffa929" stopOpacity="0.55" />
+          <stop offset="60%" stopColor="#ff7d1a" stopOpacity="0.14" />
+          <stop offset="100%" stopColor="#ff7d1a" stopOpacity="0" />
         </radialGradient>
         <linearGradient id={id("outer")} x1="0.3" y1="0" x2="0.6" y2="1">
-          <stop offset="0%" stopColor="#ff6a1f" />
-          <stop offset="55%" stopColor="#f2421c" />
-          <stop offset="100%" stopColor="#c9241a" />
+          <stop offset="0%" stopColor="#f55f14" />
+          <stop offset="55%" stopColor="#f04419" />
+          <stop offset="100%" stopColor="#c52c1b" />
         </linearGradient>
         <linearGradient id={id("middle")} x1="0.4" y1="0" x2="0.5" y2="1">
-          <stop offset="0%" stopColor="#ffb22a" />
-          <stop offset="60%" stopColor="#ff8a1c" />
-          <stop offset="100%" stopColor="#f56a18" />
+          <stop offset="0%" stopColor="#ffa929" />
+          <stop offset="60%" stopColor="#ff7d1a" />
+          <stop offset="100%" stopColor="#f55f14" />
         </linearGradient>
         <radialGradient id={id("core")} cx="50%" cy="55%" r="55%">
-          <stop offset="0%" stopColor="#ffe98a" />
-          <stop offset="55%" stopColor="#ffcf45" />
-          <stop offset="100%" stopColor="#ffb22a" stopOpacity="0" />
+          <stop offset="0%" stopColor="#fff080" />
+          <stop offset="55%" stopColor="#ffcf3d" />
+          <stop offset="100%" stopColor="#ffa929" stopOpacity="0" />
         </radialGradient>
         <linearGradient id={id("limb")} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ffa526" />
-          <stop offset="100%" stopColor="#f2541c" />
+          <stop offset="0%" stopColor="#ffa929" />
+          <stop offset="100%" stopColor="#f04419" />
         </linearGradient>
         <radialGradient id={id("eye")} cx="40%" cy="35%" r="70%">
           <stop offset="0%" stopColor="#5a2418" />
@@ -79,10 +80,10 @@ export function Mascot({ mood = "normal", size = 120, label, className = "" }: M
 
       {mood === "celebrating" && (
         <g className="mascot__sparkles">
-          <Sparkle x={30} y={54} s={9} color="#ffb22a" />
-          <Sparkle x={172} y={30} s={11} color="#ff6a1f" delay />
-          <Sparkle x={182} y={126} s={7} color="#ffcf45" />
-          <Sparkle x={18} y={138} s={6} color="#f2421c" delay />
+          <Sparkle x={30} y={54} s={9} color="#ffa929" />
+          <Sparkle x={172} y={30} s={11} color="#ff7d1a" delay />
+          <Sparkle x={182} y={126} s={7} color="#ffcf3d" />
+          <Sparkle x={18} y={138} s={6} color="#f04419" delay />
         </g>
       )}
       {mood === "thinking" && (

@@ -238,3 +238,26 @@ describe("answer positions", () => {
     expect(positions.size).toBe(4);
   });
 });
+
+describe("books of the Bible", () => {
+  it("lists 39 Old Testament and 27 New Testament books with unique ids", () => {
+    expect(pack.books.filter((b) => b.testament === "ot")).toHaveLength(39);
+    expect(pack.books.filter((b) => b.testament === "nt")).toHaveLength(27);
+    expect(new Set(pack.books.map((b) => b.id)).size).toBe(66);
+    expect(pack.books[0].name).toBe("Genesis");
+    expect(pack.books[65].name).toBe("Revelation");
+    for (const b of pack.books) expect(pack.bookGroups[b.group], b.id).toBeTruthy();
+  });
+
+  it("every story belongs to a listed book; Genesis starts with the Creation", () => {
+    for (const unit of pack.units) expect(pack.books.some((b) => b.id === unit.bookId)).toBe(true);
+    for (const s of pack.plannedStories) expect(pack.books.some((b) => b.id === s.bookId)).toBe(true);
+    const genesis = pack.units.filter((u) => u.bookId === "GEN").sort((a, b) => a.number - b.number);
+    expect(pack.topics.find((t) => t.id === genesis[0].topicId)?.title).toBe("The Creation");
+  });
+
+  it("planned stories are not playable and do not overlap a playable story's title", () => {
+    const playable = new Set(pack.units.map((u) => pack.topics.find((t) => t.id === u.topicId)?.title));
+    for (const s of pack.plannedStories) expect(playable.has(s.title)).toBe(false);
+  });
+});

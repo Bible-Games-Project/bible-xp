@@ -80,12 +80,6 @@ export function SettingsScreen() {
 
       <h2 className="section-heading">{t("settings.preferences")}</h2>
       <div className="card list">
-        <Toggle
-          label={t("settings.homeScene")}
-          description={t("settings.homeSceneHint")}
-          checked={settings.homeScene}
-          onChange={(v) => update({ homeScene: v })}
-        />
         <Toggle label={t("settings.sound")} checked={settings.sound} onChange={(v) => update({ sound: v })} />
         <Toggle
           label={t("settings.vibration")}

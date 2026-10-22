@@ -1,12 +1,16 @@
 /*
  * Bible XP design tokens.
  *
- * The palette is built from Lumi, the flame mascot (src/components/Mascot.tsx):
- * every warm colour (gold, orange, red) is one of the mascot's flame colours,
- * and every blue is the exact complement of one of them: the same colour on
- * the opposite side of the colour wheel (its RGB inverse). So the interface is
- * one warm family plus its mirror image in blue. `src/theme/palette.test.ts`
- * checks these pairs.
+ * The palette comes from the Home background illustration
+ * (src/assets/home-background.webp): a sky blue at hue 206° over warm sand,
+ * stone and sunlight.
+ * - Every blue is that sky hue (206°) at a different lightness, so blues are
+ *   monochromatic with the picture. --sky is sampled from the image itself.
+ * - Warm colours follow the picture's light, from sun yellow to sand gold to
+ *   terracotta; --flame-4, the heart of Lumi's flame, is the exact complement
+ *   of the sky (206° + 180° = 26°).
+ * - Lumi, the mascot, is drawn with these same --flame colours.
+ * `src/theme/palette.test.ts` checks these relationships and text contrast.
  *
  * Roles: blue for headers, navigation and selection; gold for the main action
  * and rewards; the flame ramp for difficulty tiers; green/red only for right
@@ -15,38 +19,42 @@
 :root {
   color-scheme: light;
 
-  /* Lumi's flame, light to deep. */
-  --flame-1: #ffe98a;
-  --flame-2: #ffcf45;
-  --flame-3: #ffb22a;
-  --flame-4: #ff8a1c;
-  --flame-5: #f56a18;
-  --flame-6: #f2421c;
-  --flame-7: #c9241a;
+  /* Warm light of the picture, as used by Lumi's flame. */
+  --flame-1: #fff080; /* sunlight */
+  --flame-2: #ffcf3d;
+  --flame-3: #ffa929; /* sand gold, hue of the path */
+  --flame-4: #ff7d1a; /* exact complement of the sky */
+  --flame-5: #f55f14;
+  --flame-6: #f04419;
+  --flame-7: #c52c1b; /* terracotta */
   --ember: #5a2418;
   --ember-dark: #2b0e0a;
 
-  /* Exact complements of the flame. */
-  --sky-1: #001675; /* complement of --flame-1 */
-  --sky-2: #0030ba; /* complement of --flame-2 */
-  --sky-3: #004dd5; /* complement of --flame-3 */
+  /* The sky of the picture (hue 206°), from deep to light. */
+  --sky-1: #0d2f4a;
+  --sky-2: #0b4f84;
+  --sky-3: #0c6cb6;
+  --sky: #6abbfb; /* sampled from the image */
+  --sky-5: #acd6f6;
+  --sky-6: #d8edfd;
+  --sky-7: #ecf6fe;
 
-  /* Base: warm whites tinted with the flame, text in the complementary navy. */
-  --bg: #fff9e7;
-  --bg-2: #fff3d0;
+  /* Base: warm whites like the clouds and sand, text in deep sky. */
+  --bg: #fff8eb;
+  --bg-2: #ffeed1;
   --surface: #ffffff;
-  --surface-2: #fff3dd;
-  --surface-3: #eedfcd;
-  --line: #ffebc8;
-  --line-strong: #ebc998;
+  --surface-2: #fff4e0;
+  --surface-3: #ebdccb;
+  --line: #ffe9c7;
+  --line-strong: #edc897;
   --text: var(--sky-1);
-  --text-2: #334591;
-  --text-3: #616fa9;
+  --text-2: #2a516f;
+  --text-3: #4b6f8b;
 
   /* Gold: the main action and rewards. */
   --gold: var(--flame-3);
   --gold-dark: var(--flame-5);
-  --gold-soft: #fff5ca;
+  --gold-soft: #fff1c7;
   --gold-text: var(--ember);
   --on-gold: var(--ember-dark);
   --warm-icon: var(--flame-7);
@@ -54,9 +62,9 @@
   /* Blue: headers, navigation, selection. */
   --brand: var(--sky-3);
   --brand-dark: var(--sky-2);
-  --brand-soft: #e6edfb;
-  --brand-tint: #f2f6fd;
-  --brand-line: #b8cdf3;
+  --brand-soft: var(--sky-6);
+  --brand-tint: var(--sky-7);
+  --brand-line: var(--sky-5);
   --on-brand: #ffffff;
 
   /* Semantic: right and wrong answers only. */
@@ -75,8 +83,8 @@
   --tier-5: var(--flame-7);
 
   /* Elevation */
-  --shadow: 0 2px 0 var(--line), 0 8px 24px rgb(0 22 117 / 0.06);
-  --shadow-lift: 0 12px 30px rgb(0 22 117 / 0.18);
+  --shadow: 0 2px 0 var(--line), 0 8px 24px rgb(13 47 74 / 0.08);
+  --shadow-lift: 0 12px 30px rgb(13 47 74 / 0.2);
 
   /* Shape */
   --radius-sm: 10px;

@@ -1,70 +1,5 @@
 /* ---------------------------------------------------------------- Home */
 
-/* The one primary action. */
-.quest {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-5) var(--space-4);
-  border-radius: var(--radius-lg);
-  background: var(--brand);
-  color: var(--on-brand);
-  box-shadow: 0 6px 0 var(--brand-dark);
-}
-.quest__top {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-.quest__text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.quest__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--fs-xs);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  opacity: 0.9;
-}
-.quest__title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 2.25rem;
-  line-height: 1.05;
-  letter-spacing: 0.01em;
-}
-.quest__meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  font-size: var(--fs-sm);
-  font-weight: 750;
-}
-.quest__story {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: var(--fs-xs);
-  font-weight: 800;
-  opacity: 0.95;
-}
-.quest__story .progress {
-  flex: none;
-  background: rgb(255 255 255 / 0.25);
-}
-.quest__mascot {
-  flex: none;
-  margin: -12px -10px -20px 0;
-}
-
 .row-link {
   display: flex;
   align-items: center;
@@ -990,55 +925,7 @@
   color: var(--brand);
 }
 
-/* Daily challenge card on Home. */
-.daily-card {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  border: 2px solid var(--gold);
-  box-shadow: 0 5px 0 var(--gold-dark);
-}
-.daily-card:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 var(--gold-dark);
-}
-.daily-card.is-done {
-  border-color: var(--success);
-  box-shadow: 0 5px 0 var(--success-dark);
-}
-.daily-card__icon {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: var(--gold);
-  color: var(--on-gold);
-  flex: none;
-}
-.daily-card.is-done .daily-card__icon {
-  background: var(--success);
-  color: #fff;
-}
-.daily-card__text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-.daily-card__title {
-  font-family: var(--font-display);
-  font-size: var(--fs-lg);
-  line-height: 1.15;
-}
-.daily-card__meta {
-  font-size: var(--fs-sm);
-  font-weight: 750;
-  color: var(--text-2);
-}
+/* XP pill on the Daily tab. */
 .daily-card__reward {
   padding: 4px 10px;
   border-radius: 999px;
@@ -1099,15 +986,33 @@
   color: var(--text-3);
 }
 
-/* Optional illustrated background behind Home (Settings → Preferences). */
-.home-scene {
+/* ---------------------------------------------------------------- Illustrated backgrounds */
+
+.scene {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: var(--bg) url("../assets/home-background.webp") center bottom / cover no-repeat;
+  background-color: var(--bg);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
-.screen--scene > :not(.home-scene) {
+.scene--home {
+  background-image: url("../assets/home-background.webp");
+  background-position: center bottom;
+}
+.scene--bible {
+  background-image: url("../assets/journey-bible.webp");
+  background-position: center top;
+}
+/* A busy picture: a light veil keeps cards and text calm on top of it. */
+.scene--old-testament {
+  background-image:
+    linear-gradient(rgb(255 248 235 / 0.35), rgb(255 248 235 / 0.35)),
+    url("../assets/journey-old-testament.webp");
+  background-position: center top;
+}
+.screen--scene > :not(.scene) {
   position: relative;
   z-index: 1;
 }
@@ -1115,15 +1020,339 @@
   position: fixed;
   z-index: 20;
 }
+.screen--scene .statusbar__avatar,
+.screen--scene .topbar .icon-btn {
+  background: rgb(255 255 255 / 0.88);
+}
 .screen--scene .statusbar__avatar {
   padding: 2px 12px 2px 2px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.85);
   flex: none;
-}
-.screen--scene .statusbar {
-  justify-content: flex-start;
 }
 .screen--scene .statusbar__avatar + .stat-chip {
   margin-left: auto;
+}
+.screen--scene .topbar__title {
+  justify-self: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.88);
+}
+
+/* A frosted panel for titles that sit directly on a picture. */
+.glass {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: rgb(255 255 255 / 0.86);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
+}
+
+/* ---------------------------------------------------------------- Home */
+
+.home {
+  min-height: 100dvh;
+}
+.home__lumi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.bubble {
+  position: relative;
+  max-width: 280px;
+  padding: 12px 18px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-weight: 850;
+  text-align: center;
+  color: var(--text);
+}
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  margin-left: -9px;
+  border: 9px solid transparent;
+  border-top-color: var(--surface);
+  border-bottom: 0;
+}
+.home__actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-bottom: var(--space-2);
+}
+.big-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 84px;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+.big-btn:active {
+  transform: translateY(5px);
+}
+.big-btn__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex: none;
+}
+.big-btn__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.big-btn__title {
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  line-height: 1.1;
+}
+.big-btn__meta {
+  font-size: var(--fs-sm);
+  font-weight: 800;
+}
+.big-btn--journey {
+  background: var(--gold);
+  color: var(--on-gold);
+  box-shadow: 0 6px 0 var(--gold-dark), var(--shadow-lift);
+}
+.big-btn--journey:active {
+  box-shadow: 0 1px 0 var(--gold-dark);
+}
+.big-btn--journey .big-btn__icon {
+  background: var(--on-gold);
+  color: var(--gold);
+}
+.big-btn--journey .big-btn__meta {
+  color: var(--ember);
+}
+.big-btn--daily {
+  background: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 6px 0 var(--brand-dark), var(--shadow-lift);
+}
+.big-btn--daily:active {
+  box-shadow: 0 1px 0 var(--brand-dark);
+}
+.big-btn--daily .big-btn__icon {
+  background: var(--sky-6);
+  color: var(--brand);
+}
+.big-btn--daily.is-done .big-btn__icon {
+  background: var(--success);
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------- Journey levels */
+
+.journey {
+  min-height: 100dvh;
+}
+.journey__testaments {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.testament {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: 0 5px 0 var(--gold-dark), var(--shadow-lift);
+  border: 2px solid var(--gold);
+}
+.testament.is-soon {
+  background: rgb(255 255 255 / 0.9);
+  border-color: var(--sky-5);
+  box-shadow: 0 5px 0 var(--sky-5), var(--shadow-lift);
+}
+.testament:active {
+  transform: translateY(3px);
+}
+.testament__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--gold);
+  color: var(--on-gold);
+  flex: none;
+}
+.testament.is-soon .testament__icon {
+  background: var(--sky-6);
+  color: var(--brand);
+}
+.testament__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.testament__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  line-height: 1.1;
+}
+.testament__meta {
+  font-size: var(--fs-sm);
+  font-weight: 750;
+  color: var(--text-2);
+}
+
+.book-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.book-group .section-heading {
+  margin-top: 0;
+  color: var(--text-2);
+}
+.book-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+.book,
+.book a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+}
+.book {
+  padding: 0 10px;
+  border-radius: 12px;
+}
+.book.is-locked {
+  background: var(--surface-2);
+  color: var(--text-3);
+}
+.book.is-open {
+  padding: 0;
+  grid-column: span 2;
+}
+.book.is-open a {
+  width: 100%;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--gold);
+  color: var(--on-gold);
+  box-shadow: 0 4px 0 var(--gold-dark);
+}
+.book.is-open a:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--gold-dark);
+}
+.book__name {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.2;
+}
+.book__meta {
+  font-size: var(--fs-xs);
+  font-weight: 900;
+}
+
+.book-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stories {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.tale-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+a.tale-card {
+  border: 2px solid var(--gold);
+  box-shadow: 0 5px 0 var(--gold-dark), var(--shadow);
+}
+a.tale-card:active {
+  transform: translateY(3px);
+}
+.tale-card.is-locked {
+  background: rgb(255 255 255 / 0.85);
+  color: var(--text-3);
+}
+.tale-card__num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--gold);
+  color: var(--on-gold);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  flex: none;
+}
+.tale-card.is-locked .tale-card__num {
+  background: var(--surface-2);
+  color: var(--text-3);
+}
+.tale-card__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tale-card__title {
+  font-weight: 900;
+  color: var(--text);
+}
+.tale-card.is-locked .tale-card__title {
+  color: var(--text-2);
+}
+.tale-card__meta {
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  color: var(--text-3);
+}
+.tale-card .progress {
+  flex: none;
+}
+.tale-card__go {
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--brand);
 }

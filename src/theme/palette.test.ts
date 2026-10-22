@@ -18,7 +18,6 @@ function tokens(): Record<string, string> {
 
 const t = tokens();
 const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-const inverse = (hex: string) => "#" + rgb(hex).map((c) => (255 - c).toString(16).padStart(2, "0")).join("");
 const hue = (hex: string) => {
   const [r, g, b] = rgb(hex).map((c) => c / 255);
   const max = Math.max(r, g, b);
@@ -38,24 +37,45 @@ const contrast = (a: string, b: string) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 
+const saturation = (hex: string) => {
+  const [r, g, b] = rgb(hex).map((c) => c / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  return max === min ? 0 : (max - min) / (1 - Math.abs(2 * l - 1));
+};
+const hueDistance = (a: number, b: number) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
+
+/** Colours sampled from src/assets/home-background.webp. */
+const IMAGE = { sky: "#6abbfb", path: "#fed79e", sun: "#fef9d1", rock: "#cf9977" };
+
 describe("palette", () => {
-  it("every flame colour is one of the mascot's own colours", () => {
-    for (let i = 1; i <= 7; i++) expect(mascot.toLowerCase()).toContain(t[`flame-${i}`]);
+  it("is anchored on the Home picture", () => {
+    expect(t.sky).toBe(IMAGE.sky);
   });
 
-  it("every blue is the exact complement of a flame colour", () => {
-    for (let i = 1; i <= 3; i++) {
-      expect(t[`sky-${i}`]).toBe(inverse(t[`flame-${i}`]));
-      expect(Math.abs(((hue(t[`sky-${i}`]) - hue(t[`flame-${i}`]) + 360) % 360) - 180)).toBeLessThan(1);
+  it("every blue has the sky's hue (monochromatic with the picture)", () => {
+    for (const key of ["sky-1", "sky-2", "sky-3", "sky-5", "sky-6", "sky-7", "text-2", "text-3"]) {
+      expect(hueDistance(hue(t[key]), hue(IMAGE.sky)), key).toBeLessThan(2);
     }
-    expect(t.brand).toBe(inverse(t.gold));
+    expect(t.brand).toBe(t["sky-3"]);
+    expect(t.text).toBe(t["sky-1"]);
   });
 
-  it("the main colours come from the flame and its complements", () => {
+  it("the heart of the flame is the exact complement of the sky", () => {
+    expect(hueDistance(hue(t["flame-4"]), hue(IMAGE.sky))).toBeGreaterThan(178.5);
+  });
+
+  it("warm colours follow the picture's light: sun, sand, stone", () => {
+    expect(hueDistance(hue(t["flame-1"]), hue(IMAGE.sun))).toBeLessThan(3);
+    expect(hueDistance(hue(t["flame-3"]), hue(IMAGE.path))).toBeLessThan(3);
+    expect(hueDistance(hue(t["flame-6"]), hue(IMAGE.rock))).toBeLessThan(13);
     expect(t.gold).toBe(t["flame-3"]);
-    expect(t.text).toBe(t["sky-1"]);
-    expect(t.brand).toBe(t["sky-3"]);
-    expect(t["brand-dark"]).toBe(t["sky-2"]);
+    for (let i = 1; i <= 6; i++) expect(saturation(t[`flame-${i}`])).toBeGreaterThan(0.85);
+  });
+
+  it("Lumi is drawn with the same flame colours", () => {
+    for (let i = 1; i <= 7; i++) expect(mascot.toLowerCase()).toContain(t[`flame-${i}`]);
   });
 
   it("text stays readable", () => {
@@ -65,6 +85,7 @@ describe("palette", () => {
       expect(contrast(t["text-3"], bg)).toBeGreaterThanOrEqual(4.5);
     }
     expect(contrast(t["on-brand"], t.brand)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(t.brand, t["brand-soft"])).toBeGreaterThanOrEqual(4.5);
     expect(contrast(t["on-gold"], t.gold)).toBeGreaterThanOrEqual(4.5);
     expect(contrast(t["gold-text"], t["gold-soft"])).toBeGreaterThanOrEqual(4.5);
     expect(contrast(t["warm-icon"], t["gold-soft"])).toBeGreaterThanOrEqual(3);

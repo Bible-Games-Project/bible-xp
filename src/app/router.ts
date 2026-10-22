@@ -8,6 +8,9 @@ import { useEffect, useSyncExternalStore } from "react";
 export type Route =
   | { name: "home" }
   | { name: "path" }
+  | { name: "testament"; testament: "ot" | "nt" }
+  | { name: "book"; bookId: string }
+  | { name: "story"; unitId: string }
   | { name: "train" }
   | { name: "profile" }
   | { name: "settings" }
@@ -49,6 +52,12 @@ export function parseHash(hash: string): Route {
     return new URLSearchParams(query).get("from") === "free" ? { name: "play", activityId: param, from: "free" } : { name: "play", activityId: param };
   }
   if (head === "intro" && param) return { name: "intro", introId: param };
+  if (head === "path") {
+    if (param === "ot" || param === "nt") return { name: "testament", testament: param };
+    const [kind, id] = rest;
+    if (kind === "book" && id) return { name: "book", bookId: id };
+    if (kind === "story" && id) return { name: "story", unitId: id };
+  }
   return { name: "not-found" };
 }
 
@@ -62,6 +71,12 @@ export function href(route: Route): string {
       return `#/intro/${encodeURIComponent(route.introId)}`;
     case "review-play":
       return "#/review/play";
+    case "testament":
+      return `#/path/${route.testament}`;
+    case "book":
+      return `#/path/book/${encodeURIComponent(route.bookId)}`;
+    case "story":
+      return `#/path/story/${encodeURIComponent(route.unitId)}`;
     case "not-found":
       return "#/";
     default:

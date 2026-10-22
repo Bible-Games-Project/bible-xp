@@ -7,7 +7,10 @@ import { TrainScreen } from "./screens/TrainScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { AboutScreen, MultiplayerScreen, NotFoundScreen, PlusScreen, PrivacyScreen, TermsScreen } from "./screens/InfoScreens";
 import { IntroScreen } from "./screens/IntroScreen";
-import { PathScreen } from "./screens/PathScreen";
+import { BookScreen } from "./screens/BookScreen";
+import { JourneyScreen } from "./screens/JourneyScreen";
+import { StoryScreen } from "./screens/StoryScreen";
+import { TestamentScreen } from "./screens/TestamentScreen";
 import { PlayScreen } from "./screens/PlayScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { ReviewPlayScreen, ReviewScreen } from "./screens/ReviewScreen";
@@ -24,7 +27,13 @@ export function App() {
     case "home":
       return <HomeScreen />;
     case "path":
-      return <PathScreen />;
+      return <JourneyScreen />;
+    case "testament":
+      return <TestamentScreen testament={route.testament} />;
+    case "book":
+      return <BookScreen key={route.bookId} bookId={route.bookId} />;
+    case "story":
+      return <StoryScreen key={route.unitId} unitId={route.unitId} />;
     case "train":
       return <TrainScreen />;
     case "profile":

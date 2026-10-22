@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Route } from "../app/router";
-import { drawSteps, findActivity, findStep, findTopic, SESSION_SIZE, stepsAtTier } from "../content";
+import { drawSteps, findActivity, findStep, findTopic, SESSION_SIZE, stepsAtTier, unitOfActivity } from "../content";
 import type { Step } from "../content/types";
 import { useContent } from "../content/useContent";
 import { GameSession } from "../engine/GameSession";
@@ -37,9 +37,9 @@ export function PlayScreen({ activityId, from }: { activityId: string; from?: "f
   if (!activity) return <NotFoundScreen />;
   const topic = findTopic(pack, activity.topicId)!;
 
-  const exitRoute: Route = from === "free" ? { name: "train" } : { name: "path" };
+  const unit = unitOfActivity(pack, activityId);
+  const exitRoute: Route = from === "free" ? { name: "train" } : unit ? { name: "story", unitId: unit.id } : { name: "path" };
   let nextRoute: Route | null = null;
-  const unit = pack.units.find((u) => u.nodes.some((n) => n.kind === "activity" && n.activityId === activityId));
   if (unit && from !== "free") {
     const next = nextNode(progress, unit);
     if (next && !(next.node.kind === "activity" && next.node.activityId === activityId)) {

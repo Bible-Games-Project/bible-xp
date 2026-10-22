@@ -29,8 +29,6 @@ export interface Settings {
   /** null follows the operating system preference. */
   reduceMotion: boolean | null;
   largeText: boolean;
-  /** Illustrated landscape behind Home instead of the plain background. */
-  homeScene: boolean;
 }
 
 export interface Profile {
@@ -123,7 +121,7 @@ export function defaultProgress(): ProgressData {
   return {
     version: PROGRESS_VERSION,
     profile: { name: "", avatar: "dawn" },
-    settings: { language: "en", sound: true, vibration: true, reduceMotion: null, largeText: false, homeScene: true },
+    settings: { language: "en", sound: true, vibration: true, reduceMotion: null, largeText: false },
     xp: 0,
     streak: { ...EMPTY_STREAK },
     difficulty: defaultDifficulty(),

@@ -81,7 +81,8 @@ export const creationTopic: Topic = {
 export const creationUnit: Unit = {
   id: "unit-1",
   number: 1,
-  title: "Eden",
+  title: "The Creation",
+  bookId: "GEN",
   topicId: TOPIC,
   nodes: [
     { id: "u1.intro", kind: "intro", topicId: TOPIC, introId: "creation.intro" },

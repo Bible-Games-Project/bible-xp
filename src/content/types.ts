@@ -193,6 +193,25 @@ export interface Topic {
   activities: Activity[];
 }
 
+export type TestamentId = "ot" | "nt";
+
+/** A book of the Bible in the Journey catalogue. Ids are USFM codes. */
+export interface BookEntry {
+  id: string;
+  name: string;
+  testament: TestamentId;
+  /** Key of the section the book belongs to (see ContentPack.bookGroups). */
+  group: string;
+}
+
+/** A story announced in a book but not playable yet. Never shown as available. */
+export interface PlannedStory {
+  bookId: string;
+  title: string;
+  /** Short human-readable range, e.g. "Genesis 6–9". */
+  passage: string;
+}
+
 /** A node on the learning path. */
 export type PathNode =
   | { id: string; kind: "intro"; topicId: string; introId: string }
@@ -202,6 +221,8 @@ export interface Unit {
   id: string;
   number: number;
   title: string;
+  /** Book of the Bible this story belongs to (BookEntry id). */
+  bookId: string;
   topicId: string;
   nodes: PathNode[];
 }
@@ -228,4 +249,9 @@ export interface ContentPack {
   topics: Topic[];
   units: Unit[];
   daily: DailyRecipe;
+  /** All books of the Bible, in canonical order. */
+  books: BookEntry[];
+  /** Section names by group key, in display order. */
+  bookGroups: Record<string, string>;
+  plannedStories: PlannedStory[];
 }
