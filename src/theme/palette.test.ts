@@ -47,7 +47,15 @@ const saturation = (hex: string) => {
 const hueDistance = (a: number, b: number) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
 
 /** Colours sampled from src/assets/home-background.webp. */
-const IMAGE = { sky: "#6abbfb", path: "#fed79e", cypress: "#386c5d", reflection: "#d1b9b1" };
+const IMAGE = {
+  sky: "#6abbf8",
+  path: "#fcd194",
+  cypress: "#3b7455",
+  rock: "#cb8258",
+  stone: "#d7996a",
+  meadow: "#f2d987",
+  sun: "#fdf8d5",
+};
 const avatar = readFileSync(new URL("../components/Avatar.tsx", import.meta.url), "utf8");
 
 /** Every interface colour and the picture hue it must share. */
@@ -55,7 +63,7 @@ const FAMILIES: Record<string, string[]> = {
   [IMAGE.sky]: ["sky-1", "sky-2", "sky-3", "sky-5", "sky-6", "sky-7", "text", "text-2", "text-3", "brand", "brand-dark", "brand-soft", "brand-tint", "brand-line"],
   [IMAGE.path]: ["bg", "bg-2", "surface-2", "surface-3", "line", "line-strong", "gold", "gold-dark", "gold-soft", "gold-text", "on-gold", "warm-icon"],
   [IMAGE.cypress]: ["success", "success-dark", "success-soft"],
-  [IMAGE.reflection]: ["danger", "danger-dark", "danger-soft"],
+  [IMAGE.rock]: ["danger", "danger-dark", "danger-soft"],
 };
 
 describe("palette", () => {
@@ -77,6 +85,14 @@ describe("palette", () => {
       const nearest = Math.min(...allowed.map((h) => hueDistance(hue(c), h)));
       const flame = Object.keys(t).filter((k) => k.startsWith("flame-")).some((k) => t[k] === c);
       expect(flame || nearest < 3, c).toBe(true);
+    }
+  });
+
+  it("every colour of Lumi's flame is a warm hue of the picture", () => {
+    const warm = [IMAGE.sun, IMAGE.meadow, IMAGE.path, IMAGE.stone, IMAGE.rock].map(hue);
+    for (let i = 1; i <= 7; i++) {
+      const nearest = Math.min(...warm.map((h) => hueDistance(hue(t[`flame-${i}`]), h)));
+      expect(nearest, `flame-${i}`).toBeLessThan(3);
     }
   });
 

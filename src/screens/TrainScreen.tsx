@@ -18,14 +18,14 @@ export function TrainScreen() {
   const tierName = useTierName();
 
   return (
-    <Screen withTabs>
+    <Screen withTabs scene="train" className="train">
       <AppHeader />
-      <div>
+      <div className="glass">
         <h1 className="screen-title">{t("train.title")}</h1>
         <p className="muted">{t("train.subtitle")}</p>
       </div>
 
-      <a className="row-link" href={href({ name: "settings" })}>
+      <a className="row-link train__difficulty" href={href({ name: "settings" })}>
         <span className="row-link__text">
           <span className="row-link__meta">{t("difficulty.title")}</span>
           <span>

@@ -36,7 +36,7 @@ export function BookScreen({ bookId }: { bookId: string }) {
           const started = done > 0;
           return (
             <li key={unit.id}>
-              <a className="tale-card" href={href({ name: "story", unitId: unit.id })}>
+              <a className="tale-card" href={href({ name: "story", unitId: unit.id, from: "library" })}>
                 <span className="tale-card__num">{unit.number}</span>
                 <span className="tale-card__text">
                   <span className="tale-card__title">{topic.title}</span>

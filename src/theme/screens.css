@@ -52,6 +52,11 @@
 
 /* ---------------------------------------------------------------- Journey */
 
+/* The road starts a little lower, so the top of the story's picture shows. */
+.story .story-head {
+  margin-top: clamp(40px, 13vh, 132px);
+}
+
 .story-head {
   position: relative;
   overflow: hidden;
@@ -375,7 +380,12 @@
   color: var(--on-brand);
 }
 
-/* ---------------------------------------------------------------- Play (Free Play) */
+/* ---------------------------------------------------------------- Train */
+
+/* A window onto the picture between the title and the games. */
+.train .train__difficulty {
+  margin-top: clamp(24px, 24vh, 240px);
+}
 
 .tier-tabs {
   display: flex;
@@ -936,14 +946,18 @@
   white-space: nowrap;
 }
 
-/* Daily tab */
+/* Daily tab: the challenge card sits low, under the picture. */
+.daily {
+  min-height: 100dvh;
+}
+.daily .daily-hero {
+  margin-top: auto;
+}
 .daily-hero {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
   gap: var(--space-3);
-  padding: var(--space-5);
+  padding: var(--space-4) var(--space-5) var(--space-5);
   border-radius: var(--radius-lg);
   background: var(--surface);
   border: 2px solid var(--gold);
@@ -952,6 +966,21 @@
 .daily-hero.is-done {
   border-color: var(--success);
   box-shadow: 0 6px 0 var(--success-dark);
+}
+.daily-hero__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.daily-hero__head .mascot {
+  flex: none;
+  margin: -6px 0 -10px -8px;
+}
+.daily-hero__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 .daily-hero__eyebrow {
   font-size: var(--fs-xs);
@@ -969,7 +998,6 @@
 .daily-hero__meta {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--space-2);
   flex-wrap: wrap;
   font-size: var(--fs-sm);
@@ -988,29 +1016,46 @@
 
 /* ---------------------------------------------------------------- Illustrated backgrounds */
 
+/*
+ * The picture is an <img> (see Scene.tsx), preloaded at start-up and decoded
+ * synchronously, so it is there in the very first frame of a screen.
+ */
 .scene {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
   background-color: var(--bg);
-  background-repeat: no-repeat;
-  background-size: cover;
 }
-.scene--home {
-  background-image: url("../assets/home-background.webp");
-  background-position: center bottom;
+.scene__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  user-select: none;
 }
-.scene--bible {
-  background-image: url("../assets/journey-bible.webp");
-  background-position: center top;
+/* Keep the hill with the three crosses in view on wide screens too. */
+.scene--home .scene__img {
+  object-position: center 52%;
 }
-/* A busy picture: a light veil keeps cards and text calm on top of it. */
-.scene--old-testament {
-  background-image:
-    linear-gradient(rgb(255 248 235 / 0.35), rgb(255 248 235 / 0.35)),
-    url("../assets/journey-old-testament.webp");
-  background-position: center top;
+.scene--daily .scene__img {
+  object-position: 30% center;
+}
+.scene--train .scene__img {
+  object-position: 62% center;
+}
+/* Busy pictures: a light veil keeps cards and text calm on top of them. */
+.scene--old-testament::after,
+.scene--train::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(255 248 235 / 0.35);
+}
+.scene--train::after {
+  background: linear-gradient(rgb(255 248 235 / 0), rgb(255 248 235 / 0.3) 45%, rgb(255 248 235 / 0.55));
 }
 .screen--scene {
   position: relative;
@@ -1035,6 +1080,18 @@
   background: rgb(255 255 255 / 0.88);
 }
 
+/* Text that would otherwise sit straight on the picture. */
+.screen--scene .stop--locked .stop__label,
+.screen--scene .daily-streak {
+  background: rgb(255 255 255 / 0.88);
+  box-shadow: var(--shadow);
+}
+.screen--scene .daily-streak {
+  align-self: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+}
+
 /* A frosted panel for titles that sit directly on a picture. */
 .glass {
   padding: var(--space-3) var(--space-4);
@@ -1051,31 +1108,34 @@
 }
 .home__lumi {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-4);
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.home__lumi .mascot {
+  flex: none;
 }
 .bubble {
   position: relative;
-  max-width: 280px;
+  flex: 1;
+  max-width: 260px;
   padding: 12px 18px;
   border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--shadow);
   font-weight: 850;
-  text-align: center;
   color: var(--text);
 }
+/* The tail points left, at Lumi. */
 .bubble::after {
   content: "";
   position: absolute;
-  left: 50%;
-  bottom: -9px;
-  margin-left: -9px;
+  top: 50%;
+  left: -9px;
+  margin-top: -9px;
   border: 9px solid transparent;
-  border-top-color: var(--surface);
-  border-bottom: 0;
+  border-right-color: var(--surface);
+  border-left: 0;
 }
 .home__actions {
   margin-top: auto;
@@ -1152,24 +1212,8 @@
   color: #fff;
 }
 
-/* ---------------------------------------------------------------- Journey levels */
+/* ---------------------------------------------------------------- Bible Library */
 
-.journey {
-  min-height: 100dvh;
-}
-.journey__go {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-  padding-bottom: var(--space-2);
-}
-.journey__go .big-btn {
-  align-self: stretch;
-}
-
-/* Bible Library */
 .library__summary {
   display: flex;
   flex-direction: column;

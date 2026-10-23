@@ -428,7 +428,7 @@
   display: grid;
   place-items: center;
   padding: var(--gutter);
-  background: rgb(0 22 117 / 0.4);
+  background: rgb(13 47 74 / 0.45);
   animation: fade-in 0.2s;
 }
 .overlay--sheet {

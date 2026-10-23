@@ -13,6 +13,7 @@ describe("router", () => {
       { name: "library" },
       { name: "book", bookId: "GEN" },
       { name: "story", unitId: "unit-1" },
+      { name: "story", unitId: "unit-1", from: "library" },
     ];
     for (const r of routes) expect(parseHash(href(r))).toEqual(r);
   });

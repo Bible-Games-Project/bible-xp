@@ -52,19 +52,23 @@ export function DailyScreen() {
   };
 
   return (
-    <Screen withTabs>
+    <Screen withTabs scene="daily" className="daily">
       <AppHeader />
-      <div>
+      <div className="glass">
         <h1 className="screen-title">{t("daily.title")}</h1>
         <p className="muted">{t("daily.subtitle")}</p>
       </div>
 
       <section className={`daily-hero${done ? " is-done" : ""}`} aria-labelledby="daily-hero-title">
-        <Mascot mood={done ? "celebrating" : "happy"} size={150} />
-        <span className="daily-hero__eyebrow">{t("daily.today")}</span>
-        <h2 id="daily-hero-title" className="daily-hero__title">
-          {done ? t("daily.alreadyDone") : challenge.theme}
-        </h2>
+        <div className="daily-hero__head">
+          <Mascot mood={done ? "celebrating" : "happy"} size={84} />
+          <div className="daily-hero__heading">
+            <span className="daily-hero__eyebrow">{t("daily.today")}</span>
+            <h2 id="daily-hero-title" className="daily-hero__title">
+              {done ? t("daily.alreadyDone") : challenge.theme}
+            </h2>
+          </div>
+        </div>
         {done ? (
           <p className="muted">{t("daily.alreadyDoneBody")}</p>
         ) : (

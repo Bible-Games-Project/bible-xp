@@ -86,32 +86,52 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   stack because bgp-admin owns the native wrapping. Do not add Expo or Capacitor.
 - Visual identity (maintainer decision): every interface colour (buttons,
   text, borders, backgrounds, avatars) is monochromatic with the Home picture
-  (`src/assets/home-background.webp`): it uses one of the picture's hues —
-  sky 206° (blues, text, navigation, selection), sand 36° (gold buttons, warm
-  text, borders, backgrounds), cypress 163° (right answers), terracotta 15°
-  (wrong answers) — and only changes lightness/saturation. Lumi keeps a fuller
-  flame (`--flame-*`, also the difficulty tiers) whose heart is the exact
-  complement of the sky. Tokens live in `src/theme/tokens.css`; never
-  hard-code colours in components. `src/theme/palette.test.ts` enforces this.
+  (`src/assets/home-background.webp`, the hill with three crosses): it uses one
+  of the picture's hues — sky 206° (blues, text, navigation, selection), sand
+  35° (gold buttons, warm text, borders, backgrounds), cypress 147° (right
+  answers), rock shade 22° (wrong answers) — and only changes
+  lightness/saturation. Lumi's flame (`--flame-*`, also the difficulty tiers)
+  uses only warm hues of the same picture (sun, meadow, path, stones, rock
+  shade; no pure reds), and its heart is the exact complement of the sky.
+  Tokens live in `src/theme/tokens.css`; never hard-code colours in
+  components. `src/theme/palette.test.ts` enforces this, with colours sampled
+  from the picture: if Home's picture changes, re-sample them and re-derive
+  the palette.
 - The learning path is called "Journey" (maintainer decision; "Atlas" and an
-  Eden river map were rejected). The Journey tab shows one "Start/Continue the
-  journey" button (picture `journey-bible.webp`) that opens the road of the
-  current story (`StoryScreen` + `JourneyRoad`, `currentUnit()` in
-  `progress/path.ts`). The catalogue of all 66 books with finished stories is
-  the Bible Library (`LibraryScreen`, `#/library`), reached from Settings and
-  from the card at the end of every story's road; a book opens its list of
-  stories (`BookScreen`, picture `journey-old-testament.webp`). Only books with
+  Eden river map were rejected). The Journey tab (`#/path`) and Home's
+  "Start/Continue the journey" button go straight to the road of the current
+  story (`CurrentStoryScreen` → `StoryScreen` + `JourneyRoad`, `currentUnit()`
+  in `progress/path.ts`); there is no landing screen in between (the
+  maintainer asked for it to be removed). Each story can have its own picture
+  behind its road (`storyScene()` in `Scene.tsx`; The Creation uses
+  `story-creation.webp`). The catalogue of all 66 books with finished stories
+  is the Bible Library (`LibraryScreen`, `#/library`, picture
+  `journey-bible.webp`), reached from Settings and from the card at the end of
+  every story's road; a book opens its list of stories (`BookScreen`, picture
+  `journey-old-testament.webp`), whose roads open with `from=library` and get
+  a back button to the book. Only books with
   a unit are playable (today: Genesis → The Creation); later Genesis stories are
   listed as coming soon from `plannedStories` in `src/content/locales/en/books.ts`.
   The road must look Duolingo-like in spirit but not a copy.
 - Home (maintainer decision): only two big buttons over the landscape —
-  "Start/Continue the journey" (goes straight to the next stop) and Daily
-  Challenge — with Lumi above them. Pictures supplied by the maintainer live in
-  `src/assets/` and are shown with `<Screen scene="…">`.
+  "Start/Continue the journey" (opens the current road) and Daily Challenge —
+  with Lumi and its speech bubble in the sky above. Lumi must never cover the
+  three crosses; check narrow, short (375×667) and wide screens after layout
+  changes.
+- Pictures supplied by the maintainer live in `src/assets/` (webp, quality 80)
+  and are shown with `<Screen scene="…">`: Home, the story road, Daily, Train
+  (the maintainer's picture, mirrored so the speaker faces the other way),
+  Bible Library and books. Screens with a picture leave a window onto it (the
+  Daily card sits low, Train's games start lower, the road starts lower).
 - Trap: never animate `transform` on `.screen` or any ancestor of a
   `position: fixed` element (tab bar, backgrounds) — while it runs, fixed
   children size to that ancestor, so backgrounds looked narrow then snapped
   wide. Screen entry fades with opacity only.
+- Trap: pictures must not blink in. `preloadScenes()` (called in `main.tsx`)
+  downloads and decodes every scene picture at start-up, and `Scene` draws an
+  `<img decoding="sync">`, not a CSS background (CSS backgrounds only start
+  loading when a screen first uses them). Register new pictures in
+  `PICTURES` in `src/components/Scene.tsx`.
 - Match the Pairs must make the left-to-right linking obvious: column titles,
   a changing hint line, highlighted waiting column, numbered matched pairs.
 - Commands: `bun run build` (runs `tsc -b` first), `bun run test` (vitest),
@@ -134,10 +154,10 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
 - Navigation (maintainer decision): bottom tabs are Home, Journey, Daily, Train.
   Profile is not a tab; it opens from the avatar at the top left and holds
   Settings.
-- Mascot (maintainer decision): Lumi is a friendly flame in red, orange and
+- Mascot (maintainer decision): Lumi is a friendly flame in orange and
   yellow (not white, like the Bible Games Project logo's flame would suggest),
-  drawn in SVG in `src/components/Mascot.tsx` with the `--flame` colours and
-  five moods.
+  in tones complementary to or monochromatic with Home's picture, drawn in SVG
+  in `src/components/Mascot.tsx` with the `--flame` colours and five moods.
 - Progress is one JSON object (`src/progress/model.ts`, version 3), all
   mutations are pure functions with tests. Bump `PROGRESS_VERSION` and extend
   `migrate()` when the shape changes; never drop XP, path progress or mistakes.

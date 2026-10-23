@@ -3,39 +3,41 @@
  *
  * Every colour of the interface (buttons, text, borders, backgrounds) is
  * monochromatic with the Home background picture
- * (src/assets/home-background.webp): it takes one of the picture's own hues
- * and only changes lightness and saturation.
- *   sky       206°  blues, navigation, selection, text
- *   sand      36°   gold buttons, warm text, borders, backgrounds
- *   cypress   163°  right answers
- *   terracotta 15°  wrong answers
- * Lumi, the mascot, keeps a fuller flame (--flame-*) whose heart, --flame-4,
- * is the exact complement of the sky. `src/theme/palette.test.ts` checks all
- * of this, plus text contrast.
+ * (src/assets/home-background.webp, the hill with the three crosses): it
+ * takes one of the picture's own hues and only changes lightness and
+ * saturation.
+ *   sky        206°  blues, navigation, selection, text
+ *   sand       35°   gold buttons, warm text, borders, backgrounds
+ *   cypress    147°  right answers
+ *   rock shade 22°   wrong answers
+ * Lumi, the mascot, is a flame (--flame-*) whose every colour is a warm hue
+ * of the same picture (sun, meadow, path, stones, rock shade); its heart,
+ * --flame-4, is also the exact complement of the sky.
+ * `src/theme/palette.test.ts` checks all of this, plus text contrast.
  */
 :root {
   color-scheme: light;
 
   /* Lumi's flame (mascot and difficulty tiers). */
-  --flame-1: #fff080;
-  --flame-2: #ffcf3d;
-  --flame-3: #ffa929;
-  --flame-4: #ff7d1a; /* exact complement of the sky */
-  --flame-5: #f55f14;
-  --flame-6: #f04419;
-  --flame-7: #c52c1b;
-  --ember-dark: #2b0e0a;
+  --flame-1: #fff080; /* sun */
+  --flame-2: #ffcf3d; /* meadow in the light */
+  --flame-3: #ffa929; /* path */
+  --flame-4: #ff7d1a; /* stones; exact complement of the sky */
+  --flame-5: #f56a19; /* rock shade, bright to deep */
+  --flame-6: #c24a0a;
+  --flame-7: #953b0f;
+  --ember-dark: #2e170a;
 
   /* Sky of the picture (hue 206°), from deep to light. */
   --sky-1: #0d2f4a;
   --sky-2: #0b4f84;
   --sky-3: #0c6cb6;
-  --sky: #6abbfb; /* sampled from the image */
+  --sky: #6abbf8; /* sampled from the image */
   --sky-5: #acd6f6;
   --sky-6: #d8edfd;
   --sky-7: #ecf6fe;
 
-  /* Sand of the picture's path (hue 36°), from deep to light. */
+  /* Sand of the picture's path (hue 35°), from deep to light. */
   --sand-1: #3c2607;
   --sand-2: #593b0d;
   --sand-3: #915a08;
@@ -75,13 +77,13 @@
   --brand-line: var(--sky-5);
   --on-brand: #ffffff;
 
-  /* Right (cypress, 163°) and wrong (terracotta, 15°) answers only. */
-  --success: #207e64;
-  --success-dark: #15654e;
-  --success-soft: #dff6ef;
-  --danger: #c1481f;
-  --danger-dark: #8f3314;
-  --danger-soft: #fceae3;
+  /* Right (cypress, 147°) and wrong (rock shade, 22°) answers only. */
+  --success: #1f7a48;
+  --success-dark: #156539;
+  --success-soft: #dff6e9;
+  --danger: #a55127;
+  --danger-dark: #7e3c1b;
+  --danger-soft: #fbe9df;
 
   /* Difficulty tiers: the flame gets hotter as questions get harder. */
   --tier-1: var(--flame-3);
@@ -138,5 +140,5 @@
 .tier-1 { --tier: var(--tier-1); --on-tier: var(--ember-dark); }
 .tier-2 { --tier: var(--tier-2); --on-tier: var(--ember-dark); }
 .tier-3 { --tier: var(--tier-3); --on-tier: var(--ember-dark); }
-.tier-4 { --tier: var(--tier-4); --on-tier: var(--ember-dark); }
+.tier-4 { --tier: var(--tier-4); --on-tier: #ffffff; }
 .tier-5 { --tier: var(--tier-5); --on-tier: #ffffff; }

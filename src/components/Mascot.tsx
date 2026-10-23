@@ -17,9 +17,10 @@ const MIDDLE =
   "M101 46 C 110 63, 126 71, 131 89 C 137 81, 140 73, 140 66 C 152 85, 155 106, 151 125 C 147 157, 126 175, 100 175 C 74 175, 52 157, 49 127 C 47 107, 55 93, 65 83 C 67 93, 71 99, 76 103 C 76 81, 88 63, 101 46 Z";
 
 /**
- * Lumi — Bible XP's mascot: a small, friendly flame in the warm red, orange
- * and yellow of the Bible Games Project logo, using the app's --flame colours
- * (src/theme/tokens.css) so it matches the rest of the interface.
+ * Lumi — Bible XP's mascot: a small, friendly flame in the warm orange and
+ * yellow of the Bible Games Project logo, using the app's --flame colours
+ * (src/theme/tokens.css): warm hues of the Home picture, so Lumi sits in the
+ * landscape and stands out against its sky.
  *
  * Drawn as layered SVG (three flame layers, a warm core, a soft highlight) so
  * it reads as a rounded 3D character at any size, with no image assets. The
@@ -48,14 +49,14 @@ export function Mascot({ mood = "normal", size = 120, label, className = "" }: M
           <stop offset="100%" stopColor="#ff7d1a" stopOpacity="0" />
         </radialGradient>
         <linearGradient id={id("outer")} x1="0.3" y1="0" x2="0.6" y2="1">
-          <stop offset="0%" stopColor="#f55f14" />
-          <stop offset="55%" stopColor="#f04419" />
-          <stop offset="100%" stopColor="#c52c1b" />
+          <stop offset="0%" stopColor="#f56a19" />
+          <stop offset="55%" stopColor="#c24a0a" />
+          <stop offset="100%" stopColor="#953b0f" />
         </linearGradient>
         <linearGradient id={id("middle")} x1="0.4" y1="0" x2="0.5" y2="1">
           <stop offset="0%" stopColor="#ffa929" />
           <stop offset="60%" stopColor="#ff7d1a" />
-          <stop offset="100%" stopColor="#f55f14" />
+          <stop offset="100%" stopColor="#f56a19" />
         </linearGradient>
         <radialGradient id={id("core")} cx="50%" cy="55%" r="55%">
           <stop offset="0%" stopColor="#fff080" />
@@ -64,18 +65,18 @@ export function Mascot({ mood = "normal", size = 120, label, className = "" }: M
         </radialGradient>
         <linearGradient id={id("limb")} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#ffa929" />
-          <stop offset="100%" stopColor="#f04419" />
+          <stop offset="100%" stopColor="#c24a0a" />
         </linearGradient>
         <radialGradient id={id("eye")} cx="40%" cy="35%" r="70%">
-          <stop offset="0%" stopColor="#5a2418" />
-          <stop offset="100%" stopColor="#2b0e0a" />
+          <stop offset="0%" stopColor="#572a14" />
+          <stop offset="100%" stopColor="#2e170a" />
         </radialGradient>
         <filter id={id("soft")} x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2.4" />
         </filter>
       </defs>
 
-      <ellipse className="mascot__shadow" cx="100" cy="191" rx="40" ry="5.5" fill="#c2501a" opacity="0.2" />
+      <ellipse className="mascot__shadow" cx="100" cy="191" rx="40" ry="5.5" fill="#c24a0a" opacity="0.2" />
       <circle className="mascot__glow" cx="100" cy="118" r="96" fill={`url(#${id("glow")})`} />
 
       {mood === "celebrating" && (
@@ -83,7 +84,7 @@ export function Mascot({ mood = "normal", size = 120, label, className = "" }: M
           <Sparkle x={30} y={54} s={9} color="#ffa929" />
           <Sparkle x={172} y={30} s={11} color="#ff7d1a" delay />
           <Sparkle x={182} y={126} s={7} color="#ffcf3d" />
-          <Sparkle x={18} y={138} s={6} color="#f04419" delay />
+          <Sparkle x={18} y={138} s={6} color="#f56a19" delay />
         </g>
       )}
       {mood === "thinking" && (
@@ -121,8 +122,8 @@ function Face({ mood, eyeFill }: { mood: MascotMood; eyeFill: string }) {
   const dx = mood === "thinking" ? 3 : 0;
   return (
     <g className="mascot__face">
-      <ellipse cx="73" cy="148" rx="9" ry="5" fill="#ff5a3c" opacity="0.38" />
-      <ellipse cx="127" cy="148" rx="9" ry="5" fill="#ff5a3c" opacity="0.38" />
+      <ellipse cx="73" cy="148" rx="9" ry="5" fill="#f56a19" opacity="0.45" />
+      <ellipse cx="127" cy="148" rx="9" ry="5" fill="#f56a19" opacity="0.45" />
 
       {(mood === "thinking" || mood === "encouraging") && (
         <g stroke="#8a3a12" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.65">
@@ -132,7 +133,7 @@ function Face({ mood, eyeFill }: { mood: MascotMood; eyeFill: string }) {
       )}
 
       {happyEyes ? (
-        <g stroke="#2b0e0a" strokeWidth="4.5" strokeLinecap="round" fill="none">
+        <g stroke="#2e170a" strokeWidth="4.5" strokeLinecap="round" fill="none">
           <path d="M75 132 Q 83 122 91 132" />
           <path d="M109 132 Q 117 122 125 132" />
         </g>
@@ -158,16 +159,16 @@ function Mouth({ mood }: { mood: MascotMood }) {
     case "celebrating":
       return (
         <g>
-          <path d="M86 148 Q 100 168 114 148 Z" fill="#7a1f16" />
-          <path d="M92 157 Q 100 164 108 157 Q 100 154 92 157 Z" fill="#ff7a6a" />
+          <path d="M86 148 Q 100 168 114 148 Z" fill="#753515" />
+          <path d="M92 157 Q 100 164 108 157 Q 100 154 92 157 Z" fill="#ff9966" />
         </g>
       );
     case "thinking":
-      return <path d="M99 154 Q 107 151 113 154" stroke="#5a1f14" strokeWidth="3.4" strokeLinecap="round" fill="none" />;
+      return <path d="M99 154 Q 107 151 113 154" stroke="#572a14" strokeWidth="3.4" strokeLinecap="round" fill="none" />;
     case "encouraging":
-      return <path d="M89 150 Q 100 160 111 150" stroke="#5a1f14" strokeWidth="3.6" strokeLinecap="round" fill="none" />;
+      return <path d="M89 150 Q 100 160 111 150" stroke="#572a14" strokeWidth="3.6" strokeLinecap="round" fill="none" />;
     default:
-      return <path d="M90 149 Q 100 158 110 149" stroke="#5a1f14" strokeWidth="3.6" strokeLinecap="round" fill="none" />;
+      return <path d="M90 149 Q 100 158 110 149" stroke="#572a14" strokeWidth="3.6" strokeLinecap="round" fill="none" />;
   }
 }
 

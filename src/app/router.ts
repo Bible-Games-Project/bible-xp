@@ -7,10 +7,11 @@ import { useEffect, useSyncExternalStore } from "react";
 
 export type Route =
   | { name: "home" }
+  /** The Journey tab: the road of the story the player is on. */
   | { name: "path" }
   | { name: "library" }
   | { name: "book"; bookId: string }
-  | { name: "story"; unitId: string }
+  | { name: "story"; unitId: string; from?: "library" }
   | { name: "train" }
   | { name: "profile" }
   | { name: "settings" }
@@ -56,7 +57,9 @@ export function parseHash(hash: string): Route {
   if (head === "path") {
     const [kind, id] = rest;
     if (kind === "book" && id) return { name: "book", bookId: id };
-    if (kind === "story" && id) return { name: "story", unitId: id };
+    if (kind === "story" && id) {
+      return new URLSearchParams(query).get("from") === "library" ? { name: "story", unitId: id, from: "library" } : { name: "story", unitId: id };
+    }
   }
   return { name: "not-found" };
 }
@@ -74,7 +77,7 @@ export function href(route: Route): string {
     case "book":
       return `#/path/book/${encodeURIComponent(route.bookId)}`;
     case "story":
-      return `#/path/story/${encodeURIComponent(route.unitId)}`;
+      return `#/path/story/${encodeURIComponent(route.unitId)}${route.from ? `?from=${route.from}` : ""}`;
     case "not-found":
       return "#/";
     default:

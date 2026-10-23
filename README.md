@@ -23,9 +23,9 @@ bun run test       # unit and content tests (vitest)
 
 - **Home** — two big buttons over an illustrated landscape: start or continue
   the Journey, and the Daily Challenge.
-- **Journey** — one button to start or continue the journey, which opens the
-  road of the current story: Story 1, The Creation (Genesis 1–3), with an
-  introduction and the six games, unlocked in order.
+- **Journey** — goes straight to the road of the story you are on: Story 1,
+  The Creation (Genesis 1–3), with an introduction and the six games, unlocked
+  in order.
 - **Bible Library** (Settings, and the end of every story) — all 66 books of the
   Bible with the stories finished in each. Genesis is open; its later stories
   are listed as coming soon.

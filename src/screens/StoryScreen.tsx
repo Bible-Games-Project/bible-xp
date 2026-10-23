@@ -2,9 +2,10 @@ import { ChevronRight, Library } from "lucide-react";
 import { href, navigate, type Route } from "../app/router";
 import { MODE_STYLE } from "../components/icons";
 import { JourneyRoad, type RoadStop } from "../components/JourneyRoad";
-import { Screen, TabBar, TopBar } from "../components/Layout";
+import { AppHeader, Screen, TabBar, TopBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
 import { ProgressBar } from "../components/ProgressBar";
+import { storyScene } from "../components/Scene";
 import { useTierName } from "../components/Tier";
 import { findBook, findTopic, unitFor, unitsOfBook } from "../content";
 import type { PathNode } from "../content/types";
@@ -12,7 +13,7 @@ import { TIERS } from "../content/types";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
 import { clearKey } from "../progress/model";
-import { bookProgress, completedCount, nodeStatus } from "../progress/path";
+import { bookProgress, completedCount, currentUnit, nodeStatus } from "../progress/path";
 import { useProgress } from "../progress/store";
 import { NotFoundScreen } from "./InfoScreens";
 import { nodeLabel, nodeMode } from "./pathLabels";
@@ -21,8 +22,20 @@ function routeFor(node: PathNode): Route {
   return node.kind === "intro" ? { name: "intro", introId: node.introId } : { name: "play", activityId: node.activityId };
 }
 
-/** One story of the Journey: a winding road of stops, unlocked in order. */
-export function StoryScreen({ unitId }: { unitId: string }) {
+/** The Journey tab: straight onto the road of the story the player is on. */
+export function CurrentStoryScreen() {
+  const pack = useContent();
+  const progress = useProgress();
+  const unit = currentUnit(progress, pack.units, pack.books.map((b) => b.id));
+  if (!unit) return <NotFoundScreen />;
+  return <StoryScreen key={unit.id} unitId={unit.id} />;
+}
+
+/**
+ * One story of the Journey: a winding road of stops, unlocked in order.
+ * Opened from the Bible Library (`from`), it gets a back button to its book.
+ */
+export function StoryScreen({ unitId, from }: { unitId: string; from?: "library" }) {
   const { t } = useI18n();
   const pack = useContent();
   const progress = useProgress();
@@ -67,8 +80,8 @@ export function StoryScreen({ unitId }: { unitId: string }) {
   const complete = done === unit.nodes.length;
 
   return (
-    <Screen withTabs>
-      <TopBar title={book?.name ?? t("path.title")} back={{ name: "path" }} />
+    <Screen withTabs scene={storyScene(unit.id)} className="story">
+      {from === "library" && book ? <TopBar title={book.name} back={{ name: "book", bookId: book.id }} /> : <AppHeader />}
       <section aria-labelledby={`${unit.id}-title`}>
         <div className="story-head">
           <div className="story-head__text">

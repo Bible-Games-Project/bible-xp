@@ -3,12 +3,12 @@ import { href, type Route } from "../app/router";
 import { AppHeader, Screen, TabBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
 import { useTierName } from "../components/Tier";
-import { dailyChallengeFor, findActivity, findBook, findTopic, unitOfActivity } from "../content";
+import { dailyChallengeFor, findActivity, findBook, findTopic } from "../content";
 import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
 import { localDate } from "../lib/date";
 import { sessionKey } from "../progress/model";
-import { nextNode } from "../progress/path";
+import { currentUnit, nextNode } from "../progress/path";
 import { recommend } from "../progress/recommend";
 import { REWARDS } from "../progress/rewards";
 import { useProgress } from "../progress/store";
@@ -23,35 +23,33 @@ export function HomeScreen() {
   const name = progress.profile.name.trim();
   const tier = progress.difficulty.selected;
 
-  // Journey button: start, continue, or keep training once everything open is done.
-  const rec = recommend(progress, pack);
-  const firstUnit = pack.units[0];
-  const fresh =
-    rec.kind === "intro" && Object.keys(progress.intros).length === 0 && Object.keys(progress.activities).length === 0;
+  // Journey button: onto the road of the current story, or keep training once everything open is done.
+  const unit = currentUnit(progress, pack.units, pack.books.map((b) => b.id));
+  const next = unit ? nextNode(progress, unit) : null;
+  const fresh = Object.keys(progress.intros).length === 0 && Object.keys(progress.activities).length === 0;
   let journeyTitle: string;
   let journeyMeta: string;
   let lumi: string;
   let route: Route;
-  if (rec.kind === "intro") {
-    const topic = findTopic(pack, firstUnit.topicId)!;
+  if (unit && next) {
+    const topic = findTopic(pack, unit.topicId)!;
     journeyTitle = fresh ? t("home.startJourney") : t("home.continueJourney");
-    journeyMeta = t("home.startMeta", { book: findBook(pack, firstUnit.bookId)?.name ?? "", story: topic.title });
+    journeyMeta = fresh
+      ? t("home.startMeta", { book: findBook(pack, unit.bookId)?.name ?? "", story: topic.title })
+      : t("home.continueMeta", { story: topic.title, n: next.index + 1, total: unit.nodes.length });
     lumi = fresh ? t("home.lumiStart") : t("home.lumiContinue");
-    route = { name: "intro", introId: rec.introId };
+    route = { name: "path" };
   } else {
-    const activity = findActivity(pack, rec.activityId)!;
-    route = { name: "play", activityId: activity.id };
-    if (rec.kind === "path" || rec.kind === "continue") {
-      const unit = unitOfActivity(pack, activity.id) ?? firstUnit;
-      const topic = findTopic(pack, unit.topicId)!;
-      const stop = (nextNode(progress, unit)?.index ?? unit.nodes.length - 1) + 1;
-      journeyTitle = t("home.continueJourney");
-      journeyMeta = t("home.continueMeta", { story: topic.title, n: stop, total: unit.nodes.length });
-      lumi = t("home.lumiContinue");
+    const rec = recommend(progress, pack);
+    journeyTitle = t("home.keepTraining");
+    lumi = t("home.lumiDone");
+    if (rec.kind === "intro") {
+      journeyMeta = "";
+      route = { name: "intro", introId: rec.introId };
     } else {
-      journeyTitle = t("home.keepTraining");
+      const activity = findActivity(pack, rec.activityId)!;
       journeyMeta = t("home.practiceMeta", { game: t(`modes.${activity.mode}.name`), tier: tierName(tier) });
-      lumi = t("home.lumiDone");
+      route = { name: "play", activityId: activity.id };
     }
   }
 
@@ -64,9 +62,10 @@ export function HomeScreen() {
       <AppHeader />
       <h1 className="sr-only">{name ? t("home.greeting", { name }) : t("home.greetingGuest")}</h1>
 
+      {/* Lumi talks from the sky, clear of the hill with the crosses. */}
       <div className="home__lumi">
+        <Mascot mood={fresh ? "happy" : "normal"} size={112} />
         <p className="bubble">{lumi}</p>
-        <Mascot mood={fresh ? "happy" : "normal"} size={132} />
       </div>
 
       <nav className="home__actions" aria-label={t("nav.home")}>
