@@ -32,8 +32,15 @@
   gap: 10px;
   margin: 4px 0 16px;
 }
-.game__guide .mascot {
+.game__mode-icon {
   flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--gold-soft);
+  color: var(--warm-icon);
 }
 .speech {
   flex: 1;
@@ -153,6 +160,21 @@
   display: flex;
   align-items: center;
   gap: 12px;
+}
+.feedback__badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: #ffffff;
+}
+.feedback--correct .feedback__badge {
+  background: var(--success);
+}
+.feedback--incorrect .feedback__badge {
+  background: var(--danger);
 }
 .feedback__title {
   font-family: var(--font-display);

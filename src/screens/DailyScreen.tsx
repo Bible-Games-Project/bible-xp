@@ -1,8 +1,7 @@
-import { Check, Flame } from "lucide-react";
+import { CalendarDays, Check, Flame } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../components/Button";
 import { AppHeader, Screen, TabBar } from "../components/Layout";
-import { Mascot } from "../components/Mascot";
 import { TierBadge } from "../components/Tier";
 import { dailyChallengeFor, findStep } from "../content";
 import type { Step } from "../content/types";
@@ -61,7 +60,9 @@ export function DailyScreen() {
 
       <section className={`daily-hero${done ? " is-done" : ""}`} aria-labelledby="daily-hero-title">
         <div className="daily-hero__head">
-          <Mascot mood={done ? "celebrating" : "happy"} size={84} />
+          <span className="daily-hero__icon" aria-hidden="true">
+            {done ? <Check size={30} strokeWidth={3} /> : <CalendarDays size={30} strokeWidth={2.4} />}
+          </span>
           <div className="daily-hero__heading">
             <span className="daily-hero__eyebrow">{t("daily.today")}</span>
             <h2 id="daily-hero-title" className="daily-hero__title">

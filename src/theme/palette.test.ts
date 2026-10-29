@@ -56,7 +56,7 @@ const IMAGE = {
   meadow: "#f2d987",
   sun: "#fdf8d5",
 };
-const avatar = readFileSync(new URL("../components/Avatar.tsx", import.meta.url), "utf8");
+const avatar = readFileSync(new URL("../components/PlayerAvatar.tsx", import.meta.url), "utf8");
 
 /** Every interface colour and the picture hue it must share. */
 const FAMILIES: Record<string, string[]> = {
@@ -77,15 +77,12 @@ describe("palette", () => {
     }
   });
 
-  it("avatars use single hues from the picture or Lumi's flame", () => {
-    const allowed = [...Object.keys(FAMILIES), t["flame-3"]].map(hue);
-    const colours = [...avatar.matchAll(/(?:from|to): "(#[0-9a-f]{6})"/gi)].map((m) => m[1].toLowerCase());
-    expect(colours.length).toBe(12);
-    for (const c of colours) {
-      const nearest = Math.min(...allowed.map((h) => hueDistance(hue(c), h)));
-      const flame = Object.keys(t).filter((k) => k.startsWith("flame-")).some((k) => t[k] === c);
-      expect(flame || nearest < 3, c).toBe(true);
-    }
+  it("the avatar's clothes and backdrop take hues of the picture", () => {
+    const wear = avatar.slice(avatar.indexOf("export const WEAR"), avatar.indexOf("};", avatar.indexOf("export const WEAR")));
+    const colours = [...wear.matchAll(/"(#[0-9a-f]{6})"/gi)].map((m) => m[1].toLowerCase());
+    expect(colours.length).toBe(9);
+    const allowed = Object.keys(FAMILIES).map(hue);
+    for (const c of colours) expect(Math.min(...allowed.map((h) => hueDistance(hue(c), h))), c).toBeLessThan(3);
   });
 
   it("every colour of Lumi's flame is a warm hue of the picture", () => {

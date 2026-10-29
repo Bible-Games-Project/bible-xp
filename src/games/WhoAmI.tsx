@@ -6,7 +6,7 @@ import { playCue } from "../lib/feedback";
 import { shuffle } from "../lib/random";
 import { PromptCard } from "./shared";
 
-export function WhoAmI({ step, locked, onResolve, onMood }: GameProps<"who-am-i">) {
+export function WhoAmI({ step, locked, onResolve }: GameProps<"who-am-i">) {
   const { t, language } = useI18n();
   const pack = getContent(language.code);
   const options = useMemo(() => shuffle(step.options, step.id), [step]);
@@ -34,7 +34,6 @@ export function WhoAmI({ step, locked, onResolve, onMood }: GameProps<"who-am-i"
     setEliminated(nextEliminated);
     if (revealed < step.clues.length) {
       setRevealed(revealed + 1);
-      onMood?.("encouraging");
     } else {
       setFailed(true);
       onResolve({

@@ -1,4 +1,4 @@
-import { Award, Gem, RotateCcw, Target, Trophy } from "lucide-react";
+import { Award, Flame, Gem, RotateCcw, Target, Trophy } from "lucide-react";
 import { TierBadge, useTierName } from "../components/Tier";
 import { REWARDS } from "../progress/rewards";
 import { navigate, type Route } from "../app/router";
@@ -91,6 +91,12 @@ export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, 
         <div className="banner banner--gold">
           <Award size={24} aria-hidden="true" />
           {t("results.levelUp", { n: summary.levelAfter })}
+        </div>
+      )}
+      {summary.streakMilestone && (
+        <div className="banner banner--gold">
+          <Flame size={24} aria-hidden="true" />
+          {t("results.streakMilestone", { n: summary.streakMilestone })}
         </div>
       )}
       {unit && (

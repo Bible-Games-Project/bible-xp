@@ -16,6 +16,4 @@ export interface GameProps<M extends GameMode> {
   /** Locked while feedback is showing, so answers cannot change. */
   locked: boolean;
   onResolve: (resolution: StepResolution) => void;
-  /** Lets a game swap the mascot's mood mid-step (e.g. after a wrong guess). */
-  onMood?: (mood: "thinking" | "encouraging" | "happy") => void;
 }

@@ -1,4 +1,4 @@
-import { CalendarDays, Check, Play } from "lucide-react";
+import { CalendarDays, Check, ChevronRight, Play } from "lucide-react";
 import { href, type Route } from "../app/router";
 import { AppHeader, Screen, TabBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
@@ -12,10 +12,11 @@ import { currentUnit, nextNode } from "../progress/path";
 import { recommend } from "../progress/recommend";
 import { REWARDS } from "../progress/rewards";
 import { useProgress } from "../progress/store";
+import { weeklyXpAt } from "../progress/week";
 
 /** Home: two big buttons over the landscape — the Journey and the Daily Challenge. */
 export function HomeScreen() {
-  const { t } = useI18n();
+  const { t, number } = useI18n();
   const pack = useContent();
   const progress = useProgress();
   const tierName = useTierName();
@@ -59,8 +60,21 @@ export function HomeScreen() {
 
   return (
     <Screen withTabs scene="home" className="home">
-      <AppHeader />
+      <AppHeader showXp={false} />
       <h1 className="sr-only">{name ? t("home.greeting", { name }) : t("home.greetingGuest")}</h1>
+
+      {/* Lifetime and weekly XP, side by side and never mixed up; opens the weekly ranking. */}
+      <a className="xp-panel" href={href({ name: "leaderboard" })} aria-label={`${t("home.xpPanel")}: ${t("home.totalXp")} ${progress.xp}, ${t("home.weeklyXp")} ${weeklyXpAt(progress.weekly, new Date())}. ${t("home.rankingLink")}`}>
+        <span className="xp-panel__item">
+          <span className="xp-panel__label">{t("home.totalXp")}</span>
+          <span className="xp-panel__value">{number(progress.xp)}</span>
+        </span>
+        <span className="xp-panel__item">
+          <span className="xp-panel__label">{t("home.weeklyXp")}</span>
+          <span className="xp-panel__value">{number(weeklyXpAt(progress.weekly, new Date()))}</span>
+        </span>
+        <ChevronRight size={20} className="xp-panel__go" aria-hidden="true" />
+      </a>
 
       {/* Lumi talks from the sky, clear of the hill with the crosses. */}
       <div className="home__lumi">

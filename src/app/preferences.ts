@@ -14,7 +14,7 @@ function subscribe(listener: () => void) {
 }
 
 /** Mirrors accessibility settings onto <html> so CSS can react to them. */
-export function useApplySettings(settings: Settings, languageCode: string) {
+export function useApplySettings(settings: Settings, languageCode: string, dir: "ltr" | "rtl" = "ltr") {
   const systemReduced = useSyncExternalStore(subscribe, prefersReducedMotion, () => false);
   const reduce = settings.reduceMotion ?? systemReduced;
   useEffect(() => {
@@ -22,5 +22,6 @@ export function useApplySettings(settings: Settings, languageCode: string) {
     root.dataset.reduceMotion = String(reduce);
     root.dataset.largeText = String(settings.largeText);
     root.lang = languageCode;
-  }, [reduce, settings.largeText, languageCode]);
+    root.dir = dir;
+  }, [reduce, settings.largeText, languageCode, dir]);
 }

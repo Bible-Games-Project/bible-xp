@@ -1,0 +1,478 @@
+/*
+ * Onboarding, avatar, XP panel and leaderboard. They sit on the Home picture
+ * (`scene="home"`), so text lives on light panels; every colour is a token.
+ */
+
+/* ---------------------------------------------------------------- Home XP panel */
+
+.xp-panel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 12px 8px 16px;
+  border-radius: var(--radius);
+  background: rgb(255 255 255 / 0.88);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+.xp-panel:active {
+  transform: translateY(2px);
+}
+.xp-panel__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.xp-panel__item + .xp-panel__item {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--line);
+}
+.xp-panel__label {
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+.xp-panel__value {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 0.9rem + 1.2vh, 1.5rem);
+  line-height: 1.15;
+  color: var(--gold-text);
+}
+.xp-panel__go {
+  flex: none;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------- Onboarding */
+
+.onboarding {
+  min-height: 100dvh;
+}
+.onboarding__progress {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: var(--space-2);
+}
+.onboarding__dot {
+  width: 32px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.7);
+}
+.onboarding__dot.is-done {
+  background: var(--gold);
+}
+.onboarding__step {
+  align-self: center;
+  margin-top: calc(var(--space-2) * -1);
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.8);
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-2);
+}
+.onboarding__welcome {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.onboarding__welcome .mascot {
+  flex: none;
+  width: clamp(80px, 12vh, 104px);
+  height: clamp(80px, 12vh, 104px);
+}
+.onboarding__hello {
+  flex: 1;
+  min-width: 0;
+}
+.onboarding__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 1.875rem);
+  line-height: 1.1;
+  outline: none;
+}
+.onboarding__subtitle {
+  font-weight: 900;
+  font-size: var(--fs-md);
+}
+.onboarding__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.onboarding__actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 460px;
+  align-self: center;
+}
+.onboarding__buttons {
+  display: flex;
+  gap: var(--space-3);
+}
+.onboarding__buttons .btn {
+  flex: 1;
+}
+.onboarding__hint {
+  align-self: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.88);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--text-2);
+  text-align: center;
+}
+
+/* Radio cards: languages, knowledge levels. Selection is blue, like Settings. */
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  box-shadow: 0 3px 0 var(--line-strong);
+  color: var(--text);
+  text-align: left;
+}
+.option-card.is-selected {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  box-shadow: 0 3px 0 var(--brand-dark);
+}
+.option-card__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.option-card__name {
+  font-weight: 900;
+  font-size: var(--fs-md);
+}
+.option-card__desc {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+.option-card__meta {
+  font-size: var(--fs-xs);
+  font-weight: 850;
+  color: var(--gold-text);
+}
+.option-card__check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  color: var(--on-brand);
+}
+.option-card.is-selected .option-card__check {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+/* ---------------------------------------------------------------- Avatar */
+
+.avatar-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.avatar-editor__preview {
+  align-self: center;
+  padding: 5px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.avatar-editor__preview svg {
+  display: block;
+  width: clamp(104px, 16vh, 128px);
+  height: clamp(104px, 16vh, 128px);
+}
+.choice-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.choice-group__legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.segmented__option,
+.swatch {
+  border-radius: var(--radius);
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  cursor: pointer;
+}
+.segmented__option {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  font-weight: 900;
+  color: var(--text-2);
+}
+.segmented__option.is-selected,
+.swatch.is-selected {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  color: var(--brand-dark);
+}
+.segmented__option:focus-within,
+.swatch:focus-within {
+  outline: 3px solid var(--brand-line);
+  outline-offset: 2px;
+}
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px;
+}
+.swatch__dot {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgb(13 47 74 / 0.12);
+  color: #ffffff;
+}
+.swatch__dot svg {
+  filter: drop-shadow(0 0 1.5px rgb(13 47 74 / 0.8));
+}
+.swatch__label {
+  font-size: var(--fs-xs);
+  font-weight: 850;
+  text-align: center;
+  color: var(--text-2);
+}
+
+.cosmetics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.cosmetics__title {
+  font-size: var(--fs-md);
+  font-weight: 900;
+}
+.cosmetics__slots {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cosmetic-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--line-strong);
+  background: var(--surface-2);
+}
+.cosmetic-slot__name {
+  font-size: var(--fs-sm);
+  font-weight: 900;
+}
+.cosmetic-slot__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cosmetic {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  font-size: var(--fs-xs);
+  font-weight: 850;
+  color: var(--text-2);
+}
+.cosmetic.is-selected {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  color: var(--brand-dark);
+}
+.cosmetic.is-locked {
+  border-style: dashed;
+  background: transparent;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------- Leaderboard */
+
+.leaderboard__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.leaderboard__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--gold);
+  color: var(--on-gold);
+  box-shadow: 0 3px 0 var(--gold-dark);
+}
+.leaderboard__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+  font-weight: 800;
+  color: var(--text-2);
+}
+.skeleton {
+  display: block;
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--surface-2), var(--line), var(--surface-2));
+  background-size: 200% 100%;
+  animation: skeleton 1.2s linear infinite;
+}
+@keyframes skeleton {
+  to {
+    background-position: -200% 0;
+  }
+}
+.rank-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  overflow: hidden;
+}
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 14px;
+}
+.rank-row + .rank-row {
+  border-top: 1px solid var(--line);
+}
+.rank-row.is-me {
+  background: var(--gold-soft);
+  box-shadow: inset 4px 0 0 var(--gold);
+}
+.rank-row__rank {
+  min-width: 2.5ch;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: var(--text-2);
+}
+.rank-row .player-avatar {
+  flex: none;
+}
+.rank-row__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 850;
+}
+.rank-row__xp {
+  flex: none;
+  font-weight: 900;
+  color: var(--gold-text);
+}
+.rank-row__xp small {
+  font-size: var(--fs-xs);
+}
+.leaderboard__note,
+.section-heading.on-scene {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.88);
+}
+.leaderboard__note {
+  align-self: center;
+  padding: 4px 12px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  text-align: center;
+  color: var(--text-2);
+}
+.section-heading.on-scene {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  padding: 2px 10px;
+}
+.banner--info {
+  background: var(--brand-tint);
+  color: var(--brand-dark);
+  border-color: var(--brand-line);
+}
+.banner--info strong,
+.leaderboard .banner--coral strong {
+  display: block;
+}
+.leaderboard .banner span {
+  font-weight: 650;
+}
+.leaderboard .banner strong {
+  font-weight: 900;
+}
+.leaderboard__week {
+  font-weight: 900;
+  color: var(--text);
+}

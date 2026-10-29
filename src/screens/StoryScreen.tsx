@@ -3,7 +3,6 @@ import { href, navigate, type Route } from "../app/router";
 import { MODE_STYLE } from "../components/icons";
 import { JourneyRoad, type RoadStop } from "../components/JourneyRoad";
 import { AppHeader, Screen, TabBar, TopBar } from "../components/Layout";
-import { Mascot } from "../components/Mascot";
 import { ProgressBar } from "../components/ProgressBar";
 import { storyScene } from "../components/Scene";
 import { useTierName } from "../components/Tier";
@@ -94,7 +93,6 @@ export function StoryScreen({ unitId, from }: { unitId: string; from?: "library"
             <span className="story-head__meta">{t("path.stops", { n: done, total: unit.nodes.length })}</span>
             <ProgressBar value={done} max={unit.nodes.length} label={t("path.stops", { n: done, total: unit.nodes.length })} size="sm" />
           </div>
-          <Mascot mood={complete ? "celebrating" : "happy"} size={92} />
         </div>
         <JourneyRoad stops={stops} finish={{ name: t("path.storyDone"), won: complete }} />
       </section>

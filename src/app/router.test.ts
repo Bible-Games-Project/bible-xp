@@ -14,6 +14,9 @@ describe("router", () => {
       { name: "book", bookId: "GEN" },
       { name: "story", unitId: "unit-1" },
       { name: "story", unitId: "unit-1", from: "library" },
+      { name: "leaderboard" },
+      { name: "leaderboard", sample: true },
+      { name: "avatar" },
     ];
     for (const r of routes) expect(parseHash(href(r))).toEqual(r);
   });

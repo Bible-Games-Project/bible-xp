@@ -1,9 +1,9 @@
 import { Check, Crown, Link2, Repeat, Sparkles, Swords, Timer, Users } from "lucide-react";
 import { navigate } from "../app/router";
-import { Avatar } from "../components/Avatar";
 import { Button } from "../components/Button";
 import { Screen, TopBar } from "../components/Layout";
 import { Mascot } from "../components/Mascot";
+import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useI18n } from "../i18n";
 import { useProgress } from "../progress/store";
 
@@ -17,11 +17,10 @@ export function MultiplayerScreen() {
         <span className="pill pill--light">{t("multiplayer.badge")}</span>
         <div className="duel" aria-hidden="true">
           <div className="duel__side">
-            <Avatar id={profile.avatar} size={64} />
+            <PlayerAvatar look={profile.look} size={64} />
             <span>{t("multiplayer.you")}</span>
           </div>
           <div className="duel__vs">
-            <Mascot mood="happy" size={92} />
             <span className="duel__badge">
               <Swords size={18} strokeWidth={2.8} /> VS
             </span>

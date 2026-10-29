@@ -1,4 +1,4 @@
-import { CalendarDays, ChevronLeft, Dumbbell, Flame, Gem, House, Route as RouteIcon } from "lucide-react";
+import { CalendarDays, ChevronLeft, Dumbbell, Flame, Gem, House, Route as RouteIcon, Trophy } from "lucide-react";
 import type { ReactNode } from "react";
 import { href, navigate, type Route } from "../app/router";
 import { useI18n } from "../i18n";
@@ -6,7 +6,7 @@ import { localDate } from "../lib/date";
 import { useProgress } from "../progress/store";
 import { levelForXp } from "../progress/levels";
 import { displayedStreak } from "../progress/streak";
-import { Avatar } from "./Avatar";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { Scene, type SceneName } from "./Scene";
 
 interface ScreenProps {
@@ -40,9 +40,12 @@ export function TopBar({ title, back, right }: { title: string; back: Route; rig
   );
 }
 
-/** Compact status row for the main tabs: profile and settings (avatar), level, streak, XP. */
-export function AppHeader() {
-  const { t } = useI18n();
+/**
+ * Compact status row for the main tabs: profile and settings (avatar), level,
+ * streak, Total XP. Home shows its own Total and Weekly XP panel, so it hides the XP chip.
+ */
+export function AppHeader({ showXp = true }: { showXp?: boolean }) {
+  const { t, number } = useI18n();
   const progress = useProgress();
   const today = localDate();
   const streak = displayedStreak(progress.streak, today);
@@ -50,17 +53,19 @@ export function AppHeader() {
   return (
     <header className="statusbar">
       <a className="statusbar__avatar" href={href({ name: "profile" })} aria-label={t("header.profileLabel")}>
-        <Avatar id={progress.profile.avatar} size={36} />
+        <PlayerAvatar look={progress.profile.look} size={36} />
         <span className="statusbar__level">{t("home.levelShort", { n: levelForXp(progress.xp) })}</span>
       </a>
       <span className={`stat-chip${activeToday ? " is-hot" : ""}`} aria-label={t("header.streakLabel", { n: streak })}>
         <Flame size={17} strokeWidth={2.6} fill={activeToday ? "currentColor" : "none"} aria-hidden="true" />
         {streak}
       </span>
-      <span className="stat-chip" aria-label={t("header.xpLabel", { n: progress.xp })}>
-        <Gem size={16} strokeWidth={2.6} aria-hidden="true" />
-        {progress.xp}
-      </span>
+      {showXp && (
+        <span className="stat-chip" aria-label={t("header.xpLabel", { n: progress.xp })}>
+          <Gem size={16} strokeWidth={2.6} aria-hidden="true" />
+          {number(progress.xp)}
+        </span>
+      )}
     </header>
   );
 }
@@ -70,6 +75,7 @@ const TABS = [
   { route: { name: "path" } as Route, icon: RouteIcon, key: "nav.path" as const },
   { route: { name: "daily" } as Route, icon: CalendarDays, key: "nav.daily" as const },
   { route: { name: "train" } as Route, icon: Dumbbell, key: "nav.train" as const },
+  { route: { name: "leaderboard" } as Route, icon: Trophy, key: "nav.leaderboard" as const },
 ];
 
 export function TabBar({ current }: { current: Route["name"] }) {

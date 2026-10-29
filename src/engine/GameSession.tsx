@@ -1,9 +1,8 @@
-import { X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { navigate, type Route } from "../app/router";
 import { Button } from "../components/Button";
 import { MODE_STYLE } from "../components/icons";
-import { Mascot, type MascotMood } from "../components/Mascot";
 import { Dialog } from "../components/Overlay";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatRefs, getContent } from "../content";
@@ -58,7 +57,6 @@ export function GameSession({ sessionKey, kind, refId, steps, tier, onPlayAgain,
   const [run, setRun] = useState(0);
   const [pending, setPending] = useState<{ index: number; resolution: StepResolution } | null>(null);
   const [summary, setSummary] = useState<SessionSummary | null>(null);
-  const [mood, setMood] = useState<MascotMood>("thinking");
   const [quitOpen, setQuitOpen] = useState(false);
   const finishing = useRef(false);
 
@@ -89,7 +87,6 @@ export function GameSession({ sessionKey, kind, refId, steps, tier, onPlayAgain,
       const current = steps[recordedIndex];
       if (!current) return;
       playCue(resolution.correct ? "correct" : "incorrect");
-      setMood(resolution.correct ? "happy" : "encouraging");
       setPending({ index: recordedIndex, resolution });
       progressActions.recordStep(
         sessionKey,
@@ -102,14 +99,12 @@ export function GameSession({ sessionKey, kind, refId, steps, tier, onPlayAgain,
 
   const onContinue = () => {
     setPending(null);
-    setMood("thinking");
   };
 
   const playAgain = () => {
     if (onPlayAgain) return onPlayAgain();
     setSummary(null);
     setPending(null);
-    setMood("thinking");
     setRun((r) => r + 1);
   };
 
@@ -143,11 +138,13 @@ export function GameSession({ sessionKey, kind, refId, steps, tier, onPlayAgain,
         <span className="game__count">{t("common.stepOf", { n: Math.min(index + 1, steps.length), total: steps.length })}</span>
       </header>
 
+      {/* No mascot while answering: the question and the Scripture have the stage. */}
       <div className="game__guide">
-        <Mascot mood={mood} size={60} />
+        <span className="game__mode-icon" aria-hidden="true">
+          <modeStyle.icon size={24} strokeWidth={2.4} />
+        </span>
         <div className="speech">
           <span className="speech__mode">
-            <modeStyle.icon size={16} strokeWidth={2.6} aria-hidden="true" />
             {t(`modes.${step.mode}.name`)}
             <TierBadge tier={step.tier} />
           </span>
@@ -156,13 +153,15 @@ export function GameSession({ sessionKey, kind, refId, steps, tier, onPlayAgain,
       </div>
 
       <div className="game__body" key={`${run}:${step.id}`}>
-        <Game step={step} locked={Boolean(pending)} onResolve={onResolve} onMood={setMood} />
+        <Game step={step} locked={Boolean(pending)} onResolve={onResolve} />
       </div>
 
       {resolution && (
         <section className={`feedback ${resolution.correct ? "feedback--correct" : "feedback--incorrect"}`} role="status" aria-live="assertive">
           <div className="feedback__head">
-            <Mascot mood={resolution.correct ? "happy" : "encouraging"} size={56} />
+            <span className="feedback__badge" aria-hidden="true">
+              {resolution.correct ? <Check size={28} strokeWidth={3.2} /> : <X size={28} strokeWidth={3.2} />}
+            </span>
             <div>
               <h2 className="feedback__title">
                 {resolution.correct ? correctTitles[(index + run) % correctTitles.length] : t("feedback.incorrectTitle")}

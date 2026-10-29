@@ -2,9 +2,10 @@
   overflow: visible;
   display: block;
 }
+/* The flame breathes from its base, where it rises out of the lamp. */
 .mascot__float {
-  transform-origin: 100px 130px;
-  animation: lumi-float 3.2s ease-in-out infinite;
+  transform-origin: 100px 183px;
+  animation: lumi-breathe 3.2s ease-in-out infinite;
 }
 .mascot__flame {
   transform-origin: 100px 183px;
@@ -20,11 +21,6 @@
   transform-origin: center;
   animation: lumi-glow 3.2s ease-in-out infinite;
 }
-.mascot__shadow {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: lumi-shadow 3.2s ease-in-out infinite;
-}
 .mascot__eyes {
   transform-box: fill-box;
   transform-origin: center;
@@ -34,7 +30,7 @@
   animation: lumi-wave 1.4s ease-in-out infinite;
 }
 .mascot--celebrating .mascot__float {
-  animation: lumi-hop 0.9s var(--ease-spring) infinite;
+  animation: lumi-rise 0.9s var(--ease-spring) infinite;
 }
 .mascot--celebrating .mascot__arm--left {
   animation: lumi-cheer-l 0.9s ease-in-out infinite;
@@ -61,21 +57,15 @@
   animation: lumi-nod 1.6s ease-in-out infinite;
 }
 
-@keyframes lumi-float {
+@keyframes lumi-breathe {
   50% {
-    transform: translateY(-6px);
+    transform: scale(0.98, 1.04);
   }
 }
 @keyframes lumi-glow {
   50% {
     transform: scale(1.06);
     opacity: 0.8;
-  }
-}
-@keyframes lumi-shadow {
-  50% {
-    transform: scale(0.85);
-    opacity: 0.6;
   }
 }
 @keyframes lumi-blink {
@@ -93,13 +83,13 @@
     transform: rotate(-14deg);
   }
 }
-@keyframes lumi-hop {
+@keyframes lumi-rise {
   0%,
   100% {
-    transform: translateY(0);
+    transform: scale(1);
   }
   40% {
-    transform: translateY(-14px);
+    transform: scale(0.96, 1.1);
   }
 }
 @keyframes lumi-cheer-l {

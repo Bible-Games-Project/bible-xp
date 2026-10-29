@@ -2,24 +2,23 @@ import { ChevronRight, Crown, Pencil, RotateCcw, Settings } from "lucide-react";
 import { useTierName } from "../components/Tier";
 import { useState, type ReactNode } from "react";
 import { href } from "../app/router";
-import { Avatar } from "../components/Avatar";
 import { Button } from "../components/Button";
 import { Screen, TopBar } from "../components/Layout";
-import { Sheet } from "../components/Overlay";
+import { PlayerAvatar } from "../components/PlayerAvatar";
 import { ProgressBar } from "../components/ProgressBar";
 import { useI18n } from "../i18n";
 import { localDate } from "../lib/date";
 import { levelProgress } from "../progress/levels";
-import { accuracy, AVATARS, openMistakes } from "../progress/model";
+import { accuracy, openMistakes } from "../progress/model";
 import { progressActions, useProgress } from "../progress/store";
 import { displayedStreak } from "../progress/streak";
+import { weeklyXpAt } from "../progress/week";
 
 export function ProfileScreen() {
-  const { t } = useI18n();
+  const { t, number } = useI18n();
   const progress = useProgress();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(progress.profile.name);
-  const [avatarOpen, setAvatarOpen] = useState(false);
 
   const level = levelProgress(progress.xp);
   const acc = accuracy(progress);
@@ -38,12 +37,12 @@ export function ProfileScreen() {
     <Screen>
       <TopBar title={t("profile.title")} back={{ name: "home" }} />
       <section className="profile-hero">
-        <button type="button" className="profile-hero__avatar" onClick={() => setAvatarOpen(true)} aria-label={t("profile.chooseAvatar")}>
-          <Avatar id={progress.profile.avatar} size={96} />
+        <a className="profile-hero__avatar" href={href({ name: "avatar" })} aria-label={t("profile.editAvatar")}>
+          <PlayerAvatar look={progress.profile.look} size={96} />
           <span className="profile-hero__edit" aria-hidden="true">
             <Pencil size={16} strokeWidth={2.8} />
           </span>
-        </button>
+        </a>
         {editing ? (
           <form
             className="name-form"
@@ -94,7 +93,9 @@ export function ProfileScreen() {
         </a>
         <div className="rank-card">
           <span className="rank-card__label">{t("common.level", { n: level.level })}</span>
-          <span className="rank-card__value text-gold">{progress.xp} XP</span>
+          <span className="rank-card__value text-gold">{t("common.xp", { n: number(progress.xp) })}</span>
+          <span className="rank-card__meta">{t("profile.totalXp")}</span>
+          <span className="rank-card__meta">{t("profile.weeklyXp", { n: number(weeklyXpAt(progress.weekly, new Date())) })}</span>
           <ProgressBar value={level.current} max={level.needed} label={levelText} size="sm" />
           <span className="rank-card__meta">{levelText}</span>
         </div>
@@ -136,27 +137,6 @@ export function ProfileScreen() {
       </nav>
       <p className="muted small center">{t("profile.guestNote")}</p>
 
-      <Sheet open={avatarOpen} onClose={() => setAvatarOpen(false)} label={t("profile.chooseAvatar")}>
-        <h2 className="node-sheet__title">{t("profile.chooseAvatar")}</h2>
-        <div className="avatar-grid" role="radiogroup" aria-label={t("profile.chooseAvatar")}>
-          {AVATARS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              role="radio"
-              aria-checked={progress.profile.avatar === id}
-              aria-label={t(`avatars.${id}`)}
-              className={`avatar-choice${progress.profile.avatar === id ? " is-selected" : ""}`}
-              onClick={() => {
-                progressActions.updateProfile({ avatar: id });
-                setAvatarOpen(false);
-              }}
-            >
-              <Avatar id={id} size={64} />
-            </button>
-          ))}
-        </div>
-      </Sheet>
     </Screen>
   );
 }

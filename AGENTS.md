@@ -113,11 +113,13 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   a unit are playable (today: Genesis → The Creation); later Genesis stories are
   listed as coming soon from `plannedStories` in `src/content/locales/en/books.ts`.
   The road must look Duolingo-like in spirit but not a copy.
-- Home (maintainer decision): only two big buttons over the landscape —
+- Home (maintainer decision): two big buttons over the landscape —
   "Start/Continue the journey" (opens the current road) and Daily Challenge —
-  with Lumi and its speech bubble in the sky above. Lumi must never cover the
-  three crosses; check narrow, short (375×667) and wide screens after layout
-  changes.
+  with the Total XP / Weekly XP panel and Lumi's speech bubble in the sky
+  above. Lumi must never cover the three crosses; check narrow, short
+  (375×667, 360×640) and wide screens after layout changes. The big buttons
+  scale with the viewport (`clamp()` on height, padding and type) and are
+  capped at 460px wide: the maintainer found them too big on some screens.
 - Pictures supplied by the maintainer live in `src/assets/` (webp, quality 80)
   and are shown with `<Screen scene="…">`: Home, the story road, Daily, Train
   (the maintainer's picture, mirrored so the speaker faces the other way),
@@ -151,20 +153,53 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   accuracy-based unlock system was removed); harder tiers pay more XP. Wrong
   options must be real details from the text (other days, rivers, speakers),
   never absurd, and never a synonym another translation uses for the right answer.
-- Navigation (maintainer decision): bottom tabs are Home, Journey, Daily, Train.
-  Profile is not a tab; it opens from the avatar at the top left and holds
-  Settings.
-- Mascot (maintainer decision): Lumi is a friendly flame in orange and
-  yellow (not white, like the Bible Games Project logo's flame would suggest),
-  in tones complementary to or monochromatic with Home's picture, drawn in SVG
-  in `src/components/Mascot.tsx` with the `--flame` colours and five moods.
-- Progress is one JSON object (`src/progress/model.ts`, version 3), all
+- Navigation (maintainer decision): bottom tabs are Home, Journey, Daily,
+  Train, Ranking (the weekly leaderboard; "Leaderboard" does not fit five tabs
+  at 360px). Profile is not a tab; it opens from the avatar at the top left and
+  holds the avatar editor (`#/avatar`) and Settings.
+- Onboarding (maintainer decision): first-time players see exactly three
+  steps over the Home picture — language (English only), Bible knowledge level
+  (Beginner/Intermediate/Advanced → starting tier 1/2/3, see
+  `progress/avatar.ts`), avatar. `App.tsx` shows it until
+  `onboarding.completedAt` is set; choices are saved together on "Start
+  learning" (`completeOnboarding`), never touching XP or progress. Players from
+  before version 4 see it once too.
+- Avatar: a bust in biblical-era dress (`PlayerAvatar.tsx`, SVG placeholder for
+  final art): male/female, three skin tones (white, mixed/brown, black). Robes,
+  footwear and accessories are reserved for XP rewards (`progress/cosmetics.ts`):
+  today the catalogue holds one clearly marked placeholder per slot that can
+  never be unlocked or worn. Never invent items or XP prices; add real ones
+  only when the maintainer defines them. Cosmetics never give XP or advantages,
+  and there is no shop.
+- Mascot (maintainer decision): Lumi is the light rising from an ancient clay
+  oil lamp — a friendly flame in orange and yellow (not white, like the Bible
+  Games Project logo's flame would suggest), in tones complementary to or
+  monochromatic with Home's picture, drawn in SVG in
+  `src/components/Mascot.tsx` with the `--flame` colours and five moods. Use
+  it selectively: onboarding, the Home greeting, intro and lesson completion,
+  level-ups, streak milestones, encouragement. Not beside questions or as
+  decoration (it was removed from the game header, answer feedback, story
+  header, Daily card and Duels screen).
+- XP: `xp` is lifetime Total XP (never resets, drives the level); `weekly` is
+  the current competition week's XP (Monday 00:00 UTC to Monday 00:00 UTC,
+  `progress/week.ts`). Both only grow through `grantXp()` in `model.ts`, from
+  the rewards in `src/progress/rewards.ts`; claimed rewards add nothing.
+- Leaderboard: there is no backend or account system. `src/leaderboard/`
+  defines `LeaderboardService`; the app uses `localLeaderboard`, which shows
+  only the player's own Weekly XP with no rank and says the global ranking is
+  not live. Never present local or sample data as a real ranking. Sample
+  players exist only in development builds (`#/leaderboard?sample=1` with `bun
+  run dev`) and are labelled as such. A shared backend should implement
+  `LeaderboardService` (and own the week boundary) using `profile.playerId`.
+- Progress is one JSON object (`src/progress/model.ts`, version 4), all
   mutations are pure functions with tests. Bump `PROGRESS_VERSION` and extend
   `migrate()` when the shape changes; never drop XP, path progress or mistakes.
 - XP amounts live only in `src/progress/rewards.ts`.
-- All UI text goes through `src/i18n/locales/en.ts`; only English exists. Do not
-  list languages that are not fully translated (the 12 planned languages were
-  not specified).
+- All UI text goes through `src/i18n/locales/en.ts`; only English exists. The
+  app is planned in 12 languages (not yet specified); add one only when it is
+  fully translated, following the steps in `src/i18n/index.ts`. Never list,
+  machine-translate or placeholder-translate a language. Format numbers and
+  dates with `number()` / `date()` from `useI18n()`.
 - Multiplayer (Duels) and Plus are intentionally "coming soon"
   (`src/config/features.ts`); never show fake players, scores or payments.
 - CSS trap: a selector like `.foo svg` also hits icon SVGs nested inside an

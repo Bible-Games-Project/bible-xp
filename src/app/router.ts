@@ -13,7 +13,10 @@ export type Route =
   | { name: "book"; bookId: string }
   | { name: "story"; unitId: string; from?: "library" }
   | { name: "train" }
+  /** `sample` shows made-up players, in development builds only. */
+  | { name: "leaderboard"; sample?: true }
   | { name: "profile" }
+  | { name: "avatar" }
   | { name: "settings" }
   | { name: "about" }
   | { name: "privacy" }
@@ -33,6 +36,7 @@ const STATIC: Record<string, Route["name"]> = {
   train: "train",
   library: "library",
   profile: "profile",
+  avatar: "avatar",
   settings: "settings",
   about: "about",
   privacy: "privacy",
@@ -47,6 +51,9 @@ const STATIC: Record<string, Route["name"]> = {
 export function parseHash(hash: string): Route {
   const [rawPath, query = ""] = hash.replace(/^#\/?/, "").split("?");
   const path = decodeURIComponent(rawPath).replace(/\/$/, "");
+  if (path === "leaderboard") {
+    return new URLSearchParams(query).get("sample") === "1" ? { name: "leaderboard", sample: true } : { name: "leaderboard" };
+  }
   if (Object.hasOwn(STATIC, path)) return { name: STATIC[path] } as Route;
   const [head, ...rest] = path.split("/");
   const param = rest.join("/");
@@ -74,6 +81,8 @@ export function href(route: Route): string {
       return `#/intro/${encodeURIComponent(route.introId)}`;
     case "review-play":
       return "#/review/play";
+    case "leaderboard":
+      return route.sample ? "#/leaderboard?sample=1" : "#/leaderboard";
     case "book":
       return `#/path/book/${encodeURIComponent(route.bookId)}`;
     case "story":

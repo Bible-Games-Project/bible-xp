@@ -8,6 +8,7 @@ import "./theme/tokens.css";
 import "./theme/base.css";
 import "./theme/components.css";
 import "./theme/screens.css";
+import "./theme/player.css";
 import "./theme/games.css";
 import "./theme/mascot.css";
 

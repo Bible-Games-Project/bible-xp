@@ -1,8 +1,11 @@
 import type { GameMode, Tier, Unit } from "../content/types";
+import { isAvatarLook, KNOWLEDGE_LEVELS, tierForKnowledge, type AvatarLook, type CosmeticSlot, type KnowledgeLevel } from "./avatar";
+import { canEquip, newlyUnlocked } from "./cosmetics";
 import { levelForXp } from "./levels";
 import { REWARDS, type RewardResult } from "./rewards";
 import { EMPTY_STREAK, recordActiveDay, type StreakState } from "./streak";
 import { defaultDifficulty, isTier, type DifficultyState } from "./tiers";
+import { addWeeklyXp, weekStartUtc, type WeeklyXp } from "./week";
 
 /*
  * The whole player state, kept as one plain JSON object so it can be saved
@@ -13,14 +16,13 @@ import { defaultDifficulty, isTier, type DifficultyState } from "./tiers";
  * - Difficulty tier (tiers.ts) is chosen freely in Settings and decides
  *   which questions you get.
  * - XP comes from correct answers, scaled by tier, plus first-clear bonuses.
- *   It drives the player level (levels.ts), which is a measure of effort.
+ *   `xp` is lifetime XP: it never resets and drives the player level
+ *   (levels.ts). `weekly` counts the XP of the current competition week
+ *   (week.ts) for the leaderboard. Both only grow through `grantXp`.
  * - The streak counts days with at least one finished session.
  */
 
-export const PROGRESS_VERSION = 3;
-
-export type AvatarId = "dawn" | "sky" | "leaf" | "flame" | "wave" | "star";
-export const AVATARS: AvatarId[] = ["dawn", "sky", "leaf", "flame", "wave", "star"];
+export const PROGRESS_VERSION = 4;
 
 export interface Settings {
   language: string;
@@ -32,8 +34,13 @@ export interface Settings {
 }
 
 export interface Profile {
+  /** Random, stable id for a future shared leaderboard. Not an account. */
+  playerId: string;
   name: string;
-  avatar: AvatarId;
+  /** Chosen during onboarding; null before that. */
+  knowledge: KnowledgeLevel | null;
+  /** Chosen during onboarding; null before that. */
+  look: AvatarLook | null;
 }
 
 /** A game on the path: finished at least once, at any tier. */
@@ -95,7 +102,13 @@ export interface ProgressData {
   version: number;
   profile: Profile;
   settings: Settings;
+  onboarding: { completedAt: string | null };
+  /** Lifetime XP. */
   xp: number;
+  /** XP of the current competition week. */
+  weekly: WeeklyXp;
+  /** Avatar cosmetics unlocked with lifetime XP. */
+  cosmetics: { unlocked: string[] };
   streak: StreakState;
   difficulty: DifficultyState;
   stats: {
@@ -117,12 +130,20 @@ export interface ProgressData {
   lastReviewRewardDate?: string;
 }
 
+export function newPlayerId(): string {
+  const random = globalThis.crypto?.randomUUID?.();
+  return random ?? `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export function defaultProgress(): ProgressData {
   return {
     version: PROGRESS_VERSION,
-    profile: { name: "", avatar: "dawn" },
+    profile: { playerId: newPlayerId(), name: "", knowledge: null, look: null },
     settings: { language: "en", sound: true, vibration: true, reduceMotion: null, largeText: false },
+    onboarding: { completedAt: null },
     xp: 0,
+    weekly: { weekStart: weekStartUtc(new Date()), xp: 0 },
+    cosmetics: { unlocked: [] },
     streak: { ...EMPTY_STREAK },
     difficulty: defaultDifficulty(),
     stats: { correctAnswers: 0, incorrectAnswers: 0, activitiesStarted: 0, sessionsCompleted: 0, lastActivity: null },
@@ -231,6 +252,27 @@ export interface SessionSummary {
   levelAfter: number;
   firstCompletion: boolean;
   unitCompleted: string | null;
+  /** The streak length just reached, when it is a milestone (3, 7, 14...). */
+  streakMilestone: number | null;
+}
+
+/** Streak lengths worth celebrating. */
+export const STREAK_MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
+
+/**
+ * The only way XP is added: lifetime XP and the current week's XP grow
+ * together, and cosmetics whose requirement is now met are unlocked.
+ */
+export function grantXp(data: ProgressData, amount: number, nowIso: string): ProgressData {
+  if (amount <= 0) return data;
+  const xp = data.xp + amount;
+  const unlocked = newlyUnlocked(data.cosmetics.unlocked, xp);
+  return {
+    ...data,
+    xp,
+    weekly: addWeeklyXp(data.weekly, amount, new Date(nowIso)),
+    cosmetics: unlocked.length ? { unlocked: [...data.cosmetics.unlocked, ...unlocked] } : data.cosmetics,
+  };
 }
 
 /**
@@ -302,7 +344,8 @@ export function completeSession(
   }
 
   const levelBefore = levelForXp(next.xp);
-  next.xp += reward.xp + reward.bonus;
+  const streakBefore = next.streak.current;
+  next = grantXp(next, reward.xp + reward.bonus, nowIso);
   next.streak = recordActiveDay(next.streak, today);
   next.stats = {
     ...next.stats,
@@ -328,6 +371,8 @@ export function completeSession(
       levelAfter: levelForXp(next.xp),
       firstCompletion,
       unitCompleted: unitCompleted.newlyCompleted,
+      streakMilestone:
+        next.streak.current !== streakBefore && STREAK_MILESTONES.includes(next.streak.current) ? next.streak.current : null,
     },
   };
 }
@@ -341,8 +386,7 @@ export function completeIntro(
 ): { data: ProgressData; xp: number } {
   if (data.intros[introId]) return { data, xp: 0 };
   let next: ProgressData = {
-    ...data,
-    xp: data.xp + REWARDS.introFirstCompletion,
+    ...grantXp(data, REWARDS.introFirstCompletion, nowIso),
     intros: { ...data.intros, [introId]: { completedAt: nowIso } },
     streak: recordActiveDay(data.streak, today),
     stats: { ...data.stats, lastActivity: { kind: "intro", refId: introId, at: nowIso } },
@@ -354,6 +398,41 @@ export function completeIntro(
 export function selectTierIn(data: ProgressData, tier: Tier): ProgressData {
   if (!isTier(tier) || tier === data.difficulty.selected) return data;
   return { ...data, difficulty: { ...data.difficulty, selected: tier } };
+}
+
+export interface OnboardingChoices {
+  language: string;
+  knowledge: KnowledgeLevel;
+  look: AvatarLook;
+}
+
+/**
+ * Saves the onboarding choices and marks onboarding done. The knowledge level
+ * sets the starting difficulty; XP and progress are never touched.
+ */
+export function completeOnboarding(data: ProgressData, choices: OnboardingChoices, nowIso: string): ProgressData {
+  if (!KNOWLEDGE_LEVELS.includes(choices.knowledge) || !isAvatarLook(choices.look)) return data;
+  return {
+    ...data,
+    settings: { ...data.settings, language: choices.language },
+    profile: { ...data.profile, knowledge: choices.knowledge, look: cleanLook(data, choices.look) },
+    difficulty: { ...data.difficulty, selected: tierForKnowledge(choices.knowledge, data.difficulty.selected) },
+    onboarding: { completedAt: data.onboarding.completedAt ?? nowIso },
+  };
+}
+
+/** Changes the avatar; worn cosmetics must be unlocked. */
+export function setLook(data: ProgressData, look: AvatarLook): ProgressData {
+  if (!isAvatarLook(look)) return data;
+  return { ...data, profile: { ...data.profile, look: cleanLook(data, look) } };
+}
+
+function cleanLook(data: ProgressData, look: AvatarLook): AvatarLook {
+  const equipped: Partial<Record<CosmeticSlot, string>> = {};
+  for (const [slot, id] of Object.entries(look.equipped ?? {}) as [CosmeticSlot, string][]) {
+    if (canEquip(id, slot, data.cosmetics.unlocked)) equipped[slot] = id;
+  }
+  return { presentation: look.presentation, skin: look.skin, equipped };
 }
 
 export function isNodeCompleted(data: ProgressData, node: Unit["nodes"][number]): boolean {
@@ -409,11 +488,15 @@ export function migrate(raw: unknown): ProgressData {
   const saved = raw as Partial<ProgressData> & { version?: number };
   const obj = <T extends object>(value: unknown, fallback: T): T =>
     value && typeof value === "object" && !Array.isArray(value) ? { ...fallback, ...(value as T) } : fallback;
-  const avatar = AVATARS.includes(saved.profile?.avatar as AvatarId) ? (saved.profile!.avatar as AvatarId) : base.profile.avatar;
+  const savedProfile = obj(saved.profile as Partial<Profile> | undefined, {} as Partial<Profile>);
+  const cosmetics = Array.isArray(saved.cosmetics?.unlocked) ? saved.cosmetics.unlocked.filter((id) => typeof id === "string") : [];
+  const weekly = saved.weekly && typeof saved.weekly.weekStart === "string" && typeof saved.weekly.xp === "number" && saved.weekly.xp >= 0 ? saved.weekly : base.weekly;
 
   // v1 → v2: sessions had no tier and question banks changed, so unfinished
   // sessions are dropped. XP, streak, path progress and mistakes are kept.
   // v2 → v3: tiers are no longer unlocked; only the selected tier is kept.
+  // v3 → v4: the abstract avatar is replaced by the onboarding avatar, and
+  // Weekly XP starts counting from the upgrade (earlier XP stays lifetime XP).
   const sessions = Object.fromEntries(
     Object.entries(obj(saved.sessions, {} as Record<string, SessionProgress>)).filter(([, s]) => s && isTier(s.tier)),
   );
@@ -422,9 +505,17 @@ export function migrate(raw: unknown): ProgressData {
 
   return {
     version: PROGRESS_VERSION,
-    profile: { ...obj(saved.profile, base.profile), avatar },
+    profile: {
+      playerId: typeof savedProfile.playerId === "string" && savedProfile.playerId ? savedProfile.playerId : base.profile.playerId,
+      name: typeof savedProfile.name === "string" ? savedProfile.name : "",
+      knowledge: KNOWLEDGE_LEVELS.includes(savedProfile.knowledge as KnowledgeLevel) ? (savedProfile.knowledge as KnowledgeLevel) : null,
+      look: isAvatarLook(savedProfile.look) ? { ...savedProfile.look, equipped: obj(savedProfile.look.equipped, {}) } : null,
+    },
     settings: obj(saved.settings, base.settings),
+    onboarding: { completedAt: typeof saved.onboarding?.completedAt === "string" ? saved.onboarding.completedAt : null },
     xp: typeof saved.xp === "number" && saved.xp >= 0 ? saved.xp : 0,
+    weekly,
+    cosmetics: { unlocked: cosmetics },
     streak: obj(saved.streak, base.streak),
     difficulty,
     stats: obj(saved.stats, base.stats),
