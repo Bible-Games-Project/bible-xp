@@ -164,8 +164,12 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   `onboarding.completedAt` is set; choices are saved together on "Start
   learning" (`completeOnboarding`), never touching XP or progress. Players from
   before version 4 see it once too.
-- Avatar: a bust in biblical-era dress (`PlayerAvatar.tsx`, SVG placeholder for
-  final art): male/female, three skin tones (white, mixed/brown, black). Robes,
+- Avatar: a painted head-and-shoulders portrait in biblical-era dress
+  (`PlayerAvatar.tsx`, six transparent webp files in `src/assets/avatars/`):
+  male/female, three skin tones (white, mixed/brown, black). They were made
+  with an image model as one consistent set; `docs/avatar-art.md` has the
+  prompts and the method (always edit from an existing portrait). New avatar
+  pictures must match that set. Robes,
   footwear and accessories are reserved for XP rewards (`progress/cosmetics.ts`):
   today the catalogue holds one clearly marked placeholder per slot that can
   never be unlocked or worn. Never invent items or XP prices; add real ones

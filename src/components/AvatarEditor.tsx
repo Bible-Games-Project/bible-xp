@@ -48,7 +48,7 @@ export function AvatarEditor({ value, onChange }: AvatarEditorProps) {
                 checked={value.skin === tone}
                 onChange={() => onChange({ ...value, skin: tone })}
               />
-              <span className="swatch__dot" style={{ background: SKIN[tone].base }} aria-hidden="true">
+              <span className="swatch__dot" style={{ background: SKIN[tone] }} aria-hidden="true">
                 {value.skin === tone && <Check size={18} strokeWidth={3} />}
               </span>
               <span className="swatch__label">{t(`avatar.skin.${tone}`)}</span>

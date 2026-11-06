@@ -77,10 +77,10 @@ describe("palette", () => {
     }
   });
 
-  it("the avatar's clothes and backdrop take hues of the picture", () => {
-    const wear = avatar.slice(avatar.indexOf("export const WEAR"), avatar.indexOf("};", avatar.indexOf("export const WEAR")));
-    const colours = [...wear.matchAll(/"(#[0-9a-f]{6})"/gi)].map((m) => m[1].toLowerCase());
-    expect(colours.length).toBe(9);
+  it("the avatar's backdrop takes hues of the picture", () => {
+    const backdrop = avatar.slice(avatar.indexOf("export const BACKDROP"), avatar.indexOf("};", avatar.indexOf("export const BACKDROP")));
+    const colours = [...backdrop.matchAll(/"(#[0-9a-f]{6})"/gi)].map((m) => m[1].toLowerCase());
+    expect(colours.length).toBe(3);
     const allowed = Object.keys(FAMILIES).map(hue);
     for (const c of colours) expect(Math.min(...allowed.map((h) => hueDistance(hue(c), h))), c).toBeLessThan(3);
   });

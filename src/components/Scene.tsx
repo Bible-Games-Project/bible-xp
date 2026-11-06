@@ -4,6 +4,7 @@ import daily from "../assets/daily-background.webp";
 import home from "../assets/home-background.webp";
 import oldTestament from "../assets/journey-old-testament.webp";
 import train from "../assets/train-background.webp";
+import { preloadImages } from "../lib/preload";
 
 /**
  * Full-screen illustrated background behind a screen. Use it through
@@ -28,20 +29,12 @@ export function storyScene(unitId: string): SceneName {
   return STORY_SCENES[unitId] ?? "bible";
 }
 
-const loaded: HTMLImageElement[] = [];
-
 /**
  * Downloads and decodes every picture once, at start-up, so no screen shows
  * an empty background while its picture loads. Home's picture goes first.
  */
 export function preloadScenes() {
-  if (loaded.length > 0 || typeof Image === "undefined") return;
-  for (const src of Object.values(PICTURES)) {
-    const img = new Image();
-    img.src = src;
-    img.decode().catch(() => {});
-    loaded.push(img);
-  }
+  preloadImages(Object.values(PICTURES));
 }
 
 export function Scene({ name }: { name: SceneName }) {
