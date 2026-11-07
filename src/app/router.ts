@@ -13,7 +13,7 @@ export type Route =
   | { name: "book"; bookId: string }
   | { name: "story"; unitId: string; from?: "library" }
   | { name: "train" }
-  /** `sample` shows made-up players, in development builds only. */
+  /** `sample` shows made-up players, in developer builds only. */
   | { name: "leaderboard"; sample?: true }
   | { name: "profile" }
   | { name: "avatar" }

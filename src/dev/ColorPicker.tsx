@@ -1,19 +1,19 @@
-import { Copy, MousePointerClick, Palette, RotateCcw, Undo2, X } from "lucide-react";
+import { Copy, MousePointerClick, RotateCcw, Undo2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { createRoot } from "react-dom/client";
 import { hslToRgb, parseColor, rgbToHsl, toHex, type Hsl } from "./color";
 
 /*
- * Developer colour picker. Tap the palette button, then any button or text:
+ * Developer colour picker, part of developer mode (DevTools.tsx). Tap the
+ * palette button, then any button or text:
  * a panel opens with a colour wheel (hue around it, saturation from the centre
  * out) and a lightness bar. It changes either the design token the element
  * uses (e.g. --gold: every gold button changes) or only elements like the one
  * picked. Tweaks stay in this browser (localStorage) until reset; "Copy CSS"
  * gives the values to move into src/theme.
  *
- * Mounted only by `bun run dev` and the devtools build (`bun run
- * build:devtools`), never in a release build: see main.tsx. Nothing here runs
- * at import time, so release builds drop the module entirely.
+ * Tweaks show only while developer mode is on, so switching it off shows the
+ * colours the game really ships with. Nothing here runs at import time, so
+ * release builds drop the module entirely.
  */
 
 type Prop = "background" | "text" | "border";
@@ -29,6 +29,8 @@ interface Overrides {
 }
 
 const STORE = "testalume:dev-colours";
+const NONE: Overrides = { tokens: {}, rules: {} };
+export type PickerMode = "idle" | "picking" | "editing";
 const OVERRIDES_ID = "dev-colour-overrides";
 
 function loadOverrides(): Overrides {
@@ -234,8 +236,8 @@ function Wheel({ hsl, onChange }: { hsl: Hsl; onChange: (next: Hsl) => void }) {
   );
 }
 
-function ColorPicker() {
-  const [mode, setMode] = useState<"idle" | "picking" | "editing">("idle");
+/** The picker itself; DevTools owns `mode` and starts it with its palette button. */
+export function ColorPicker({ enabled, mode, setMode }: { enabled: boolean; mode: PickerMode; setMode: (mode: PickerMode) => void }) {
   const [chain, setChain] = useState<Element[]>([]);
   const [index, setIndex] = useState(0);
   const [prop, setProp] = useState<Prop>("background");
@@ -253,13 +255,13 @@ function ColorPicker() {
   const key = info ? (tokenOn ? info.token!.token : `${info.selector}|${PROPS[prop].write}`) : "";
 
   useEffect(() => {
-    applyOverrides(overrides);
+    applyOverrides(enabled ? overrides : NONE);
     try {
       localStorage.setItem(STORE, JSON.stringify(overrides));
     } catch {
       /* Not saved; the tweak still shows until reload. */
     }
-  }, [overrides]);
+  }, [overrides, enabled]);
 
   // Keep the panel clear of the element being edited.
   useEffect(() => {
@@ -368,12 +370,6 @@ function ColorPicker() {
         <div className={`dcp-outline${mode === "editing" ? " is-target" : ""}`} style={{ left: box.left - 3, top: box.top - 3, width: box.width + 6, height: box.height + 6 }} />
       )}
 
-      {mode === "idle" && (
-        <button type="button" className="dcp-fab" onClick={() => setMode("picking")} aria-label="Developer colour picker">
-          <Palette size={18} />
-          <span>DEV</span>
-        </button>
-      )}
 
       {mode === "picking" && (
         <div className="dcp-banner">
@@ -484,12 +480,9 @@ function ColorPicker() {
   );
 }
 
-const STYLES = `
+export const PICKER_STYLES = `
 [data-devtool] { font: 13px/1.35 system-ui, sans-serif; color: #1d2733; }
 [data-devtool] button { font: inherit; cursor: pointer; }
-.dcp-fab { position: fixed; left: 10px; bottom: calc(var(--tabbar-h, 66px) + env(safe-area-inset-bottom, 0px) + 12px); z-index: 10000;
-  display: flex; align-items: center; gap: 4px; padding: 6px 9px; border: 0; border-radius: 999px;
-  background: #1d2733; color: #fff; font-weight: 700; font-size: 11px; letter-spacing: .06em; opacity: .85; box-shadow: 0 4px 14px rgb(0 0 0 / .25); }
 .dcp-banner { position: fixed; left: 50%; top: 10px; transform: translateX(-50%); z-index: 10001; display: flex; align-items: center; gap: 8px;
   padding: 8px 12px; border-radius: 999px; background: #1d2733; color: #fff; box-shadow: 0 6px 20px rgb(0 0 0 / .3); white-space: nowrap; }
 .dcp-banner button { border: 0; border-radius: 999px; padding: 3px 10px; background: #fff; color: #1d2733; }
@@ -528,15 +521,3 @@ const STYLES = `
 .dcp-actions button { display: inline-flex; align-items: center; gap: 4px; }
 .dcp-css { width: 100%; box-sizing: border-box; min-height: 90px; font: 12px ui-monospace, monospace; border: 1px solid #d5dbe3; border-radius: 8px; padding: 6px; }
 `;
-
-/** Adds the picker to the page. Saved tweaks are applied straight away. */
-export function mountColorPicker() {
-  const style = document.createElement("style");
-  style.textContent = STYLES;
-  document.head.appendChild(style);
-  applyOverrides(loadOverrides());
-  const host = document.createElement("div");
-  host.setAttribute("data-devtool", "");
-  document.body.appendChild(host);
-  createRoot(host).render(<ColorPicker />);
-}

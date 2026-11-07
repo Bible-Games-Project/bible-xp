@@ -9,7 +9,7 @@ import type { AvatarLook } from "../progress/avatar";
  * (source "local"). A future shared backend implements the same interface,
  * returns source "global", and becomes the authority for the competition week
  * (see progress/week.ts). Nothing here invents other players: the sample
- * service exists only in development builds and labels itself as sample data.
+ * service exists only in developer builds and labels itself as sample data.
  */
 
 /** What this device knows about the current player for the ranking. */
@@ -79,5 +79,7 @@ export const sampleLeaderboard: LeaderboardService = {
  * implementation here; screens do not change.
  */
 export function leaderboardService(options: { sample?: boolean } = {}): LeaderboardService {
-  return options.sample && import.meta.env.DEV ? sampleLeaderboard : localLeaderboard;
+  // Written out (not DEV_BUILD from dev/devMode) so release builds fold it to false and drop the sample data.
+  const developerBuild = import.meta.env.DEV || import.meta.env.MODE === "devtools";
+  return options.sample && developerBuild ? sampleLeaderboard : localLeaderboard;
 }

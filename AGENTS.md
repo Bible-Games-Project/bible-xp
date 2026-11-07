@@ -167,14 +167,19 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   pill at the top right, which opens the Profile (avatar editor `#/avatar`,
   stats, Settings). No streak chip in the header; the streak shows in the
   Profile and as milestone banners in the results.
-- Developer colour picker (`src/dev/ColorPicker.tsx`, maintainer request): a
-  small "DEV" button that picks any element and recolours it with an HSL wheel
-  and a lightness bar, either through the design token it uses (e.g. `--gold`)
-  or for elements like it only; tweaks persist in localStorage and "Copy CSS"
-  exports them to move into `src/theme`. It is mounted only by `bun run dev`
-  and `bun run build:devtools` (`--mode devtools`, output `dist-devtools/`),
-  and must never ship: `main.tsx` guards it so release builds drop the module
-  (check with a grep for `dev-colour-overrides` in `dist/`).
+- Developer mode (`src/dev/`, maintainer request): one game, with a "DEV"
+  toggle button in it. While on: every Journey stop is open, and icon buttons
+  give the colour picker (pick any element, recolour it with an HSL wheel and a
+  lightness bar through the token it uses, e.g. `--gold`, or for elements like
+  it only; "Copy CSS" exports the tweaks for `src/theme`; tweaks only show
+  while the mode is on), the ranking with sample players, and replaying
+  onboarding. The switch and the colour tweaks persist in localStorage, apart
+  from the player's progress. It exists only in `bun run dev` and `bun run
+  build:devtools` (`--mode devtools`, output `dist-devtools/`); the Claude
+  artifact the maintainer plays is a devtools build. Release builds (`bun run
+  build`, what bgp-admin publishes) must not contain it: `main.tsx` and
+  `leaderboard.ts` write the condition out so it folds to false; check with a
+  grep for `dev-toggle` and `Sample player` in `dist/`.
 - Onboarding (maintainer decision): first-time players see exactly three
   steps over the Home picture — language (English only), Bible knowledge level
   (Beginner/Intermediate/Advanced → starting tier 1/2/3, see

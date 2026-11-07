@@ -16,20 +16,21 @@ see `AGENTS.md`. Nothing native lives in this repo.
 
 ```bash
 bun install
-bun run dev        # development server (with the developer colour picker)
-bun run build      # typecheck + production build into dist/
-bun run build:devtools  # same build plus the colour picker, into dist-devtools/
+bun run dev        # development server (with the DEV button)
+bun run build      # typecheck + release build into dist/ (no DEV button)
+bun run build:devtools  # same build plus the DEV button, into dist-devtools/
 bun run preview    # serve the production build
 bun run test       # unit and content tests (vitest)
 ```
 
-**Colour picker (developers only).** In `bun run dev` and the devtools build, a
-small "DEV" button sits above the tab bar. Tap it, then tap any button or text:
-a panel opens with a colour wheel (hue and saturation) and a lightness bar.
-Change the design token the element uses (every element using it follows) or
-only elements like it. Tweaks are kept in that browser until "Reset all";
-"Copy CSS" gives the values to put into `src/theme`. Release builds do not
-include it.
+**Developer mode.** In `bun run dev` and the devtools build, a small "DEV"
+button sits above the tab bar. Switch it on and every Journey stop opens, and
+three tools appear: the colour picker (tap it, then any button or text: a
+colour wheel for hue and saturation and a lightness bar change the design
+token the element uses, or only elements like it; "Copy CSS" gives the values
+to put into `src/theme`), the ranking with sample players, and replaying
+onboarding. Switch it off to see the game exactly as it ships. Release builds
+do not include any of it.
 
 ## What's inside
 

@@ -122,6 +122,10 @@ export const progressActions = {
   setLook(look: AvatarLook) {
     commit(setLook(state, look));
   },
+  /** Developer mode: shows onboarding again, with the saved choices filled in. Progress is kept. */
+  restartOnboarding() {
+    commit({ ...state, onboarding: { completedAt: null } });
+  },
   /** Clears progress but keeps the player's profile, avatar, onboarding and settings. */
   resetProgress() {
     // Cosmetics come from XP, so they are cleared too and nothing stays worn.

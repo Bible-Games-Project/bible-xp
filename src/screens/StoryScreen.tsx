@@ -10,6 +10,7 @@ import { findBook, findTopic, unitFor, unitsOfBook } from "../content";
 import type { PathNode } from "../content/types";
 import { TIERS } from "../content/types";
 import { useContent } from "../content/useContent";
+import { useDevMode } from "../dev/devMode";
 import { useI18n } from "../i18n";
 import { clearKey } from "../progress/model";
 import { bookProgress, completedCount, currentUnit, nodeStatus } from "../progress/path";
@@ -39,6 +40,7 @@ export function StoryScreen({ unitId, from }: { unitId: string; from?: "library"
   const pack = useContent();
   const progress = useProgress();
   const tierName = useTierName();
+  const devMode = useDevMode();
   const unit = unitFor(pack, unitId);
   if (!unit) return <NotFoundScreen />;
   const topic = findTopic(pack, unit.topicId)!;
@@ -46,7 +48,9 @@ export function StoryScreen({ unitId, from }: { unitId: string; from?: "library"
   const done = completedCount(progress, unit);
 
   const stops: RoadStop[] = unit.nodes.map((node, i) => {
-    const status = nodeStatus(progress, unit, i);
+    // Developer mode opens every stop, to play any game straight away.
+    const ordered = nodeStatus(progress, unit, i);
+    const status = devMode && ordered === "locked" ? "available" : ordered;
     const cleared = node.kind === "activity" ? TIERS.filter((tier) => progress.tierClears[clearKey(node.activityId, tier)]) : [];
     const state =
       status === "locked"
