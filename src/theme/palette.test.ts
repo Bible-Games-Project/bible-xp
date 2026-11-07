@@ -99,14 +99,19 @@ describe("palette", () => {
   });
 
   it("Testalume, the mascot, is drawn only with warm hues of the picture and the game's gold", () => {
-    const table = mascot.slice(mascot.indexOf("export const FLAME"), mascot.indexOf("};", mascot.indexOf("export const FLAME")));
-    const colours = [...table.matchAll(/"(#[0-9a-f]{6})"/gi)].map((m) => m[1].toLowerCase());
-    expect(colours.length).toBeGreaterThan(15);
+    const keys = Object.keys(t).filter((k) => k.startsWith("mascot-"));
+    expect(keys.length).toBeGreaterThan(15);
     const warm = [IMAGE.sun, IMAGE.meadow, IMAGE.path, IMAGE.stone, IMAGE.rock].map(hue);
-    for (const c of colours) expect(Math.min(...warm.map((h) => hueDistance(hue(c), h))), c).toBeLessThan(3);
-    // The outer flame starts from the main button gold, so the mascot matches the buttons.
-    expect(hueDistance(hue(colours[0]), hue(t.gold))).toBeLessThan(4);
-    expect(table.toLowerCase()).toContain(t.gold);
+    for (const k of keys) expect(Math.min(...warm.map((h) => hueDistance(hue(t[k]), h))), k).toBeLessThan(3);
+    // The flame grows from the main button gold, so the mascot matches the buttons.
+    expect(t["mascot-inner-2"]).toBe(t.gold);
+    expect(hueDistance(hue(t["mascot-flame-1"]), hue(t.gold))).toBeLessThan(4);
+  });
+
+  it("the mascot uses exactly the --mascot-* tokens", () => {
+    const defined = Object.keys(t).filter((k) => k.startsWith("mascot-")).map((k) => k.slice("mascot-".length)).sort();
+    const used = [...new Set([...mascot.matchAll(/v\("([\w-]+)"\)/g)].map((m) => m[1]))].sort();
+    expect(used).toEqual(defined);
   });
 
   it("text stays readable", () => {

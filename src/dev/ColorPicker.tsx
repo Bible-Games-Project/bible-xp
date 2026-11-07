@@ -1,15 +1,17 @@
-import { Copy, MousePointerClick, RotateCcw, Undo2, X } from "lucide-react";
+import { Copy, MousePointerClick, Pipette, RotateCcw, Undo2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { hslToRgb, parseColor, rgbToHsl, toHex, type Hsl } from "./color";
+import { hslToRgb, parseColor, rgbToHsl, toHex, type Hsl, type Rgb } from "./color";
 
 /*
  * Developer colour picker, part of developer mode (DevTools.tsx). Tap the
- * palette button, then any button or text:
+ * palette button, then any button, text or the mascot:
  * a panel opens with a colour wheel (hue around it, saturation from the centre
  * out) and a lightness bar. It changes either the design token the element
  * uses (e.g. --gold: every gold button changes) or only elements like the one
- * picked. Tweaks stay in this browser (localStorage) until reset; "Copy CSS"
- * gives the values to move into src/theme.
+ * picked. The mascot shows its own colours (--mascot-* tokens) to change one
+ * by one. A colour can also come from the screen (eyedropper) or from the
+ * game's palette. Tweaks stay in this browser (localStorage) until reset;
+ * "Copy CSS" gives the values to move into src/theme.
  *
  * Tweaks show only while developer mode is on, so switching it off shows the
  * colours the game really ships with. Nothing here runs at import time, so
@@ -156,9 +158,50 @@ interface Info {
   selector: string;
   token: { chain: string[]; token: string } | null;
   current: string;
+  /** Set when the mascot was picked: its colour tokens, and the one for the part tapped. */
+  mascot?: { tokens: string[]; part: string };
 }
 
+/** Custom properties declared on :root, in source order. */
+function rootTokens(): string[] {
+  const names: string[] = [];
+  for (const rule of styleRules()) {
+    if (rule.selectorText !== ":root") continue;
+    for (let i = 0; i < rule.style.length; i++) if (rule.style[i].startsWith("--") && !names.includes(rule.style[i])) names.push(rule.style[i]);
+  }
+  return names;
+}
+
+function tokenColour(name: string): string {
+  const rgb = parseColor(getComputedStyle(document.documentElement).getPropertyValue(name));
+  return rgb ? toHex(rgb) : "#ffffff";
+}
+
+/** Which mascot colour a tapped part starts on. */
+const MASCOT_PARTS: [string, string][] = [
+  [".mascot__flame--outer", "--mascot-flame-2"],
+  [".mascot__flame--middle", "--mascot-inner-2"],
+  [".mascot__heart", "--mascot-heart-2"],
+  [".mascot__eyes", "--mascot-eye-1"],
+  [".mascot__mouth", "--mascot-mouth"],
+  [".mascot__glow", "--mascot-glow-1"],
+];
+
+const MASCOT_NAMES: Record<string, string> = {
+  flame: "Flame", inner: "Inner", heart: "Heart", glow: "Glow", eye: "Eyes",
+  brow: "Brows", line: "Lines", mouth: "Mouth", tongue: "Tongue", shine: "Shine",
+};
+const mascotLabel = (token: string) => {
+  const [part, n] = token.replace("--mascot-", "").split("-");
+  return `${MASCOT_NAMES[part] ?? part}${n ? ` ${n}` : ""}`;
+};
+
 function describe(el: Element, prop: Prop): Info {
+  if (el.closest("svg.mascot")) {
+    const tokens = rootTokens().filter((n) => n.startsWith("--mascot-"));
+    const part = MASCOT_PARTS.find(([sel]) => el.closest(sel))?.[1] ?? "--mascot-flame-2";
+    return { selector: ".mascot", token: null, current: tokenColour(part), mascot: { tokens, part } };
+  }
   // Text colour is often inherited: look up the tree for the rule that sets it.
   let source: Element | null = el;
   let found = declaredVar(el, PROPS[prop].read);
@@ -172,6 +215,101 @@ function describe(el: Element, prop: Prop): Info {
 }
 
 const label = (el: Element) => `${el.tagName.toLowerCase()}${Array.from(el.classList).slice(0, 2).map((c) => `.${c}`).join("")}`;
+
+/* ------------------------------------------------------------ Eyedropper */
+
+/** The pixel of a picture (object-fit: cover) under a screen point. */
+function sampleImage(img: HTMLImageElement, x: number, y: number): Rgb | null {
+  if (!img.naturalWidth) return null;
+  const rect = img.getBoundingClientRect();
+  const fit = getComputedStyle(img).objectFit;
+  const scaleX = fit === "cover" ? Math.max(rect.width / img.naturalWidth, rect.height / img.naturalHeight) : rect.width / img.naturalWidth;
+  const scaleY = fit === "cover" ? scaleX : rect.height / img.naturalHeight;
+  const [px, py] = getComputedStyle(img)
+    .objectPosition.split(" ")
+    .map((v) => (v.endsWith("%") ? parseFloat(v) / 100 : 0.5));
+  const left = rect.left + (rect.width - img.naturalWidth * scaleX) * px;
+  const top = rect.top + (rect.height - img.naturalHeight * scaleY) * py;
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(img, (x - left) / scaleX, (y - top) / scaleY, 1, 1, 0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    return a > 0 ? [r, g, b] : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The pixel of an inline SVG (e.g. the mascot) under a screen point, drawn with its live colours. */
+async function sampleSvg(svg: SVGSVGElement, x: number, y: number): Promise<Rgb | null> {
+  const rect = svg.getBoundingClientRect();
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+  // A standalone SVG picture cannot see the page's CSS variables: bake the computed colours in.
+  const from = [svg, ...Array.from(svg.querySelectorAll("*"))];
+  const to = [clone, ...Array.from(clone.querySelectorAll("*"))];
+  from.forEach((el, i) => {
+    const cs = getComputedStyle(el);
+    const copy = to[i] as SVGElement;
+    if (el.tagName.toLowerCase() === "stop") {
+      copy.removeAttribute("style");
+      copy.setAttribute("stop-color", cs.stopColor);
+      copy.setAttribute("stop-opacity", cs.stopOpacity);
+    } else {
+      copy.style.fill = cs.fill;
+      copy.style.stroke = cs.stroke;
+    }
+  });
+  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  clone.setAttribute("width", String(rect.width));
+  clone.setAttribute("height", String(rect.height));
+  try {
+    const img = new Image();
+    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(clone))}`;
+    await img.decode();
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(rect.width);
+    canvas.height = Math.ceil(rect.height);
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(img, 0, 0, rect.width, rect.height);
+    const [r, g, b, a] = ctx.getImageData(Math.floor(x - rect.left), Math.floor(y - rect.top), 1, 1).data;
+    return a > 128 ? [r, g, b] : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The colour shown at a screen point: picture pixels, the mascot, or the nearest solid background. */
+async function colourAt(x: number, y: number): Promise<Rgb | null> {
+  for (const el of document.elementsFromPoint(x, y)) {
+    if (el.closest("[data-devtool]")) continue;
+    if (el === document.body || el === document.documentElement) break;
+    if (el instanceof HTMLImageElement) {
+      const c = sampleImage(el, x, y);
+      if (c) return c;
+      continue;
+    }
+    const svg = el.closest("svg");
+    if (svg) {
+      const c = await sampleSvg(svg, x, y);
+      if (c) return c;
+      continue;
+    }
+    const bg = parseColor(getComputedStyle(el).backgroundColor);
+    if (bg) return bg;
+  }
+  // The pictures behind each screen ignore taps, so they are not in that list: look for them directly.
+  for (const img of Array.from(document.querySelectorAll("img")).reverse()) {
+    const r = img.getBoundingClientRect();
+    if (img.closest("[data-devtool]") || x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
+    const c = sampleImage(img, x, y);
+    if (c) return c;
+  }
+  return parseColor(getComputedStyle(document.body).backgroundColor);
+}
+
+type EyeDropperCtor = new () => { open: () => Promise<{ sRGBHex: string }> };
 
 /* ------------------------------------------------------------ UI */
 
@@ -249,10 +387,16 @@ export function ColorPicker({ enabled, mode, setMode }: { enabled: boolean; mode
   const [dock, setDock] = useState<"bottom" | "top">("bottom");
   const [showCss, setShowCss] = useState(false);
   const [box, setBox] = useState<DOMRect | null>(null);
+  const [mascotToken, setMascotToken] = useState("--mascot-flame-2");
+  const [sampling, setSampling] = useState(false);
+  const [note, setNote] = useState("");
+  const palette = useMemo(() => rootTokens().filter((n) => /^--(sky|sand|flame)(-\d+)?$|^--(success|danger)$/.test(n)), []);
   const target = chain[index] ?? null;
   const info = useMemo(() => (target ? describe(target, prop) : null), [target, prop]);
   const tokenOn = Boolean(info?.token && useToken);
-  const key = info ? (tokenOn ? info.token!.token : `${info.selector}|${PROPS[prop].write}`) : "";
+  // The token being edited: a mascot colour, the element's token, or none (an element rule).
+  const editToken = info?.mascot ? mascotToken : tokenOn ? info!.token!.token : null;
+  const key = info ? (editToken ?? `${info.selector}|${PROPS[prop].write}`) : "";
 
   useEffect(() => {
     applyOverrides(enabled ? overrides : NONE);
@@ -270,14 +414,21 @@ export function ColorPicker({ enabled, mode, setMode }: { enabled: boolean; mode
     setDock(rect.top + rect.height / 2 > window.innerHeight / 2 ? "top" : "bottom");
   }, [target]);
 
-  // A new element or property: start from the colour it shows now.
+  // A new element, property or mascot colour: start from the colour it shows now.
+  const startFrom = (hex: string) => {
+    setHsl(rgbToHsl(parseColor(hex)!));
+    setHexDraft(hex);
+    setOriginal(hex);
+  };
   useEffect(() => {
     if (!info) return;
-    const rgb = parseColor(info.current)!;
-    setHsl(rgbToHsl(rgb));
-    setHexDraft(info.current);
-    setOriginal(info.current);
+    if (info.mascot) setMascotToken(info.mascot.part);
+    startFrom(info.current);
   }, [info]);
+  const chooseMascotColour = (token: string) => {
+    setMascotToken(token);
+    startFrom(tokenColour(token));
+  };
 
   // Picking: the next tap selects an element instead of using it.
   useEffect(() => {
@@ -338,11 +489,59 @@ export function ColorPicker({ enabled, mode, setMode }: { enabled: boolean; mode
     setHexDraft(hex);
     setOverrides((o) => {
       const copy: Overrides = { tokens: { ...o.tokens }, rules: { ...o.rules } };
-      if (tokenOn) copy.tokens[info.token!.token] = hex;
+      if (editToken) copy.tokens[editToken] = hex;
       else copy.rules[key] = { selector: info.selector, prop: PROPS[prop].write, value: hex };
       return copy;
     });
   };
+  const applyColour = (rgb: Rgb) => change(rgbToHsl(rgb));
+
+  // Eyedropper: the browser's own when it has one (desktop Chrome and Edge),
+  // otherwise the next tap takes the colour under the finger.
+  const pickFromScreen = async () => {
+    setNote("");
+    const Dropper = (window as unknown as { EyeDropper?: EyeDropperCtor }).EyeDropper;
+    if (Dropper) {
+      try {
+        const rgb = parseColor((await new Dropper().open()).sRGBHex);
+        if (rgb) applyColour(rgb);
+        return;
+      } catch (error) {
+        if ((error as DOMException).name === "AbortError") return;
+      }
+    }
+    setSampling(true);
+  };
+
+  useEffect(() => {
+    if (!sampling) return;
+    const outside = (e: Event) => e.target instanceof Element && !e.target.closest("[data-devtool]");
+    const block = (e: Event) => {
+      if (!outside(e)) return;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    const take = (e: MouseEvent) => {
+      if (!outside(e)) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      void colourAt(e.clientX, e.clientY).then((rgb) => {
+        if (rgb) applyColour(rgb);
+        else setNote("No colour found there. Try another spot.");
+        setSampling(false);
+      });
+    };
+    const escape = (e: KeyboardEvent) => e.key === "Escape" && setSampling(false);
+    const events = ["pointerdown", "pointerup", "mousedown", "mouseup"] as const;
+    events.forEach((name) => window.addEventListener(name, block, true));
+    window.addEventListener("click", take, true);
+    window.addEventListener("keydown", escape);
+    return () => {
+      events.forEach((name) => window.removeEventListener(name, block, true));
+      window.removeEventListener("click", take, true);
+      window.removeEventListener("keydown", escape);
+    };
+  });
 
   const undo = () =>
     setOverrides((o) => {
@@ -373,14 +572,23 @@ export function ColorPicker({ enabled, mode, setMode }: { enabled: boolean; mode
 
       {mode === "picking" && (
         <div className="dcp-banner">
-          <MousePointerClick size={16} /> Tap a button or a text to recolour it
+          <MousePointerClick size={16} /> Tap a button, a text or the mascot
           <button type="button" onClick={() => setMode("idle")}>
             Cancel
           </button>
         </div>
       )}
 
-      {mode === "editing" && info && (
+      {mode === "editing" && sampling && (
+        <div className="dcp-banner">
+          <Pipette size={16} /> Tap anywhere to take its colour
+          <button type="button" onClick={() => setSampling(false)}>
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {mode === "editing" && info && !sampling && (
         <section className={`dcp-panel dcp-panel--${dock}`} aria-label="Developer colour picker">
           <header className="dcp-head">
             <strong>
@@ -394,35 +602,51 @@ export function ColorPicker({ enabled, mode, setMode }: { enabled: boolean; mode
             </button>
           </header>
 
-          <div className="dcp-chips" title="The element to recolour">
-            {chain.map((el, i) => (
-              <button key={i} type="button" className={i === index ? "is-on" : ""} onClick={() => setIndex(i)}>
-                {label(el)}
-              </button>
-            ))}
-          </div>
+          {info.mascot ? (
+            <div className="dcp-mascot">
+              <span className="dcp-label">Mascot colours</span>
+              <div className="dcp-mascot-grid">
+                {info.mascot.tokens.map((token) => (
+                  <button key={token} type="button" className={token === mascotToken ? "is-on" : ""} onClick={() => chooseMascotColour(token)} title={token}>
+                    <span style={{ background: overrides.tokens[token] ?? tokenColour(token) }} />
+                    {mascotLabel(token)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="dcp-chips" title="The element to recolour">
+                {chain.map((el, i) => (
+                  <button key={i} type="button" className={i === index ? "is-on" : ""} onClick={() => setIndex(i)}>
+                    {label(el)}
+                  </button>
+                ))}
+              </div>
 
-          <div className="dcp-seg">
-            {(Object.keys(PROPS) as Prop[]).map((p) => (
-              <button key={p} type="button" className={p === prop ? "is-on" : ""} onClick={() => setProp(p)}>
-                {PROPS[p].label}
-              </button>
-            ))}
-          </div>
+              <div className="dcp-seg">
+                {(Object.keys(PROPS) as Prop[]).map((p) => (
+                  <button key={p} type="button" className={p === prop ? "is-on" : ""} onClick={() => setProp(p)}>
+                    {PROPS[p].label}
+                  </button>
+                ))}
+              </div>
 
-          <div className="dcp-scope">
-            {info.token && (
-              <label>
-                <input type="radio" checked={tokenOn} onChange={() => setUseToken(true)} />
-                Token <code>{info.token.token}</code> · everything that uses it
-                {info.token.chain.length > 1 && <small> (via {info.token.chain.slice(0, -1).join(" → ")})</small>}
-              </label>
-            )}
-            <label>
-              <input type="radio" checked={!tokenOn} onChange={() => setUseToken(false)} />
-              Only elements like this one: <code>{info.selector}</code>
-            </label>
-          </div>
+              <div className="dcp-scope">
+                {info.token && (
+                  <label>
+                    <input type="radio" checked={tokenOn} onChange={() => setUseToken(true)} />
+                    Token <code>{info.token.token}</code> · everything that uses it
+                    {info.token.chain.length > 1 && <small> (via {info.token.chain.slice(0, -1).join(" → ")})</small>}
+                  </label>
+                )}
+                <label>
+                  <input type="radio" checked={!tokenOn} onChange={() => setUseToken(false)} />
+                  Only elements like this one: <code>{info.selector}</code>
+                </label>
+              </div>
+            </>
+          )}
 
           <div className="dcp-body">
             <Wheel hsl={hsl} onChange={change} />
@@ -459,9 +683,22 @@ export function ColorPicker({ enabled, mode, setMode }: { enabled: boolean; mode
             />
           </label>
 
+          <div className="dcp-palette" title="Game colours">
+            <span className="dcp-label">Game colours</span>
+            <div>
+              {palette.map((token) => (
+                <button key={token} type="button" title={token} style={{ background: tokenColour(token) }} onClick={() => applyColour(parseColor(tokenColour(token))!)} />
+              ))}
+            </div>
+          </div>
+          {note && <p className="dcp-note">{note}</p>}
+
           <div className="dcp-actions">
+            <button type="button" onClick={pickFromScreen}>
+              <Pipette size={14} /> Pick colour from screen
+            </button>
             <button type="button" onClick={() => setMode("picking")}>
-              <MousePointerClick size={14} /> Pick another
+              <MousePointerClick size={14} /> Other element
             </button>
             <button type="button" onClick={undo}>
               <Undo2 size={14} /> Undo this
@@ -519,5 +756,13 @@ export const PICKER_STYLES = `
 .dcp-light input::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid #1d2733; }
 .dcp-actions { display: flex; flex-wrap: wrap; gap: 4px; }
 .dcp-actions button { display: inline-flex; align-items: center; gap: 4px; }
+.dcp-label { display: block; font-size: 11px; font-weight: 700; color: #4a5868; margin-bottom: 4px; }
+.dcp-mascot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.dcp-mascot-grid button { display: flex; align-items: center; gap: 5px; padding: 3px 6px; border: 1px solid #d5dbe3; border-radius: 8px; background: #fff; font-size: 12px; text-align: left; }
+.dcp-mascot-grid button.is-on { border-color: #1d2733; box-shadow: inset 0 0 0 1px #1d2733; font-weight: 700; }
+.dcp-mascot-grid span { flex: none; width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .15); }
+.dcp-palette > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.dcp-palette button { width: 22px; height: 22px; padding: 0; border: 0; border-radius: 6px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .15); }
+.dcp-note { margin: 0; color: #b0352f; font-size: 12px; }
 .dcp-css { width: 100%; box-sizing: border-box; min-height: 90px; font: 12px ui-monospace, monospace; border: 1px solid #d5dbe3; border-radius: 8px; padding: 6px; }
 `;

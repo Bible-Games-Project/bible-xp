@@ -171,9 +171,14 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   toggle button in it. While on: every Journey stop is open, and icon buttons
   give the colour picker (pick any element, recolour it with an HSL wheel and a
   lightness bar through the token it uses, e.g. `--gold`, or for elements like
-  it only; "Copy CSS" exports the tweaks for `src/theme`; tweaks only show
-  while the mode is on), the ranking with sample players, and replaying
-  onboarding. The switch and the colour tweaks persist in localStorage, apart
+  it only; tapping the mascot lists its `--mascot-*` tokens one by one; a
+  colour can also come from the screen, with the browser's EyeDropper where it
+  exists, else the next tap reads the pixel, background pictures included, or
+  from the game palette; "Copy CSS" exports the tweaks for `src/theme`; tweaks
+  only show while the mode is on), the ranking with sample players, and
+  replaying onboarding. The mascot's colours are the `--mascot-*` tokens in
+  `tokens.css` (set through `style`, since SVG presentation attributes ignore
+  CSS variables). The switch and the colour tweaks persist in localStorage, apart
   from the player's progress. It exists only in `bun run dev` and `bun run
   build:devtools` (`--mode devtools`, output `dist-devtools/`); the Claude
   artifact the maintainer plays is a devtools build. Release builds (`bun run

@@ -25,11 +25,13 @@ bun run test       # unit and content tests (vitest)
 
 **Developer mode.** In `bun run dev` and the devtools build, a small "DEV"
 button sits above the tab bar. Switch it on and every Journey stop opens, and
-three tools appear: the colour picker (tap it, then any button or text: a
-colour wheel for hue and saturation and a lightness bar change the design
-token the element uses, or only elements like it; "Copy CSS" gives the values
-to put into `src/theme`), the ranking with sample players, and replaying
-onboarding. Switch it off to see the game exactly as it ships. Release builds
+three tools appear: the colour picker (tap it, then any button, text or the
+mascot: a colour wheel for hue and saturation and a lightness bar change the
+design token the element uses, or only elements like it, or one of the
+mascot's colours; "Pick colour from screen" takes a colour from anything on
+screen, the pictures included, and "Game colours" offers the palette; "Copy
+CSS" gives the values to put into `src/theme`), the ranking with sample
+players, and replaying onboarding. Switch it off to see the game exactly as it ships. Release builds
 do not include any of it.
 
 ## What's inside

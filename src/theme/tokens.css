@@ -29,6 +29,29 @@
   --flame-7: #953b0f;
   --ember-dark: #2e170a;
 
+  /*
+   * Testalume, the mascot (Mascot.tsx): the game's gold deepening to amber,
+   * with a pale golden heart. The DEV colour picker can change each one.
+   */
+  --mascot-flame-1: #ff9a1f; /* outer flame: tips, middle, base */
+  --mascot-flame-2: #f07c12;
+  --mascot-flame-3: #c95e08;
+  --mascot-inner-1: #ffcf3d; /* inner flame */
+  --mascot-inner-2: #ffa929;
+  --mascot-inner-3: #f07c12;
+  --mascot-heart-1: #fff3c4; /* glowing heart behind the face */
+  --mascot-heart-2: #fff080;
+  --mascot-heart-3: #ffcf3d;
+  --mascot-glow-1: #ffcf3d; /* soft halo */
+  --mascot-glow-2: #ffa929;
+  --mascot-eye-1: #593b0d;
+  --mascot-eye-2: #3c2607;
+  --mascot-brow: #915a08;
+  --mascot-line: #3c2607; /* closed eyes and mouth lines */
+  --mascot-mouth: #593b0d;
+  --mascot-tongue: #ff7d1a;
+  --mascot-shine: #fff6d6; /* highlights */
+
   /* Sky of the picture (hue 206°), from deep to light. */
   --sky-1: #0d2f4a;
   --sky-2: #0b4f84;
