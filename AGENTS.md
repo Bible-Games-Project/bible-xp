@@ -175,8 +175,8 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   colour can also come from the screen, with the browser's EyeDropper where it
   exists, else the next tap reads the pixel, background pictures included, or
   from the game palette; "Copy CSS" exports the tweaks for `src/theme`; tweaks
-  only show while the mode is on), the ranking with sample players, and
-  replaying onboarding. The mascot's colours are the `--mascot-*` tokens in
+  only show while the mode is on), the Voices panel (see Voices), the ranking
+  with sample players, and replaying onboarding. The mascot's colours are the `--mascot-*` tokens in
   `tokens.css` (set through `style`, since SVG presentation attributes ignore
   CSS variables). The switch and the colour tweaks persist in localStorage, apart
   from the player's progress. It exists only in `bun run dev` and `bun run
@@ -213,6 +213,28 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   level-ups, streak milestones, encouragement. Not beside questions or as
   decoration (it was removed from the game header, answer feedback, story
   header, Daily card and Duels screen).
+- Voices (maintainer request, in progress): the maintainer picks an ElevenLabs
+  voice per role in developer mode (DEV → microphone, `src/dev/VoicePanel.tsx`);
+  roles are the cast in `src/voice/cast.ts` (Narrator, Testalume) plus any
+  added in the panel. Picks stay in that browser; "Copy choices" gives the
+  list, which goes into `CAST`, and then the lines are voiced. No line is
+  voiced yet. The catalogue (`src/dev/voiceLibrary.json`, developer builds
+  only) is the Bible RPG project's library (Bible-Games-Project/bible-rpg,
+  `public/assets/dev/library.json`): 200 American men, 200 women (one with no
+  preview left replaced by Emma, same criteria: no extra cost, no live
+  moderation, at least a year's notice), 20 older men, 20 older women; its
+  monsters were left out. Previews are ElevenLabs' free samples (no credits)
+  and not ours to ship: they play from ElevenLabs' links, and only the Claude
+  artifact packs them next to the page (`voice-previews.json` +
+  `voices-<n>.mp3`, 64 kbps mono, ≤ 12 MB each) because its page cannot load
+  other sites. Preview links expire: `GET /v1/shared-voices?search=<voice id>`
+  (free) returns a current one; `api.us.elevenlabs.io` links work on
+  `api.elevenlabs.io`. The API key is a network secret of the cloud
+  environment for `api.elevenlabs.io`, header `xi-api-key` with no prefix.
+  Per the Bible RPG notes the account is on the paid Starter plan (library
+  voices work by voice_id); voice final lines while subscribed, so they keep
+  their commercial licence, and every line costs credits: only regenerate
+  lines whose text or voice changed.
 - Music (maintainer decision): background music plays on every menu screen
   (onboarding included) from a playlist that loops back to the first song
   (`PLAYLIST` in `src/lib/music.ts`, files in `src/assets/music/`, numbered
