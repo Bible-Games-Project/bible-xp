@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { useScrollReset, useRoute } from "./app/router";
 import { useApplySettings } from "./app/preferences";
 import { useI18n } from "./i18n";
+import { music } from "./lib/music";
 import { AvatarScreen } from "./screens/AvatarScreen";
 import { LeaderboardScreen } from "./screens/LeaderboardScreen";
 import { OnboardingScreen } from "./screens/OnboardingScreen";
@@ -23,6 +25,8 @@ export function App() {
   const { settings, onboarding } = useProgress();
   const { language } = useI18n();
   useApplySettings(settings, language.code, language.dir);
+  // Background music starts with the app and follows the Music setting.
+  useEffect(() => music()?.setEnabled(settings.music), [settings.music]);
   useScrollReset(JSON.stringify(route));
 
   // First-time setup comes before everything else, whatever the link opened.

@@ -348,6 +348,7 @@ const en = {
     language: "Language",
     languageNote: "More languages are coming. Only fully translated languages are listed.",
     sound: "Sound effects",
+    music: "Music",
     vibration: "Vibration",
     vibrationUnsupported: "Not supported on this device",
     reduceMotion: "Reduce motion",

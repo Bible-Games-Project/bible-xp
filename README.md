@@ -62,6 +62,8 @@ do not include any of it.
   stats, mistakes review, Settings and Testalume Plus (informational).
 - **Avatar** — male or female, three skin tones; robes, sandals and accessories
   are reserved as future XP rewards (placeholders, locked).
+- **Music** — a looping playlist on the menus that fades out and pauses
+  during games, then fades back in where it left off (Settings > Music).
 - **Testalume** — the mascot: a little flame with a face and five moods,
   shown at key moments only.
 

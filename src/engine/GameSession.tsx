@@ -16,6 +16,7 @@ import { StoryOrder } from "../games/StoryOrder";
 import { WhoAmI } from "../games/WhoAmI";
 import { useI18n } from "../i18n";
 import { playCue } from "../lib/feedback";
+import { music } from "../lib/music";
 import type { SessionKind, SessionSummary } from "../progress/model";
 import { progressActions, useProgress } from "../progress/store";
 import { Results } from "./Results";
@@ -59,6 +60,14 @@ export function GameSession({ sessionKey, kind, refId, steps, tier, onPlayAgain,
   const [summary, setSummary] = useState<SessionSummary | null>(null);
   const [quitOpen, setQuitOpen] = useState(false);
   const finishing = useRef(false);
+
+  // No background music while playing: it fades out, pausing where it was, and
+  // fades back in when the game closes (results included).
+  useEffect(() => {
+    const player = music();
+    player?.enterGame();
+    return () => player?.leaveGame();
+  }, []);
 
   useEffect(() => {
     if (!summary) progressActions.startSession(sessionKey, kind, refId, stepIds, tier);

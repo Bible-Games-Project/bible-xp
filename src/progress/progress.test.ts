@@ -246,7 +246,8 @@ describe("saved progress", () => {
       sessions: { "activity:creation.quiz": { key: "activity:creation.quiz", kind: "activity", refId: "creation.quiz", stepIds: ["x"], index: 0, outcomes: [], startedAt: NOW } },
     };
     const migrated = migrate(v1);
-    expect(migrated.version).toBe(4);
+    expect(migrated.version).toBe(5);
+    expect(migrated.settings.music).toBe(true);
     expect(migrated.xp).toBe(120);
     expect(migrated.profile).toEqual({ playerId: expect.any(String), name: "Ruth", knowledge: null, look: null });
     expect(migrated.onboarding.completedAt).toBeNull();

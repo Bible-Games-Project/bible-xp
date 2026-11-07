@@ -22,11 +22,14 @@ import { addWeeklyXp, weekStartUtc, type WeeklyXp } from "./week";
  * - The streak counts days with at least one finished session.
  */
 
-export const PROGRESS_VERSION = 4;
+export const PROGRESS_VERSION = 5;
 
 export interface Settings {
   language: string;
+  /** Sound effects (answer cues). */
   sound: boolean;
+  /** Background music on menus. */
+  music: boolean;
   vibration: boolean;
   /** null follows the operating system preference. */
   reduceMotion: boolean | null;
@@ -139,7 +142,7 @@ export function defaultProgress(): ProgressData {
   return {
     version: PROGRESS_VERSION,
     profile: { playerId: newPlayerId(), name: "", knowledge: null, look: null },
-    settings: { language: "en", sound: true, vibration: true, reduceMotion: null, largeText: false },
+    settings: { language: "en", sound: true, music: true, vibration: true, reduceMotion: null, largeText: false },
     onboarding: { completedAt: null },
     xp: 0,
     weekly: { weekStart: weekStartUtc(new Date()), xp: 0 },
@@ -495,6 +498,8 @@ export function migrate(raw: unknown): ProgressData {
   // v1 → v2: sessions had no tier and question banks changed, so unfinished
   // sessions are dropped. XP, streak, path progress and mistakes are kept.
   // v2 → v3: tiers are no longer unlocked; only the selected tier is kept.
+  // v4 → v5: settings.music (background music), on unless turned off; the
+  // settings merge below fills it in.
   // v3 → v4: the abstract avatar is replaced by the onboarding avatar, and
   // Weekly XP starts counting from the upgrade (earlier XP stays lifetime XP).
   const sessions = Object.fromEntries(
