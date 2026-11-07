@@ -66,7 +66,7 @@ export const creationTopic: Topic = {
       {
         title: "The garden of Eden",
         icon: "leaf",
-        body: "Genesis 2 looks closely at the first man and woman in the garden. Genesis 3 tells how they ate from the forbidden tree. Readers understand these chapters in different ways; Bible XP focuses on what the text says.",
+        body: "Genesis 2 looks closely at the first man and woman in the garden. Genesis 3 tells how they ate from the forbidden tree. Readers understand these chapters in different ways; Testalume focuses on what the text says.",
         quote: {
           text: "Yahweh God planted a garden eastward, in Eden, and there he put the man whom he had formed.",
           ref: g(2, 8),

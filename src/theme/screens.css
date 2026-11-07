@@ -1055,16 +1055,9 @@
   z-index: 1;
 }
 .screen--scene .statusbar__avatar,
+.screen--scene .statusbar__settings,
 .screen--scene .topbar .icon-btn {
   background: rgb(255 255 255 / 0.88);
-}
-.screen--scene .statusbar__avatar {
-  padding: 2px 12px 2px 2px;
-  border-radius: 999px;
-  flex: none;
-}
-.screen--scene .statusbar__avatar + .stat-chip {
-  margin-left: auto;
 }
 .screen--scene .topbar__title {
   justify-self: center;
@@ -1121,7 +1114,7 @@
   font-weight: 850;
   color: var(--text);
 }
-/* The tail points left, at Lumi. */
+/* The tail points left, at Testalume. */
 .bubble::after {
   content: "";
   position: absolute;

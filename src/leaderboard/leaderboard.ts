@@ -3,7 +3,7 @@ import type { AvatarLook } from "../progress/avatar";
 /*
  * Global weekly leaderboard, ranked by Weekly XP (never by Total XP).
  *
- * Bible XP has no backend or player accounts yet, so there is no shared
+ * Testalume has no backend or player accounts yet, so there is no shared
  * ranking to read. The screen talks to a `LeaderboardService`; today that is
  * `localLeaderboard`, which only knows the player on this device and says so
  * (source "local"). A future shared backend implements the same interface,

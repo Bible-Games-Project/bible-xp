@@ -17,7 +17,8 @@ export type Route =
   | { name: "leaderboard"; sample?: true }
   | { name: "profile" }
   | { name: "avatar" }
-  | { name: "settings" }
+  /** `from` decides where Back goes: the profile, or Home (the header gear). */
+  | { name: "settings"; from?: "profile" }
   | { name: "about" }
   | { name: "privacy" }
   | { name: "terms" }
@@ -37,7 +38,6 @@ const STATIC: Record<string, Route["name"]> = {
   library: "library",
   profile: "profile",
   avatar: "avatar",
-  settings: "settings",
   about: "about",
   privacy: "privacy",
   terms: "terms",
@@ -51,6 +51,9 @@ const STATIC: Record<string, Route["name"]> = {
 export function parseHash(hash: string): Route {
   const [rawPath, query = ""] = hash.replace(/^#\/?/, "").split("?");
   const path = decodeURIComponent(rawPath).replace(/\/$/, "");
+  if (path === "settings") {
+    return new URLSearchParams(query).get("from") === "profile" ? { name: "settings", from: "profile" } : { name: "settings" };
+  }
   if (path === "leaderboard") {
     return new URLSearchParams(query).get("sample") === "1" ? { name: "leaderboard", sample: true } : { name: "leaderboard" };
   }
@@ -83,6 +86,8 @@ export function href(route: Route): string {
       return "#/review/play";
     case "leaderboard":
       return route.sample ? "#/leaderboard?sample=1" : "#/leaderboard";
+    case "settings":
+      return route.from ? `#/settings?from=${route.from}` : "#/settings";
     case "book":
       return `#/path/book/${encodeURIComponent(route.bookId)}`;
     case "story":

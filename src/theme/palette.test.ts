@@ -85,7 +85,7 @@ describe("palette", () => {
     for (const c of colours) expect(Math.min(...allowed.map((h) => hueDistance(hue(c), h))), c).toBeLessThan(3);
   });
 
-  it("every colour of Lumi's flame is a warm hue of the picture", () => {
+  it("every flame colour (difficulty tiers) is a warm hue of the picture", () => {
     const warm = [IMAGE.sun, IMAGE.meadow, IMAGE.path, IMAGE.stone, IMAGE.rock].map(hue);
     for (let i = 1; i <= 7; i++) {
       const nearest = Math.min(...warm.map((h) => hueDistance(hue(t[`flame-${i}`]), h)));
@@ -93,13 +93,20 @@ describe("palette", () => {
     }
   });
 
-  it("the heart of Lumi's flame is the exact complement of the sky", () => {
+  it("the heart of the flame scale is the exact complement of the sky", () => {
     expect(hueDistance(hue(t["flame-4"]), hue(IMAGE.sky))).toBeGreaterThan(178.5);
     for (let i = 1; i <= 6; i++) expect(saturation(t[`flame-${i}`])).toBeGreaterThan(0.85);
   });
 
-  it("Lumi is drawn with the flame colours", () => {
-    for (let i = 1; i <= 7; i++) expect(mascot.toLowerCase()).toContain(t[`flame-${i}`]);
+  it("Testalume, the mascot, is drawn only with warm hues of the picture and the game's gold", () => {
+    const table = mascot.slice(mascot.indexOf("export const FLAME"), mascot.indexOf("};", mascot.indexOf("export const FLAME")));
+    const colours = [...table.matchAll(/"(#[0-9a-f]{6})"/gi)].map((m) => m[1].toLowerCase());
+    expect(colours.length).toBeGreaterThan(15);
+    const warm = [IMAGE.sun, IMAGE.meadow, IMAGE.path, IMAGE.stone, IMAGE.rock].map(hue);
+    for (const c of colours) expect(Math.min(...warm.map((h) => hueDistance(hue(c), h))), c).toBeLessThan(3);
+    // The outer flame starts from the main button gold, so the mascot matches the buttons.
+    expect(hueDistance(hue(colours[0]), hue(t.gold))).toBeLessThan(4);
+    expect(table.toLowerCase()).toContain(t.gold);
   });
 
   it("text stays readable", () => {

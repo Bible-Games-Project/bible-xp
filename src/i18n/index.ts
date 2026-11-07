@@ -3,7 +3,7 @@ import en, { type Messages } from "./locales/en";
 
 /**
  * UI languages. Only languages with a complete translation are listed (today:
- * English). Bible XP is planned in 12 languages; each one is added here once
+ * English). Testalume is planned in 12 languages; each one is added here once
  * it is fully translated, with no change to screens or game logic:
  *   1. src/i18n/locales/<code>.ts exporting a `Messages` object (the type
  *      makes the compiler list every missing string);

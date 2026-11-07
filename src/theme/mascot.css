@@ -5,47 +5,38 @@
 /* The flame breathes from its base, where it rises out of the lamp. */
 .mascot__float {
   transform-origin: 100px 183px;
-  animation: lumi-breathe 3.2s ease-in-out infinite;
+  animation: flame-breathe 3.2s ease-in-out infinite;
 }
 .mascot__flame {
   transform-origin: 100px 183px;
 }
 .mascot__flame--outer {
-  animation: lumi-flicker 1.6s ease-in-out infinite;
+  animation: flame-flicker 1.6s ease-in-out infinite;
 }
 .mascot__flame--middle {
-  animation: lumi-flicker 1.3s ease-in-out infinite reverse;
+  animation: flame-flicker 1.3s ease-in-out infinite reverse;
 }
 .mascot__glow {
   transform-box: fill-box;
   transform-origin: center;
-  animation: lumi-glow 3.2s ease-in-out infinite;
+  animation: flame-glow 3.2s ease-in-out infinite;
 }
 .mascot__eyes {
   transform-box: fill-box;
   transform-origin: center;
-  animation: lumi-blink 4.6s infinite;
-}
-.mascot--happy .mascot__arm--right {
-  animation: lumi-wave 1.4s ease-in-out infinite;
+  animation: flame-blink 4.6s infinite;
 }
 .mascot--celebrating .mascot__float {
-  animation: lumi-rise 0.9s var(--ease-spring) infinite;
-}
-.mascot--celebrating .mascot__arm--left {
-  animation: lumi-cheer-l 0.9s ease-in-out infinite;
-}
-.mascot--celebrating .mascot__arm--right {
-  animation: lumi-cheer-r 0.9s ease-in-out infinite;
+  animation: flame-rise 0.9s var(--ease-spring) infinite;
 }
 .mascot__sparkle {
-  animation: lumi-twinkle 1.4s ease-in-out infinite;
+  animation: flame-twinkle 1.4s ease-in-out infinite;
 }
 .mascot__sparkle--delay {
   animation-delay: 0.7s;
 }
 .mascot__thought circle {
-  animation: lumi-think 1.8s ease-in-out infinite;
+  animation: flame-think 1.8s ease-in-out infinite;
 }
 .mascot__thought circle:nth-child(2) {
   animation-delay: 0.2s;
@@ -54,21 +45,21 @@
   animation-delay: 0.4s;
 }
 .mascot--encouraging .mascot__float {
-  animation: lumi-nod 1.6s ease-in-out infinite;
+  animation: flame-nod 1.6s ease-in-out infinite;
 }
 
-@keyframes lumi-breathe {
+@keyframes flame-breathe {
   50% {
     transform: scale(0.98, 1.04);
   }
 }
-@keyframes lumi-glow {
+@keyframes flame-glow {
   50% {
     transform: scale(1.06);
     opacity: 0.8;
   }
 }
-@keyframes lumi-blink {
+@keyframes flame-blink {
   0%,
   94%,
   100% {
@@ -78,12 +69,7 @@
     transform: scaleY(0.1);
   }
 }
-@keyframes lumi-wave {
-  50% {
-    transform: rotate(-14deg);
-  }
-}
-@keyframes lumi-rise {
+@keyframes flame-rise {
   0%,
   100% {
     transform: scale(1);
@@ -92,17 +78,7 @@
     transform: scale(0.96, 1.1);
   }
 }
-@keyframes lumi-cheer-l {
-  50% {
-    transform: rotate(12deg);
-  }
-}
-@keyframes lumi-cheer-r {
-  50% {
-    transform: rotate(-12deg);
-  }
-}
-@keyframes lumi-twinkle {
+@keyframes flame-twinkle {
   0%,
   100% {
     transform: scale(0.6);
@@ -113,12 +89,12 @@
     opacity: 1;
   }
 }
-@keyframes lumi-think {
+@keyframes flame-think {
   50% {
     opacity: 0.5;
   }
 }
-@keyframes lumi-nod {
+@keyframes flame-nod {
   0%,
   100% {
     transform: translateY(0) rotate(0);
@@ -131,7 +107,7 @@
   }
 }
 
-@keyframes lumi-flicker {
+@keyframes flame-flicker {
   0%,
   100% {
     transform: scale(1, 1) skewX(0deg);

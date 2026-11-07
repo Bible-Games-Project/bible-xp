@@ -48,7 +48,7 @@ export function App() {
     case "profile":
       return <ProfileScreen />;
     case "settings":
-      return <SettingsScreen />;
+      return <SettingsScreen from={route.from} />;
     case "about":
       return <AboutScreen />;
     case "privacy":

@@ -17,6 +17,8 @@ describe("router", () => {
       { name: "leaderboard" },
       { name: "leaderboard", sample: true },
       { name: "avatar" },
+      { name: "settings" },
+      { name: "settings", from: "profile" },
     ];
     for (const r of routes) expect(parseHash(href(r))).toEqual(r);
   });

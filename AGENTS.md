@@ -75,7 +75,13 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
 
 <!-- BGP-ADMIN:END -->
 
-## Bible XP — project notes
+## Testalume — project notes
+
+- Name (maintainer decision): the game is **Testalume** (formerly Bible XP),
+  and so is its mascot. Internal identifiers keep `bible-xp` on purpose: the
+  repository, `package.json` name and the saved-progress key
+  `bible-xp:progress` (renaming the key would wipe every player's progress).
+  The native app's display name and store listing live in bgp-admin.
 
 - Stack: Vite + React 19 + TypeScript, plain CSS (`src/theme/`), lucide-react
   icons, self-hosted fonts (`@fontsource-variable/nunito` for UI,
@@ -90,7 +96,7 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   of the picture's hues — sky 206° (blues, text, navigation, selection), sand
   35° (gold buttons, warm text, borders, backgrounds), cypress 147° (right
   answers), rock shade 22° (wrong answers) — and only changes
-  lightness/saturation. Lumi's flame (`--flame-*`, also the difficulty tiers)
+  lightness/saturation. The flame scale (`--flame-*`, the difficulty tiers)
   uses only warm hues of the same picture (sun, meadow, path, stones, rock
   shade; no pure reds), and its heart is the exact complement of the sky.
   Tokens live in `src/theme/tokens.css`; never hard-code colours in
@@ -115,8 +121,8 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   The road must look Duolingo-like in spirit but not a copy.
 - Home (maintainer decision): two big buttons over the landscape —
   "Start/Continue the journey" (opens the current road) and Daily Challenge —
-  with the Total XP / Weekly XP panel and Lumi's speech bubble in the sky
-  above. Lumi must never cover the three crosses; check narrow, short
+  with the Total XP / Weekly XP panel and Testalume's speech bubble in the sky
+  above. The mascot must never cover the three crosses; check narrow, short
   (375×667, 360×640) and wide screens after layout changes. The big buttons
   scale with the viewport (`clamp()` on height, padding and type) and are
   capped at 460px wide: the maintainer found them too big on some screens.
@@ -155,8 +161,20 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   never absurd, and never a synonym another translation uses for the right answer.
 - Navigation (maintainer decision): bottom tabs are Home, Journey, Daily,
   Train, Ranking (the weekly leaderboard; "Leaderboard" does not fit five tabs
-  at 360px). Profile is not a tab; it opens from the avatar at the top left and
-  holds the avatar editor (`#/avatar`) and Settings.
+  at 360px). Header (maintainer decision): a settings gear at the top left
+  (`#/settings`, Back goes Home; from the Profile menu it is
+  `#/settings?from=profile` and Back returns there), and the level + avatar
+  pill at the top right, which opens the Profile (avatar editor `#/avatar`,
+  stats, Settings). No streak chip in the header; the streak shows in the
+  Profile and as milestone banners in the results.
+- Developer colour picker (`src/dev/ColorPicker.tsx`, maintainer request): a
+  small "DEV" button that picks any element and recolours it with an HSL wheel
+  and a lightness bar, either through the design token it uses (e.g. `--gold`)
+  or for elements like it only; tweaks persist in localStorage and "Copy CSS"
+  exports them to move into `src/theme`. It is mounted only by `bun run dev`
+  and `bun run build:devtools` (`--mode devtools`, output `dist-devtools/`),
+  and must never ship: `main.tsx` guards it so release builds drop the module
+  (check with a grep for `dev-colour-overrides` in `dist/`).
 - Onboarding (maintainer decision): first-time players see exactly three
   steps over the Home picture — language (English only), Bible knowledge level
   (Beginner/Intermediate/Advanced → starting tier 1/2/3, see
@@ -175,11 +193,12 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   never be unlocked or worn. Never invent items or XP prices; add real ones
   only when the maintainer defines them. Cosmetics never give XP or advantages,
   and there is no shop.
-- Mascot (maintainer decision): Lumi is the light rising from an ancient clay
-  oil lamp — a friendly flame in orange and yellow (not white, like the Bible
-  Games Project logo's flame would suggest), in tones complementary to or
-  monochromatic with Home's picture, drawn in SVG in
-  `src/components/Mascot.tsx` with the `--flame` colours and five moods. Use
+- Mascot (maintainer decision): Testalume is a small friendly flame, only the
+  flame with eyes, eyebrows and mouth: no lamp or bowl under it, no arms (both
+  were tried and removed). Its colours (`FLAME` in `src/components/Mascot.tsx`)
+  start from the gold of the main buttons and deepen to amber, with a pale
+  golden heart, so it matches the game and still reads as fire; never white
+  (like the Bible Games Project logo's flame) and no heavy reds. Five moods. Use
   it selectively: onboarding, the Home greeting, intro and lesson completion,
   level-ups, streak milestones, encouragement. Not beside questions or as
   decoration (it was removed from the game header, answer feedback, story

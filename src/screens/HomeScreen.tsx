@@ -76,7 +76,7 @@ export function HomeScreen() {
         <ChevronRight size={20} className="xp-panel__go" aria-hidden="true" />
       </a>
 
-      {/* Lumi talks from the sky, clear of the hill with the crosses. */}
+      {/* Testalume talks from the sky, clear of the hill with the crosses. */}
       <div className="home__lumi">
         <Mascot mood={fresh ? "happy" : "normal"} size={112} />
         <p className="bubble">{lumi}</p>

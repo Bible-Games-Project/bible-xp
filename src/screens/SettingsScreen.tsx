@@ -13,7 +13,7 @@ import { tierKey } from "../components/Tier";
 import { TIERS } from "../content/types";
 import { REWARDS } from "../progress/rewards";
 
-export function SettingsScreen() {
+export function SettingsScreen({ from }: { from?: "profile" }) {
   const { t } = useI18n();
   const { settings, difficulty } = useProgress();
   const [resetOpen, setResetOpen] = useState(false);
@@ -23,7 +23,7 @@ export function SettingsScreen() {
 
   return (
     <Screen>
-      <TopBar title={t("settings.title")} back={{ name: "profile" }} />
+      <TopBar title={t("settings.title")} back={from === "profile" ? { name: "profile" } : { name: "home" }} />
 
       {getStorageStatus() !== "ok" && (
         <div className="banner banner--coral" role="alert">

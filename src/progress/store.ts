@@ -43,7 +43,7 @@ function load(): ProgressData {
     if (parsed.version !== PROGRESS_VERSION) save(data);
     return data;
   } catch (error) {
-    console.warn("Bible XP: could not read saved progress, starting fresh.", error);
+    console.warn("Testalume: could not read saved progress, starting fresh.", error);
     storageStatus = "unavailable";
     return defaultProgress();
   }
@@ -54,7 +54,7 @@ function save(next: ProgressData) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: PROGRESS_VERSION, data: next }));
     storageStatus = "ok";
   } catch (error) {
-    console.warn("Bible XP: could not save progress.", error);
+    console.warn("Testalume: could not save progress.", error);
     storageStatus = "write-failed";
   }
 }

@@ -119,7 +119,7 @@ export function ProfileScreen() {
           <span className="menu__meta">{mistakes ? t("profile.reviewCount", { n: mistakes }) : t("profile.reviewEmpty")}</span>
           <ChevronRight size={20} className="muted" aria-hidden="true" />
         </a>
-        <a className="menu__item" href={href({ name: "settings" })}>
+        <a className="menu__item" href={href({ name: "settings", from: "profile" })}>
           <span className="menu__icon accent-gold" aria-hidden="true">
             <Settings size={20} strokeWidth={2.6} />
           </span>

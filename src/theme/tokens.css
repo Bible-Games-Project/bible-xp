@@ -1,5 +1,5 @@
 /*
- * Bible XP design tokens.
+ * Testalume design tokens.
  *
  * Every colour of the interface (buttons, text, borders, backgrounds) is
  * monochromatic with the Home background picture
@@ -10,15 +10,16 @@
  *   sand       35°   gold buttons, warm text, borders, backgrounds
  *   cypress    147°  right answers
  *   rock shade 22°   wrong answers
- * Lumi, the mascot, is a flame (--flame-*) whose every colour is a warm hue
- * of the same picture (sun, meadow, path, stones, rock shade); its heart,
- * --flame-4, is also the exact complement of the sky.
+ * The flame scale (--flame-*, the difficulty tiers) uses only warm hues of
+ * the same picture (sun, meadow, path, stones, rock shade); its heart,
+ * --flame-4, is also the exact complement of the sky. Testalume, the mascot,
+ * is drawn from the gold and amber end of it (FLAME in Mascot.tsx).
  * `src/theme/palette.test.ts` checks all of this, plus text contrast.
  */
 :root {
   color-scheme: light;
 
-  /* Lumi's flame (mascot and difficulty tiers). */
+  /* The flame scale: difficulty tiers get hotter from 1 to 7. */
   --flame-1: #fff080; /* sun */
   --flame-2: #ffcf3d; /* meadow in the light */
   --flame-3: #ffa929; /* path */

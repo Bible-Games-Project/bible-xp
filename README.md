@@ -1,4 +1,7 @@
-# Bible XP
+# Testalume
+
+_Formerly Bible XP. The repository, package and saved-progress key keep the old
+`bible-xp` name so existing players keep their progress._
 
 A gamified Bible-learning app for adults: short, tactile exercises about the
 people, events and words of the Bible, with XP, levels, streaks and a daily
@@ -13,11 +16,20 @@ see `AGENTS.md`. Nothing native lives in this repo.
 
 ```bash
 bun install
-bun run dev        # development server
+bun run dev        # development server (with the developer colour picker)
 bun run build      # typecheck + production build into dist/
+bun run build:devtools  # same build plus the colour picker, into dist-devtools/
 bun run preview    # serve the production build
 bun run test       # unit and content tests (vitest)
 ```
+
+**Colour picker (developers only).** In `bun run dev` and the devtools build, a
+small "DEV" button sits above the tab bar. Tap it, then tap any button or text:
+a panel opens with a colour wheel (hue and saturation) and a lightness bar.
+Change the design token the element uses (every element using it follows) or
+only elements like it. Tweaks are kept in that browser until "Reset all";
+"Copy CSS" gives the values to put into `src/theme`. Release builds do not
+include it.
 
 ## What's inside
 
@@ -44,10 +56,10 @@ bun run test       # unit and content tests (vitest)
   mechanics tighten too (decoy letters, more verse options, more pairs, fewer
   clues). Harder levels pay more XP.
 - **Profile** (avatar, top left) — avatar editor, level, Total and Weekly XP,
-  stats, mistakes review, Settings and Bible XP Plus (informational).
+  stats, mistakes review, Settings and Testalume Plus (informational).
 - **Avatar** — male or female, three skin tones; robes, sandals and accessories
   are reserved as future XP rewards (placeholders, locked).
-- **Lumi** — the mascot: the light of an ancient oil lamp, with five moods,
+- **Testalume** — the mascot: a little flame with a face and five moods,
   shown at key moments only.
 
 ## Progression in one paragraph
@@ -65,7 +77,7 @@ ranking.
 ```
 src/
   app/          hash router, accessibility preferences
-  components/   design-system components and Lumi, the mascot (SVG)
+  components/   design-system components and Testalume, the mascot (SVG)
   config/       feature flags for not-yet-live features
   content/      typed Bible content per content locale + WEB source text
   engine/       shared game session runner, feedback and results
