@@ -1,0 +1,137 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-md);
+  line-height: 1.45;
+  font-weight: 600;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 850;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.muted {
+  color: var(--text-2);
+}
+.faint {
+  color: var(--text-3);
+}
+.small {
+  font-size: var(--fs-sm);
+}
+.center {
+  text-align: center;
+}
+.text-green {
+  color: var(--success);
+}
+.text-gold {
+  color: var(--gold-text);
+}
+
+/* Accent helpers for icon tiles: a strong colour and its soft wash. */
+.accent-gold {
+  --accent: var(--warm-icon);
+  --accent-soft: var(--gold-soft);
+}
+.accent-cyan,
+.accent-blue {
+  --accent: var(--brand);
+  --accent-soft: var(--brand-soft);
+}
+.accent-green {
+  --accent: var(--success);
+  --accent-soft: var(--success-soft);
+}
+.accent-coral {
+  --accent: var(--danger);
+  --accent-soft: var(--danger-soft);
+}
+.accent-violet {
+  --accent: var(--tier-3);
+  --accent-soft: var(--brand-soft);
+}
+.accent-yellow {
+  --accent: var(--warm-icon);
+  --accent-soft: var(--gold-soft);
+}
+
+/* Reduced motion: from the OS or from Settings. */
+:root[data-reduce-motion="true"] *,
+:root[data-reduce-motion="true"] *::before,
+:root[data-reduce-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}

@@ -1,0 +1,168 @@
+/*
+ * Testalume design tokens.
+ *
+ * Every colour of the interface (buttons, text, borders, backgrounds) is
+ * monochromatic with the Home background picture
+ * (src/assets/home-background.webp, the hill with the three crosses): it
+ * takes one of the picture's own hues and only changes lightness and
+ * saturation.
+ *   sky        206°  blues, navigation, selection, text
+ *   sand       35°   gold buttons, warm text, borders, backgrounds
+ *   cypress    147°  right answers
+ *   rock shade 22°   wrong answers
+ * The flame scale (--flame-*, the difficulty tiers) uses only warm hues of
+ * the same picture (sun, meadow, path, stones, rock shade); its heart,
+ * --flame-4, is also the exact complement of the sky. Testalume, the mascot,
+ * is drawn from the gold and amber end of it (FLAME in Mascot.tsx).
+ * `src/theme/palette.test.ts` checks all of this, plus text contrast.
+ */
+:root {
+  color-scheme: light;
+
+  /* The flame scale: difficulty tiers get hotter from 1 to 7. */
+  --flame-1: #fff080; /* sun */
+  --flame-2: #ffcf3d; /* meadow in the light */
+  --flame-3: #ffa929; /* path */
+  --flame-4: #ff7d1a; /* stones; exact complement of the sky */
+  --flame-5: #f56a19; /* rock shade, bright to deep */
+  --flame-6: #c24a0a;
+  --flame-7: #953b0f;
+  --ember-dark: #2e170a;
+
+  /*
+   * Testalume, the mascot (Mascot.tsx): the game's gold deepening to amber,
+   * with a pale golden heart. The DEV colour picker can change each one.
+   */
+  --mascot-flame-1: #ff9a1f; /* outer flame: tips, middle, base */
+  --mascot-flame-2: #f07c12;
+  --mascot-flame-3: #c95e08;
+  --mascot-inner-1: #ffcf3d; /* inner flame */
+  --mascot-inner-2: #ffa929;
+  --mascot-inner-3: #f07c12;
+  --mascot-heart-1: #fff3c4; /* glowing heart behind the face */
+  --mascot-heart-2: #fff080;
+  --mascot-heart-3: #ffcf3d;
+  --mascot-glow-1: #ffcf3d; /* soft halo */
+  --mascot-glow-2: #ffa929;
+  --mascot-eye-1: #593b0d;
+  --mascot-eye-2: #3c2607;
+  --mascot-brow: #915a08;
+  --mascot-line: #3c2607; /* closed eyes and mouth lines */
+  --mascot-mouth: #593b0d;
+  --mascot-tongue: #ff7d1a;
+  --mascot-shine: #fff6d6; /* highlights */
+
+  /* Sky of the picture (hue 206°), from deep to light. */
+  --sky-1: #0d2f4a;
+  --sky-2: #0b4f84;
+  --sky-3: #0c6cb6;
+  --sky: #6abbf8; /* sampled from the image */
+  --sky-5: #acd6f6;
+  --sky-6: #d8edfd;
+  --sky-7: #ecf6fe;
+
+  /* Sand of the picture's path (hue 35°), from deep to light. */
+  --sand-1: #3c2607;
+  --sand-2: #593b0d;
+  --sand-3: #915a08;
+  --sand-4: #c77905;
+  --sand: #ffa929;
+  --sand-6: #edca97;
+  --sand-7: #ffe9c7;
+  --sand-8: #ffebcc;
+  --sand-9: #fff3e0;
+  --sand-10: #fff7eb;
+
+  /* Base */
+  --bg: var(--sand-10);
+  --bg-2: #ffedd1;
+  --surface: #ffffff;
+  --surface-2: var(--sand-9);
+  --surface-3: #eadecd;
+  --line: var(--sand-7);
+  --line-strong: var(--sand-6);
+  --text: var(--sky-1);
+  --text-2: #2a516f;
+  --text-3: #4b6f8b;
+
+  /* Gold (sand): the main action and rewards. */
+  --gold: var(--sand);
+  --gold-dark: var(--sand-4);
+  --gold-soft: var(--sand-8);
+  --gold-text: var(--sand-2);
+  --on-gold: var(--sand-1);
+  --warm-icon: var(--sand-3);
+
+  /* Blue (sky): headers, navigation, selection. */
+  --brand: var(--sky-3);
+  --brand-dark: var(--sky-2);
+  --brand-soft: var(--sky-6);
+  --brand-tint: var(--sky-7);
+  --brand-line: var(--sky-5);
+  --on-brand: #ffffff;
+
+  /* Right (cypress, 147°) and wrong (rock shade, 22°) answers only. */
+  --success: #1f7a48;
+  --success-dark: #156539;
+  --success-soft: #dff6e9;
+  --danger: #a55127;
+  --danger-dark: #7e3c1b;
+  --danger-soft: #fbe9df;
+
+  /* Difficulty tiers: the flame gets hotter as questions get harder. */
+  --tier-1: var(--flame-3);
+  --tier-2: var(--flame-4);
+  --tier-3: var(--flame-5);
+  --tier-4: var(--flame-6);
+  --tier-5: var(--flame-7);
+
+  /* Elevation */
+  --shadow: 0 2px 0 var(--line), 0 8px 24px rgb(13 47 74 / 0.08);
+  --shadow-lift: 0 12px 30px rgb(13 47 74 / 0.2);
+
+  /* Shape */
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 22px;
+  --ledge: 0 4px 0;
+
+  /* Type */
+  --font: "Nunito Variable", "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Lilita One", "Nunito Variable", ui-rounded, system-ui, sans-serif;
+  --font-scripture: Georgia, "Times New Roman", serif;
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.625rem;
+  --fs-2xl: 2.125rem;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Layout */
+  --gutter: 16px;
+  --max-width: 560px;
+  --tabbar-h: 66px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:root[data-large-text="true"] {
+  font-size: 112.5%;
+}
+
+/* Tier colour as local variables: class="tier-3" sets --tier and the text colour on it. */
+.tier-1 { --tier: var(--tier-1); --on-tier: var(--ember-dark); }
+.tier-2 { --tier: var(--tier-2); --on-tier: var(--ember-dark); }
+.tier-3 { --tier: var(--tier-3); --on-tier: var(--ember-dark); }
+.tier-4 { --tier: var(--tier-4); --on-tier: #ffffff; }
+.tier-5 { --tier: var(--tier-5); --on-tier: #ffffff; }

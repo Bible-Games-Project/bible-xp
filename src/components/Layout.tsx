@@ -1,0 +1,104 @@
+import { CalendarDays, ChevronLeft, Dumbbell, Gem, House, Route as RouteIcon, Settings, Trophy } from "lucide-react";
+import type { ReactNode } from "react";
+import { href, navigate, type Route } from "../app/router";
+import { useI18n } from "../i18n";
+import { useProgress } from "../progress/store";
+import { levelForXp } from "../progress/levels";
+import { PlayerAvatar } from "./PlayerAvatar";
+import { Scene, type SceneName } from "./Scene";
+
+interface ScreenProps {
+  children: ReactNode;
+  withTabs?: boolean;
+  className?: string;
+  /** Illustrated background, drawn outside the screen so it always spans the viewport. */
+  scene?: SceneName;
+}
+
+export function Screen({ children, withTabs, className = "", scene }: ScreenProps) {
+  return (
+    <>
+      {scene && <Scene name={scene} />}
+      <main className={`screen${withTabs ? " screen--tabs" : ""}${scene ? " screen--scene" : ""} ${className}`}>{children}</main>
+    </>
+  );
+}
+
+/** Header for secondary screens: back button and title. */
+export function TopBar({ title, back, right }: { title: string; back: Route; right?: ReactNode }) {
+  const { t } = useI18n();
+  return (
+    <header className="topbar">
+      <button type="button" className="icon-btn" aria-label={t("nav.back")} onClick={() => navigate(back, { replace: true })}>
+        <ChevronLeft size={28} strokeWidth={2.6} />
+      </button>
+      <h1 className="topbar__title">{title}</h1>
+      <div className="topbar__right">{right}</div>
+    </header>
+  );
+}
+
+/**
+ * Compact status row for the main tabs: the settings gear on the left; Total
+ * XP and the player's level and avatar (opens the profile) on the right.
+ * Home shows its own Total and Weekly XP panel, so it hides the XP chip.
+ */
+export function AppHeader({ showXp = true }: { showXp?: boolean }) {
+  const { t, number } = useI18n();
+  const progress = useProgress();
+  return (
+    <header className="statusbar">
+      <a className="statusbar__settings" href={href({ name: "settings" })} aria-label={t("header.settingsLabel")}>
+        <Settings size={24} strokeWidth={2.3} aria-hidden="true" />
+      </a>
+      <span className="statusbar__right">
+        {showXp && (
+          <span className="stat-chip" aria-label={t("header.xpLabel", { n: progress.xp })}>
+            <Gem size={16} strokeWidth={2.6} aria-hidden="true" />
+            {number(progress.xp)}
+          </span>
+        )}
+        <a className="statusbar__avatar" href={href({ name: "profile" })} aria-label={t("header.profileLabel")}>
+          <span className="statusbar__level">{t("home.levelShort", { n: levelForXp(progress.xp) })}</span>
+          <PlayerAvatar look={progress.profile.look} size={36} />
+        </a>
+      </span>
+    </header>
+  );
+}
+
+const TABS = [
+  { route: { name: "home" } as Route, icon: House, key: "nav.home" as const },
+  { route: { name: "path" } as Route, icon: RouteIcon, key: "nav.path" as const },
+  { route: { name: "daily" } as Route, icon: CalendarDays, key: "nav.daily" as const },
+  { route: { name: "train" } as Route, icon: Dumbbell, key: "nav.train" as const },
+  { route: { name: "leaderboard" } as Route, icon: Trophy, key: "nav.leaderboard" as const },
+];
+
+export function TabBar({ current }: { current: Route["name"] }) {
+  const { t } = useI18n();
+  return (
+    <nav className="tabbar" aria-label="Main">
+      {TABS.map(({ route, icon: Icon, key }) => {
+        const active = route.name === current;
+        return (
+          <a key={route.name} href={href(route)} className={`tabbar__item${active ? " is-active" : ""}`} aria-current={active ? "page" : undefined}>
+            <span className="tabbar__icon">
+              <Icon size={26} strokeWidth={active ? 2.6 : 2.2} aria-hidden="true" />
+            </span>
+            <span className="tabbar__label">{t(key)}</span>
+          </a>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
+  return (
+    <div className="section-title">
+      <h2>{children}</h2>
+      {action}
+    </div>
+  );
+}
