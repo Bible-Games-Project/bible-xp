@@ -1,8 +1,11 @@
 import luminasPath from "../assets/music/1-luminas-path.mp3";
 import magicalKingdom from "../assets/music/2-magical-kingdom.mp3";
-import magicalMorning from "../assets/music/3-magical-morning.mp3";
-import magicalKingdomII from "../assets/music/4-magical-kingdom-ii.mp3";
-import morningKingdom from "../assets/music/5-morning-kingdom.mp3";
+import adventureAwaits from "../assets/music/3-adventure-awaits.mp3";
+import magicalMorning from "../assets/music/4-magical-morning.mp3";
+import luminasPathII from "../assets/music/5-luminas-path-ii.mp3";
+import magicalKingdomII from "../assets/music/6-magical-kingdom-ii.mp3";
+import adventureAwaitsII from "../assets/music/7-adventure-awaits-ii.mp3";
+import morningKingdom from "../assets/music/8-morning-kingdom.mp3";
 
 /*
  * Background music. The playlist plays in order and starts again from the
@@ -16,15 +19,27 @@ import morningKingdom from "../assets/music/5-morning-kingdom.mp3";
  * starting at once is refused, the music begins with the first touch.
  *
  * To add songs: put the file in src/assets/music (128 kbps MP3, levelled to
- * about -16 LUFS like the others) and add it to PLAYLIST in playing order.
+ * about -16 LUFS like the others, numbered in playing order) and add it to
+ * PLAYLIST. Versions of the same song are kept apart, also across the loop.
  */
-export const PLAYLIST = [luminasPath, magicalKingdom, magicalMorning, magicalKingdomII, morningKingdom];
+export const PLAYLIST = [
+  luminasPath,
+  magicalKingdom,
+  adventureAwaits,
+  magicalMorning,
+  luminasPathII,
+  magicalKingdomII,
+  adventureAwaitsII,
+  morningKingdom,
+];
 
 /** Music volume, below the sound effects. */
 export const MUSIC_VOLUME = 0.5;
-const FADE_IN_MS = 1200;
-const FADE_OUT_MS = 600;
-const STEPS = 20;
+/** Maintainer's choice: a slow 3 s fade out into a game, a quick 1 s fade back in. */
+export const FADE_OUT_MS = 3000;
+export const FADE_IN_MS = 1000;
+/** One volume step every this many ms, so long fades stay smooth. */
+const TICK_MS = 40;
 
 /** What the player needs from <audio>; a fake one stands in for it in tests. */
 export interface AudioLike {
@@ -174,16 +189,17 @@ export class MusicPlayer {
       done?.();
       return;
     }
+    const steps = Math.max(1, Math.round(ms / TICK_MS));
     let step = 0;
     this.fade = setInterval(() => {
       step += 1;
-      this.setLevel(from + ((target - from) * step) / STEPS);
-      if (step >= STEPS) {
+      this.setLevel(from + ((target - from) * step) / steps);
+      if (step >= steps) {
         clearInterval(this.fade!);
         this.fade = null;
         done?.();
       }
-    }, ms / STEPS);
+    }, ms / steps);
   }
 }
 

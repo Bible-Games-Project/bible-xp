@@ -217,13 +217,15 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   (onboarding included) from a playlist that loops back to the first song
   (`PLAYLIST` in `src/lib/music.ts`, files in `src/assets/music/`, numbered
   in playing order, 128 kbps MP3 levelled to about -16 LUFS, no cover art).
-  While a game is open (`GameSession`, results included) it fades out and
-  pauses where it was, and fades back in from there on a menu. It also pauses
+  While a game is open (`GameSession`, results included) it fades out over
+  3 s and pauses where it was, and fades back in over 1 s from there on a
+  menu (maintainer's timing, `FADE_OUT_MS` / `FADE_IN_MS`). It also pauses
   in the background and follows Settings > Music (`settings.music`, progress
   version 5). Volume goes through a Web Audio gain because iOS ignores
   `<audio>.volume`. Browsers allow sound only after a first tap, so the music
   may start with the first touch; in the app shell, autoplay is bgp-admin's
-  call. The maintainer will send more songs: add them to `PLAYLIST`.
+  call. Eight songs today; versions of the same song are never back to back,
+  also across the loop (tested). More may come: add them to `PLAYLIST`.
 - XP: `xp` is lifetime Total XP (never resets, drives the level); `weekly` is
   the current competition week's XP (Monday 00:00 UTC to Monday 00:00 UTC,
   `progress/week.ts`). Both only grow through `grantXp()` in `model.ts`, from

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MUSIC_VOLUME, MusicPlayer, PLAYLIST, type AudioLike } from "./music";
+import { FADE_IN_MS, FADE_OUT_MS, MUSIC_VOLUME, MusicPlayer, PLAYLIST, type AudioLike } from "./music";
 
 class FakeAudio implements AudioLike {
   src = "";
@@ -28,7 +28,7 @@ class FakeAudio implements AudioLike {
 }
 
 const SONGS = ["one.mp3", "two.mp3", "three.mp3"];
-const settle = async (ms = 1500) => {
+const settle = async (ms = Math.max(FADE_IN_MS, FADE_OUT_MS) + 100) => {
   await Promise.resolve();
   await Promise.resolve();
   vi.advanceTimersByTime(ms);
@@ -64,18 +64,20 @@ describe("background music", () => {
     await settle();
     audio.currentTime = 42;
     player.enterGame();
+    vi.advanceTimersByTime(FADE_OUT_MS / 2);
+    expect(audio.paused).toBe(false); // halfway through the 3 s fade out
+    expect(audio.volume).toBeCloseTo(MUSIC_VOLUME / 2, 1);
+    vi.advanceTimersByTime(FADE_OUT_MS / 2 - 200);
+    expect(audio.paused).toBe(false);
     vi.advanceTimersByTime(300);
-    expect(audio.paused).toBe(false); // still fading out
-    expect(audio.volume).toBeLessThan(MUSIC_VOLUME);
-    await settle();
     expect(audio.paused).toBe(true);
     expect(audio.volume).toBe(0);
     player.leaveGame();
-    await settle(100);
+    await settle(FADE_IN_MS / 2);
     expect(audio.paused).toBe(false);
     expect(audio.currentTime).toBe(42);
-    expect(audio.volume).toBeLessThan(MUSIC_VOLUME); // still fading in
-    await settle();
+    expect(audio.volume).toBeCloseTo(MUSIC_VOLUME / 2, 1); // halfway through the 1 s fade in
+    await settle(FADE_IN_MS / 2 + 50);
     expect(audio.volume).toBeCloseTo(MUSIC_VOLUME);
   });
 
@@ -111,9 +113,10 @@ describe("background music", () => {
     expect(audio.paused).toBe(true);
   });
 
-  it("ships the five songs in their playing order", () => {
-    expect(PLAYLIST).toHaveLength(5);
-    expect(PLAYLIST[0]).toContain("1-luminas-path");
-    expect(PLAYLIST[4]).toContain("5-morning-kingdom");
+  it("ships the songs numbered in playing order, with versions of a song never back to back", () => {
+    expect(PLAYLIST).toHaveLength(8);
+    const names = PLAYLIST.map((src) => src.match(/(\d+)-([a-z-]+?)(?:-ii)?(?:-[\w]{8})?\.mp3/)!);
+    names.forEach((m, i) => expect(Number(m[1]), m[0]).toBe(i + 1));
+    names.forEach((m, i) => expect(m[2], `${m[0]} next to ${names[(i + 1) % names.length][0]}`).not.toBe(names[(i + 1) % names.length][2]));
   });
 });
