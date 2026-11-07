@@ -1,28 +1,33 @@
-import { Palette, RotateCcw, Trophy } from "lucide-react";
+import { Mic, Palette, RotateCcw, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { navigate } from "../app/router";
 import { progressActions } from "../progress/store";
 import { ColorPicker, PICKER_STYLES, type PickerMode } from "./ColorPicker";
 import { setDevMode, useDevMode } from "./devMode";
+import { VOICE_STYLES, VoicePanel } from "./VoicePanel";
 
 /*
  * The DEV button: switches developer mode on and off. While it is on, every
- * Journey stop is open (StoryScreen) and these tools appear above it:
- * colour picker, the ranking with sample players, and replaying onboarding.
+ * Journey stop is open (StoryScreen) and these tools appear beside it:
+ * colour picker, voices (pick an ElevenLabs voice for each role), the
+ * ranking with sample players, and replaying onboarding.
  * Only developer builds mount this (main.tsx); release builds drop it.
  */
 function DevTools() {
   const on = useDevMode();
   const [mode, setMode] = useState<PickerMode>("idle");
+  const [voices, setVoices] = useState(false);
 
   useEffect(() => {
-    if (!on) setMode("idle");
+    if (on) return;
+    setMode("idle");
+    setVoices(false);
   }, [on]);
 
   return (
     <div data-devtool="">
-      {mode === "idle" && (
+      {mode === "idle" && !voices && (
         <div className="dev-bar">
           <button
             type="button"
@@ -39,6 +44,9 @@ function DevTools() {
               <button type="button" className="dev-tool" aria-label="Colours" title="Colours" onClick={() => setMode("picking")}>
                 <Palette size={17} aria-hidden="true" />
               </button>
+              <button type="button" className="dev-tool" aria-label="Voices" title="Voices" onClick={() => setVoices(true)}>
+                <Mic size={17} aria-hidden="true" />
+              </button>
               <button type="button" className="dev-tool" aria-label="Sample ranking" title="Sample ranking" onClick={() => navigate({ name: "leaderboard", sample: true })}>
                 <Trophy size={17} aria-hidden="true" />
               </button>
@@ -50,6 +58,7 @@ function DevTools() {
         </div>
       )}
       <ColorPicker enabled={on} mode={on ? mode : "idle"} setMode={setMode} />
+      {on && voices && <VoicePanel onClose={() => setVoices(false)} />}
     </div>
   );
 }
@@ -68,7 +77,7 @@ const DEV_STYLES = `
 /** Adds the DEV button to the page. */
 export function mountDevTools() {
   const style = document.createElement("style");
-  style.textContent = PICKER_STYLES + DEV_STYLES;
+  style.textContent = PICKER_STYLES + DEV_STYLES + VOICE_STYLES;
   document.head.appendChild(style);
   const host = document.createElement("div");
   document.body.appendChild(host);
