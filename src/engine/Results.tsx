@@ -1,13 +1,14 @@
-import { Award, Flame, Gem, RotateCcw, Target, Trophy } from "lucide-react";
+import { Award, Flame, Gem, RotateCcw, Target, Trophy, UserRound } from "lucide-react";
 import { TierBadge, useTierName } from "../components/Tier";
 import { REWARDS } from "../progress/rewards";
-import { navigate, type Route } from "../app/router";
+import { href, navigate, type Route } from "../app/router";
 import { Button } from "../components/Button";
 import { Mascot } from "../components/Mascot";
 import { formatRef, getContent } from "../content";
 import type { BibleRef, Step } from "../content/types";
 import { useI18n } from "../i18n";
 import type { SessionSummary } from "../progress/model";
+import { unlockedCharacters, useProgress } from "../progress/store";
 
 interface ResultsProps {
   summary: SessionSummary;
@@ -29,6 +30,10 @@ export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, 
   const title = ratio === 1 ? t("results.titlePerfect") : ratio >= 0.5 ? t("results.titleGood") : t("results.titleTry");
   const xp = summary.reward.xp + summary.reward.bonus;
   const unit = summary.unitCompleted ? pack.units.find((u) => u.id === summary.unitCompleted) : null;
+  // Characters unlocked but not yet seen on the avatar screen (a streak, a story, a finished book).
+  const progress = useProgress();
+  const seenCharacters = new Set(progress.charactersSeen);
+  const newCharacters = unlockedCharacters(progress).filter((id) => !seenCharacters.has(id));
 
   const rewardNote = {
     "first-clear": t("results.firstCompletion", { tier: tierName(summary.tier), n: REWARDS.firstClear[summary.tier] }),
@@ -98,6 +103,12 @@ export function Results({ summary, steps, subtitle, onDone, onAgain, nextRoute, 
           <Flame size={24} aria-hidden="true" />
           {t("results.streakMilestone", { n: summary.streakMilestone })}
         </div>
+      )}
+      {newCharacters.length > 0 && (
+        <a className="banner banner--gold banner--link" href={href({ name: "avatar" })}>
+          <UserRound size={24} aria-hidden="true" />
+          {t("results.newCharacter", { names: newCharacters.map((id) => pack.characters[id]?.name ?? id).join(", ") })}
+        </a>
       )}
       {unit && (
         <div className="banner banner--gold">

@@ -6,6 +6,8 @@ import { App } from "./App";
 import { preloadAvatars } from "./components/PlayerAvatar";
 import { preloadScenes } from "./components/Scene";
 import { mountDevTools } from "./dev/DevTools";
+import { STARTING_CHARACTER } from "./progress/characters";
+import { getProgress } from "./progress/store";
 import "./theme/tokens.css";
 import "./theme/base.css";
 import "./theme/components.css";
@@ -15,7 +17,7 @@ import "./theme/games.css";
 import "./theme/mascot.css";
 
 preloadScenes();
-preloadAvatars();
+preloadAvatars([...Object.values(STARTING_CHARACTER), getProgress().profile.look?.character ?? ""]);
 
 // The DEV button (developer mode): `bun run dev` and `bun run build:devtools`
 // only. Release builds (`bun run build`) compile this to `if (false)` and drop it.

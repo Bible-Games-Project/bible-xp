@@ -59,13 +59,15 @@ export const localLeaderboard: LeaderboardService = {
   },
 };
 
+const SAMPLE_CHARACTERS = ["noah", "sarah", "abel", "rebekah", "seth", "hagar", "shem", "eve", "adam"];
+
 /** Development only: made-up players to preview the layout. Never shipped as real data. */
 export const sampleLeaderboard: LeaderboardService = {
   async weekly(weekStart, me) {
     const sample: PlayerScore[] = [420, 365, 310, 310, 240, 185, 120, 75, 30].map((weeklyXp, i) => ({
       playerId: `sample-${i + 1}`,
       name: `Sample player ${i + 1}`,
-      look: { presentation: i % 2 ? "female" : "male", skin: (["light", "brown", "dark"] as const)[i % 3], equipped: {} },
+      look: { character: SAMPLE_CHARACTERS[i % SAMPLE_CHARACTERS.length], equipped: {} },
       weeklyXp,
     }));
     const entries = rankScores([...sample, me]);

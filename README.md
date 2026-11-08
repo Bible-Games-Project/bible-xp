@@ -60,10 +60,11 @@ do not include any of it.
   chosen in Settings. Each game has its own questions at every level, and the
   mechanics tighten too (decoy letters, more verse options, more pairs, fewer
   clues). Harder levels pay more XP.
-- **Profile** (avatar, top left) — avatar editor, level, Total and Weekly XP,
+- **Profile** (avatar, top left) — character picker, level, Total and Weekly XP,
   stats, mistakes review, Settings and Testalume Plus (informational).
-- **Avatar** — male or female, three skin tones; robes, sandals and accessories
-  are reserved as future XP rewards (placeholders, locked).
+- **Avatar** — a Bible character from a list of 200 men and 200 women. Adam
+  and Eve are open from the start; the rest unlock through the Journey,
+  streaks, sharing the game or Plus. Locked ones say what unlocks them.
 - **Music** — a looping playlist on the menus that fades out and pauses
   during games, then fades back in where it left off (Settings > Music).
 - **Testalume** — the mascot: a little flame with a face and five moods,

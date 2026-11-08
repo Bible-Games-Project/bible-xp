@@ -1,5 +1,6 @@
 import type { GameMode, Tier, Unit } from "../content/types";
 import { isAvatarLook, KNOWLEDGE_LEVELS, tierForKnowledge, type AvatarLook, type CosmeticSlot, type KnowledgeLevel } from "./avatar";
+import { isCharacterId, STARTING_CHARACTER } from "./characters";
 import { canEquip, newlyUnlocked } from "./cosmetics";
 import { levelForXp } from "./levels";
 import { REWARDS, type RewardResult } from "./rewards";
@@ -22,7 +23,9 @@ import { addWeeklyXp, weekStartUtc, type WeeklyXp } from "./week";
  * - The streak counts days with at least one finished session.
  */
 
-export const PROGRESS_VERSION = 5;
+export const PROGRESS_VERSION = 6;
+
+const STARTING_CHARACTERS = Object.values(STARTING_CHARACTER);
 
 export interface Settings {
   language: string;
@@ -112,6 +115,10 @@ export interface ProgressData {
   weekly: WeeklyXp;
   /** Avatar cosmetics unlocked with lifetime XP. */
   cosmetics: { unlocked: string[] };
+  /** When the player first shared the game (unlocks the sharing characters). */
+  sharedAt: string | null;
+  /** Unlocked characters the player has already seen, so new ones can be announced. */
+  charactersSeen: string[];
   streak: StreakState;
   difficulty: DifficultyState;
   stats: {
@@ -147,6 +154,8 @@ export function defaultProgress(): ProgressData {
     xp: 0,
     weekly: { weekStart: weekStartUtc(new Date()), xp: 0 },
     cosmetics: { unlocked: [] },
+    sharedAt: null,
+    charactersSeen: [...STARTING_CHARACTERS],
     streak: { ...EMPTY_STREAK },
     difficulty: defaultDifficulty(),
     stats: { correctAnswers: 0, incorrectAnswers: 0, activitiesStarted: 0, sessionsCompleted: 0, lastActivity: null },
@@ -403,6 +412,17 @@ export function selectTierIn(data: ProgressData, tier: Tier): ProgressData {
   return { ...data, difficulty: { ...data.difficulty, selected: tier } };
 }
 
+/** Remembers that the game was shared; only the first time is kept. */
+export function markShared(data: ProgressData, nowIso: string): ProgressData {
+  return data.sharedAt ? data : { ...data, sharedAt: nowIso };
+}
+
+/** Marks unlocked characters as seen, so they are no longer announced as new. */
+export function markCharactersSeen(data: ProgressData, ids: string[]): ProgressData {
+  const fresh = ids.filter((id) => isCharacterId(id) && !data.charactersSeen.includes(id));
+  return fresh.length ? { ...data, charactersSeen: [...data.charactersSeen, ...fresh] } : data;
+}
+
 export interface OnboardingChoices {
   language: string;
   knowledge: KnowledgeLevel;
@@ -411,10 +431,11 @@ export interface OnboardingChoices {
 
 /**
  * Saves the onboarding choices and marks onboarding done. The knowledge level
- * sets the starting difficulty; XP and progress are never touched.
+ * sets the starting difficulty; XP and progress are never touched. The avatar
+ * must be one of the `unlocked` characters.
  */
-export function completeOnboarding(data: ProgressData, choices: OnboardingChoices, nowIso: string): ProgressData {
-  if (!KNOWLEDGE_LEVELS.includes(choices.knowledge) || !isAvatarLook(choices.look)) return data;
+export function completeOnboarding(data: ProgressData, choices: OnboardingChoices, nowIso: string, unlocked: string[]): ProgressData {
+  if (!KNOWLEDGE_LEVELS.includes(choices.knowledge) || !isAvatarLook(choices.look) || !unlocked.includes(choices.look.character)) return data;
   return {
     ...data,
     settings: { ...data.settings, language: choices.language },
@@ -424,9 +445,9 @@ export function completeOnboarding(data: ProgressData, choices: OnboardingChoice
   };
 }
 
-/** Changes the avatar; worn cosmetics must be unlocked. */
-export function setLook(data: ProgressData, look: AvatarLook): ProgressData {
-  if (!isAvatarLook(look)) return data;
+/** Changes the avatar to one of the `unlocked` characters; worn cosmetics must be unlocked. */
+export function setLook(data: ProgressData, look: AvatarLook, unlocked: string[]): ProgressData {
+  if (!isAvatarLook(look) || !unlocked.includes(look.character)) return data;
   return { ...data, profile: { ...data.profile, look: cleanLook(data, look) } };
 }
 
@@ -435,7 +456,7 @@ function cleanLook(data: ProgressData, look: AvatarLook): AvatarLook {
   for (const [slot, id] of Object.entries(look.equipped ?? {}) as [CosmeticSlot, string][]) {
     if (canEquip(id, slot, data.cosmetics.unlocked)) equipped[slot] = id;
   }
-  return { presentation: look.presentation, skin: look.skin, equipped };
+  return { character: look.character, equipped };
 }
 
 export function isNodeCompleted(data: ProgressData, node: Unit["nodes"][number]): boolean {
@@ -481,6 +502,15 @@ export function openMistakes(data: ProgressData): MistakeRecord[] {
     .sort((a, b) => b.lastWrongAt.localeCompare(a.lastWrongAt));
 }
 
+function migrateLook(saved: unknown): AvatarLook | null {
+  if (!saved || typeof saved !== "object") return null;
+  const look = saved as Partial<AvatarLook> & { presentation?: unknown };
+  const equipped = look.equipped && typeof look.equipped === "object" && !Array.isArray(look.equipped) ? { ...look.equipped } : {};
+  if (isCharacterId(look.character)) return { character: look.character, equipped };
+  if (look.presentation === "male" || look.presentation === "female") return { character: STARTING_CHARACTER[look.presentation], equipped };
+  return null;
+}
+
 /**
  * Turns whatever was saved into a valid current-version object. Unknown or
  * missing fields fall back to defaults instead of discarding the player's data.
@@ -500,6 +530,8 @@ export function migrate(raw: unknown): ProgressData {
   // v2 → v3: tiers are no longer unlocked; only the selected tier is kept.
   // v4 → v5: settings.music (background music), on unless turned off; the
   // settings merge below fills it in.
+  // v5 → v6: the avatar is a Bible character instead of a gender and skin
+  // tone; men become Adam and women Eve, the two characters open from the start.
   // v3 → v4: the abstract avatar is replaced by the onboarding avatar, and
   // Weekly XP starts counting from the upgrade (earlier XP stays lifetime XP).
   const sessions = Object.fromEntries(
@@ -514,13 +546,17 @@ export function migrate(raw: unknown): ProgressData {
       playerId: typeof savedProfile.playerId === "string" && savedProfile.playerId ? savedProfile.playerId : base.profile.playerId,
       name: typeof savedProfile.name === "string" ? savedProfile.name : "",
       knowledge: KNOWLEDGE_LEVELS.includes(savedProfile.knowledge as KnowledgeLevel) ? (savedProfile.knowledge as KnowledgeLevel) : null,
-      look: isAvatarLook(savedProfile.look) ? { ...savedProfile.look, equipped: obj(savedProfile.look.equipped, {}) } : null,
+      look: migrateLook(savedProfile.look),
     },
     settings: obj(saved.settings, base.settings),
     onboarding: { completedAt: typeof saved.onboarding?.completedAt === "string" ? saved.onboarding.completedAt : null },
     xp: typeof saved.xp === "number" && saved.xp >= 0 ? saved.xp : 0,
     weekly,
     cosmetics: { unlocked: cosmetics },
+    sharedAt: typeof saved.sharedAt === "string" ? saved.sharedAt : null,
+    charactersSeen: Array.isArray(saved.charactersSeen)
+      ? [...new Set([...STARTING_CHARACTERS, ...saved.charactersSeen.filter(isCharacterId)])]
+      : [...STARTING_CHARACTERS],
     streak: obj(saved.streak, base.streak),
     difficulty,
     stats: obj(saved.stats, base.stats),

@@ -3,12 +3,15 @@ import { getContent } from "../content";
 import type { Tier } from "../content/types";
 import { localDate } from "../lib/date";
 import type { AvatarLook } from "./avatar";
+import { findCharacter, STARTING_CHARACTER, unlockedIds, unlockState, type UnlockState } from "./characters";
 import {
   abandonSession,
   completeIntro,
   completeOnboarding,
   completeSession,
   defaultProgress,
+  markCharactersSeen,
+  markShared,
   migrate,
   PROGRESS_VERSION,
   recordStep,
@@ -86,6 +89,18 @@ export function getStorageStatus(): StorageStatus {
 const now = () => new Date().toISOString();
 const units = () => getContent(state.settings.language).units;
 
+/** What the avatar characters' unlocks depend on, for a given progress. */
+export function characterUnlocks(data: ProgressData): UnlockState {
+  const pack = getContent(data.settings.language);
+  // Testalume Plus does not exist yet, so its characters stay locked.
+  return unlockState(data, { units: pack.units, planned: pack.plannedStories }, false);
+}
+
+/** Ids of the characters the player can choose right now. */
+export function unlockedCharacters(data: ProgressData = state): string[] {
+  return unlockedIds(characterUnlocks(data));
+}
+
 export const progressActions = {
   startSession(key: string, kind: SessionKind, refId: string, stepIds: string[], tier: Tier) {
     commit(startSession(state, key, kind, refId, stepIds, tier, now()));
@@ -117,10 +132,18 @@ export const progressActions = {
     commit({ ...state, profile: { ...state.profile, ...patch } });
   },
   completeOnboarding(choices: OnboardingChoices) {
-    commit(completeOnboarding(state, choices, now()));
+    commit(completeOnboarding(state, choices, now(), unlockedCharacters()));
   },
   setLook(look: AvatarLook) {
-    commit(setLook(state, look));
+    commit(setLook(state, look, unlockedCharacters()));
+  },
+  /** The player shared the game (the share sheet completed, or the link was copied). */
+  markShared() {
+    commit(markShared(state, now()));
+  },
+  /** Every character unlocked now has been seen and is no longer announced as new. */
+  markCharactersSeen() {
+    commit(markCharactersSeen(state, unlockedCharacters()));
   },
   /** Developer mode: shows onboarding again, with the saved choices filled in. Progress is kept. */
   restartOnboarding() {
@@ -129,7 +152,11 @@ export const progressActions = {
   /** Clears progress but keeps the player's profile, avatar, onboarding and settings. */
   resetProgress() {
     // Cosmetics come from XP, so they are cleared too and nothing stays worn.
-    const look = state.profile.look && { ...state.profile.look, equipped: {} };
-    commit({ ...defaultProgress(), profile: { ...state.profile, look }, settings: state.settings, onboarding: state.onboarding });
+    // Characters unlocked by progress are lost: the avatar goes back to Adam or Eve.
+    const fresh: ProgressData = { ...defaultProgress(), settings: state.settings, onboarding: state.onboarding, sharedAt: state.sharedAt, charactersSeen: state.charactersSeen };
+    const worn = findCharacter(state.profile.look?.character);
+    const character = worn && unlockedCharacters(fresh).includes(worn.id) ? worn.id : STARTING_CHARACTER[worn?.gender ?? "male"];
+    const look = state.profile.look && { character, equipped: {} };
+    commit({ ...fresh, profile: { ...state.profile, look } });
   },
 };

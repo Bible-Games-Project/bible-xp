@@ -110,13 +110,14 @@ export const books: BookEntry[] = [
 /**
  * The main stories of Genesis after the Creation, announced on the Genesis
  * page as coming soon. Titles and chapter ranges are the standard divisions of
- * the book; no questions exist for them yet.
+ * the book; no questions exist for them yet. When one is built, its unit
+ * must keep the planned `id`: avatar characters unlock with it.
  */
 export const plannedStories: PlannedStory[] = [
-  { bookId: "GEN", title: "Cain and Abel", passage: "Genesis 4" },
-  { bookId: "GEN", title: "Noah and the Flood", passage: "Genesis 6–9" },
-  { bookId: "GEN", title: "The Tower of Babel", passage: "Genesis 11" },
-  { bookId: "GEN", title: "Abraham", passage: "Genesis 12–25" },
-  { bookId: "GEN", title: "Jacob and Esau", passage: "Genesis 25–36" },
-  { bookId: "GEN", title: "Joseph", passage: "Genesis 37–50" },
+  { id: "gen-cain-abel", bookId: "GEN", title: "Cain and Abel", passage: "Genesis 4" },
+  { id: "gen-noah", bookId: "GEN", title: "Noah and the Flood", passage: "Genesis 6–9" },
+  { id: "gen-babel", bookId: "GEN", title: "The Tower of Babel", passage: "Genesis 11" },
+  { id: "gen-abraham", bookId: "GEN", title: "Abraham", passage: "Genesis 12–25" },
+  { id: "gen-jacob", bookId: "GEN", title: "Jacob and Esau", passage: "Genesis 25–36" },
+  { id: "gen-joseph", bookId: "GEN", title: "Joseph", passage: "Genesis 37–50" },
 ];

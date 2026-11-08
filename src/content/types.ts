@@ -206,6 +206,8 @@ export interface BookEntry {
 
 /** A story announced in a book but not playable yet. Never shown as available. */
 export interface PlannedStory {
+  /** The id its unit will have once it is built (avatar unlocks refer to it). */
+  id: string;
   bookId: string;
   title: string;
   /** Short human-readable range, e.g. "Genesis 6–9". */
@@ -254,4 +256,14 @@ export interface ContentPack {
   /** Section names by group key, in display order. */
   bookGroups: Record<string, string>;
   plannedStories: PlannedStory[];
+  /** Name and description of each avatar character, by character id. */
+  characters: Record<string, CharacterText>;
+}
+
+/** How an avatar character is presented. Descriptions paraphrase, never quote. */
+export interface CharacterText {
+  name: string;
+  about: string;
+  /** Why a special unlock (streak, sharing) suits this character. */
+  why?: string;
 }

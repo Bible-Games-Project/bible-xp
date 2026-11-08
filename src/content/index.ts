@@ -15,6 +15,7 @@ import type {
   Unit,
 } from "./types";
 import { bookGroups, books, plannedStories } from "./locales/en/books";
+import { characterText } from "./locales/en/characters";
 import { creationDaily, creationTopic, creationUnit } from "./locales/en/creation";
 
 /**
@@ -32,6 +33,7 @@ const packs: Record<string, ContentPack> = {
     books,
     bookGroups,
     plannedStories,
+    characters: characterText,
   },
 };
 

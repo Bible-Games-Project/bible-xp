@@ -1,35 +1,25 @@
 import type { Tier } from "../content/types";
+import { isCharacterId } from "./characters";
 
 /*
- * The player's avatar and starting knowledge level, chosen during onboarding
- * and editable later from the profile.
+ * The player's avatar (a Bible character, see characters.ts) and starting
+ * knowledge level, chosen during onboarding and editable later from the profile.
  */
-
-export type Presentation = "male" | "female";
-export const PRESENTATIONS: Presentation[] = ["male", "female"];
-
-export type SkinTone = "light" | "brown" | "dark";
-export const SKIN_TONES: SkinTone[] = ["light", "brown", "dark"];
 
 /** Avatar parts reserved for rewards earned with XP (see cosmetics.ts). */
 export type CosmeticSlot = "clothing" | "footwear" | "accessory";
 export const COSMETIC_SLOTS: CosmeticSlot[] = ["clothing", "footwear", "accessory"];
 
 export interface AvatarLook {
-  presentation: Presentation;
-  skin: SkinTone;
+  /** Id of the Bible character the player appears as. */
+  character: string;
   /** Unlocked cosmetic worn in each slot; an empty slot shows the basic outfit. */
   equipped: Partial<Record<CosmeticSlot, string>>;
 }
 
 export function isAvatarLook(value: unknown): value is AvatarLook {
   const look = value as Partial<AvatarLook> | null;
-  return (
-    !!look &&
-    typeof look === "object" &&
-    PRESENTATIONS.includes(look.presentation as Presentation) &&
-    SKIN_TONES.includes(look.skin as SkinTone)
-  );
+  return !!look && typeof look === "object" && isCharacterId(look.character);
 }
 
 export type KnowledgeLevel = "beginner" | "intermediate" | "advanced";

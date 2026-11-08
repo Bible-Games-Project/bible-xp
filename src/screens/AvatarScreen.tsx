@@ -1,37 +1,36 @@
-import { AvatarEditor, CosmeticSlots } from "../components/AvatarEditor";
+import { useEffect, useState } from "react";
+import { CharacterPicker } from "../components/CharacterPicker";
 import { Screen, TopBar } from "../components/Layout";
 import { useI18n } from "../i18n";
-import { progressActions, useProgress } from "../progress/store";
+import { STARTING_CHARACTER } from "../progress/characters";
+import { getProgress, progressActions, unlockedCharacters, useProgress } from "../progress/store";
 
-/** Edit the avatar chosen during onboarding. Every change is saved at once. */
+/** Choose the Bible character the player appears as. Every change is saved at once. */
 export function AvatarScreen() {
   const { t } = useI18n();
-  const { profile, cosmetics } = useProgress();
-  const look = profile.look ?? { presentation: "male" as const, skin: "brown" as const, equipped: {} };
+  const { profile } = useProgress();
+  const look = profile.look ?? { character: STARTING_CHARACTER.male, equipped: {} };
+  // Characters unlocked since the last visit keep their "New" badge while the screen is open.
+  const [fresh] = useState(() => {
+    const seen = new Set(getProgress().charactersSeen);
+    return unlockedCharacters().filter((id) => !seen.has(id));
+  });
+
+  useEffect(() => {
+    progressActions.markCharactersSeen();
+  }, []);
 
   return (
     <Screen scene="home" className="avatar-screen">
       <TopBar title={t("avatar.title")} back={{ name: "profile" }} />
       <section className="glass onboarding__panel">
-        <AvatarEditor
-          value={look}
-          onChange={(next) => {
-            if (next.presentation && next.skin) progressActions.setLook({ ...look, presentation: next.presentation, skin: next.skin });
-          }}
+        <p className="muted">{t("avatar.body")}</p>
+        <CharacterPicker
+          selected={look.character}
+          fresh={fresh}
+          onSelect={(character) => progressActions.setLook({ ...look, character })}
         />
       </section>
-      <div className="glass onboarding__panel">
-        <CosmeticSlots
-          unlocked={cosmetics.unlocked}
-          equipped={look.equipped}
-          onEquip={(slot, itemId) => {
-            const equipped = { ...look.equipped };
-            if (itemId) equipped[slot] = itemId;
-            else delete equipped[slot];
-            progressActions.setLook({ ...look, equipped });
-          }}
-        />
-      </div>
     </Screen>
   );
 }

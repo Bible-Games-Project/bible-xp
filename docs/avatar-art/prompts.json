@@ -1,0 +1,82 @@
+{
+ "adam": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Adam, the first man, a strong young man around thirty with warm olive-brown skin, thick dark wavy hair and a short dark beard, wearing a simple rough garment of tanned animal hide over his shoulders. Calm, kind, thoughtful expression with a gentle closed-mouth smile."
+ },
+ "cain": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Cain, a farmer in his thirties with sun-tanned olive skin, unruly black hair, a thick black beard and heavy brows, wearing a coarse undyed wool tunic with a dusty brown mantle, a sheaf of golden wheat resting on his shoulder. Serious, brooding expression, not smiling."
+ },
+ "abel": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Abel, a gentle young shepherd around twenty with light olive skin, short dark curly hair and a thin young beard, wearing a cream sheepskin cloak, a small white lamb resting on his shoulder. Kind, peaceful expression with a soft smile."
+ },
+ "seth": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Seth, a young man in his late twenties with medium olive-brown skin, neat dark-brown hair and a short beard, wearing a cream linen tunic with a moss-green woollen mantle over one shoulder. Calm, hopeful expression."
+ },
+ "enoch": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Enoch, a serene man in his fifties with warm brown skin, salt-and-pepper hair and a neat grey-streaked beard, wearing a pale cream robe and a soft sky-blue mantle. Peaceful, prayerful expression, eyes gently lifted, a faint smile."
+ },
+ "methuselah": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Methuselah, a very old man with deeply lined olive-brown skin, a long flowing white beard and long white hair, wearing a heavy dark-brown woollen mantle over a cream tunic, the curved top of a wooden walking staff beside his shoulder. Wise, gentle expression."
+ },
+ "noah": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Noah, an elderly but sturdy man with weathered olive-brown skin, a full grey beard and grey hair, wearing a cream tunic and a deep ochre-brown mantle, a coil of thick rope over his shoulder as an ark builder. Steady, trusting, kind expression."
+ },
+ "shem": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Shem, son of Noah, a man in his thirties with medium olive skin, black wavy hair and a full trimmed black beard, wearing a cream tunic with a deep olive-green mantle. Earnest, respectful expression."
+ },
+ "ham": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Ham, son of Noah, a man in his thirties with deep brown skin, short tightly curled black hair and a short black beard, wearing a cream tunic with a burnt-orange woollen mantle. Confident expression with a slight smile."
+ },
+ "japheth": {
+  "gender": "male",
+  "prompt": "Head-and-shoulders portrait of Japheth, son of Noah, a man in his late twenties with light olive skin, light-brown wavy hair and a short brown beard, wearing a cream tunic with a slate-blue mantle. Open, friendly expression."
+ },
+ "eve": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of Eve, the first woman, a young woman in her late twenties with warm olive-brown skin and long flowing dark-brown wavy hair, uncovered, wearing a simple garment of soft tanned animal hide that covers her shoulders. Gentle, warm expression with a closed-mouth smile."
+ },
+ "adah": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of Adah, wife of Lamech and mother of herdsmen and musicians, a woman in her thirties with medium olive-brown skin and dark braided hair under a rust-red head covering, wearing a cream tunic and a small string of wooden beads. Warm, proud expression."
+ },
+ "zillah": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of Zillah, wife of Lamech and mother of the metalworker Tubal-cain, a woman in her thirties with warm brown skin and dark hair under a plum-coloured head covering, wearing simple hammered bronze earrings and a cream tunic. Calm, dignified expression."
+ },
+ "naamah": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of Naamah, sister of Tubal-cain, a young woman around twenty with light olive skin and long dark hair partly covered by a soft teal veil held by a thin bronze circlet. Bright, gentle expression."
+ },
+ "noahs-wife": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of the wife of Noah, a kind older woman in her sixties with olive-brown skin, grey-streaked dark hair under a warm sand-coloured head covering, wearing a cream tunic and a brown woollen shawl. Motherly, patient expression with a soft smile."
+ },
+ "sarah": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of Sarah, wife of Abraham, a beautiful dignified woman in her fifties with light olive skin, dark hair with a few silver strands under a fine deep-crimson head covering, small gold earrings, cream linen tunic. Graceful, quietly amused expression."
+ },
+ "milcah": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of Milcah, wife of Nahor, a Mesopotamian woman in her forties with medium olive-brown skin, black hair in a braid under an indigo head covering, a cream tunic and a beaded collar. Calm, wise expression."
+ },
+ "hagar": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of Hagar, the Egyptian servant of Sarah, a young woman in her twenties with deep brown skin, dark eyes with a little kohl, black hair under a plain white Egyptian linen head cloth, a simple white linen dress. Strong, hopeful expression."
+ },
+ "lots-wife": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of the wife of Lot, a woman in her forties with olive skin and dark hair under a pale grey-blue head covering, wearing a cream tunic; she turns her head to glance back over her shoulder with a longing, worried expression. A few pale salt-white flecks drift on her shawl."
+ },
+ "rebekah": {
+  "gender": "female",
+  "prompt": "Head-and-shoulders portrait of Rebekah, a young woman around twenty with warm olive skin and long dark hair under a light sky-blue head covering, wearing a cream tunic, a clay water jar resting on her shoulder and a small gold nose ring. Kind, lively expression with a gentle smile."
+ }
+}

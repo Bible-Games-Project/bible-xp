@@ -12,6 +12,7 @@ import {
   defaultProgress,
   grantXp,
   migrate,
+  PROGRESS_VERSION,
   openMistakes,
   recordStep,
   selectTierIn,
@@ -246,7 +247,7 @@ describe("saved progress", () => {
       sessions: { "activity:creation.quiz": { key: "activity:creation.quiz", kind: "activity", refId: "creation.quiz", stepIds: ["x"], index: 0, outcomes: [], startedAt: NOW } },
     };
     const migrated = migrate(v1);
-    expect(migrated.version).toBe(5);
+    expect(migrated.version).toBe(PROGRESS_VERSION);
     expect(migrated.settings.music).toBe(true);
     expect(migrated.xp).toBe(120);
     expect(migrated.profile).toEqual({ playerId: expect.any(String), name: "Ruth", knowledge: null, look: null });
@@ -277,10 +278,16 @@ describe("saved progress", () => {
       weekly: { weekStart: "2026-10-19", xp: 40 },
     };
     const migrated = migrate(saved);
-    expect(migrated.profile).toEqual(saved.profile);
+    // Version 6 replaced gender and skin tone with Bible characters: Eve for the female look.
+    expect(migrated.profile).toEqual({ ...saved.profile, look: { character: "eve", equipped: {} } });
     expect(migrated.onboarding.completedAt).toBe(NOW);
     expect(migrated.weekly).toEqual(saved.weekly);
+    expect(migrate({ profile: { look: { presentation: "male", skin: "light" } } }).profile.look).toEqual({ character: "adam", equipped: {} });
     expect(migrate({ profile: { look: { presentation: "robot", skin: "light" } } }).profile.look).toBeNull();
+    expect(migrate({ profile: { look: { character: "noah", equipped: {} } } }).profile.look).toEqual({ character: "noah", equipped: {} });
+    expect(migrate({ profile: { look: { character: "nobody", equipped: {} } } }).profile.look).toBeNull();
+    expect(migrated.sharedAt).toBeNull();
+    expect(migrated.charactersSeen).toEqual(["adam", "eve"]);
   });
 
   it("upgrades version 2 saves, keeping the selected tier and dropping unlock data", () => {
@@ -397,11 +404,12 @@ describe("streak milestones", () => {
 });
 
 describe("onboarding and avatar", () => {
-  const look = { presentation: "female" as const, skin: "brown" as const, equipped: {} };
+  const look = { character: "eve", equipped: {} };
+  const START = ["adam", "eve"];
 
   it("saves every choice and sets the starting difficulty, keeping progress", () => {
     const before = { ...defaultProgress(), xp: 55 };
-    const after = completeOnboarding(before, { language: "en", knowledge: "intermediate", look }, NOW);
+    const after = completeOnboarding(before, { language: "en", knowledge: "intermediate", look }, NOW, START);
     expect(after.onboarding.completedAt).toBe(NOW);
     expect(after.profile.knowledge).toBe("intermediate");
     expect(after.profile.look).toEqual(look);
@@ -409,13 +417,17 @@ describe("onboarding and avatar", () => {
     expect(after.difficulty.selected).toBe(STARTING_TIER.intermediate);
     expect(after.xp).toBe(55);
     // Revisiting keeps the first completion date.
-    expect(completeOnboarding(after, { language: "en", knowledge: "beginner", look }, "2026-11-01T00:00:00.000Z").onboarding.completedAt).toBe(NOW);
+    expect(completeOnboarding(after, { language: "en", knowledge: "beginner", look }, "2026-11-01T00:00:00.000Z", START).onboarding.completedAt).toBe(NOW);
   });
 
-  it("rejects incomplete choices", () => {
+  it("rejects incomplete choices and locked characters", () => {
     const data = defaultProgress();
-    const noSkin = { presentation: "male", equipped: {} } as unknown as typeof look;
-    expect(completeOnboarding(data, { language: "en", knowledge: "advanced", look: noSkin }, NOW)).toBe(data);
+    const old = { presentation: "male", skin: "brown", equipped: {} } as unknown as typeof look;
+    expect(completeOnboarding(data, { language: "en", knowledge: "advanced", look: old }, NOW, START)).toBe(data);
+    expect(completeOnboarding(data, { language: "en", knowledge: "advanced", look: { character: "noah", equipped: {} } }, NOW, START)).toBe(data);
+    const done = completeOnboarding(data, { language: "en", knowledge: "advanced", look }, NOW, START);
+    expect(setLook(done, { character: "judas-iscariot", equipped: {} }, START)).toBe(done);
+    expect(setLook(done, { character: "adam", equipped: {} }, START).profile.look?.character).toBe("adam");
   });
 
   it("keeps a tier that already matches the chosen level", () => {
@@ -425,8 +437,8 @@ describe("onboarding and avatar", () => {
   });
 
   it("only lets unlocked, real cosmetics be worn", () => {
-    const data = completeOnboarding(defaultProgress(), { language: "en", knowledge: "beginner", look }, NOW);
-    const tried = setLook(data, { ...look, equipped: { clothing: "placeholder-robes", footwear: "unknown" } });
+    const data = completeOnboarding(defaultProgress(), { language: "en", knowledge: "beginner", look }, NOW, START);
+    const tried = setLook(data, { ...look, equipped: { clothing: "placeholder-robes", footwear: "unknown" } }, START);
     expect(tried.profile.look?.equipped).toEqual({});
   });
 });

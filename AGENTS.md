@@ -164,7 +164,7 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   at 360px). Header (maintainer decision): a settings gear at the top left
   (`#/settings`, Back goes Home; from the Profile menu it is
   `#/settings?from=profile` and Back returns there), and the level + avatar
-  pill at the top right, which opens the Profile (avatar editor `#/avatar`,
+  pill at the top right, which opens the Profile (character picker `#/avatar`,
   stats, Settings). No streak chip in the header; the streak shows in the
   Profile and as milestone banners in the results.
 - Developer mode (`src/dev/`, maintainer request): one game, with a "DEV"
@@ -192,17 +192,25 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   `onboarding.completedAt` is set; choices are saved together on "Start
   learning" (`completeOnboarding`), never touching XP or progress. Players from
   before version 4 see it once too.
-- Avatar: a painted head-and-shoulders portrait in biblical-era dress
-  (`PlayerAvatar.tsx`, six transparent webp files in `src/assets/avatars/`):
-  male/female, three skin tones (white, mixed/brown, black). They were made
-  with an image model as one consistent set; `docs/avatar-art.md` has the
-  prompts and the method (always edit from an existing portrait). New avatar
-  pictures must match that set. Robes,
-  footwear and accessories are reserved for XP rewards (`progress/cosmetics.ts`):
-  today the catalogue holds one clearly marked placeholder per slot that can
-  never be unlocked or worn. Never invent items or XP prices; add real ones
-  only when the maintainer defines them. Cosmetics never give XP or advantages,
-  and there is no shop.
+- Avatar (maintainer decision, November 2026): the player picks a Bible
+  character, not a gender or skin tone. `progress/characters.ts` lists 200 men
+  and 200 women in Bible order (names and short descriptions in
+  `content/locales/en/characters.ts`; descriptions paraphrase, never quote).
+  Only Adam and Eve are open at the start. Others unlock by finishing a Journey
+  story (`story` = unit id; planned stories in `books.ts` carry the id their
+  unit must keep) or a whole book, by the best streak (7/30/100/365 days:
+  Joshua, Rahab, Daniel, Ruth, Caleb, Hannah, Enoch, Anna, chosen for their
+  constancy), by sharing the game (Andrew, the Samaritan woman), or with Plus
+  (5 men, 5 women, Judas Iscariot among them; locked while Plus is "coming
+  soon"). Special unlocks must fit the character's story. Unlocks are derived
+  from progress, never stored; only `sharedAt` and `charactersSeen` (for the
+  "New" badge and the results banner) are saved. Jesus and God are not avatars.
+  Portraits: `src/assets/characters/<id>.webp`, picked up automatically; a
+  missing one shows a silhouette. Only the first 10 of each list are painted so
+  far; `docs/avatar-art.md` has the method and prompts, and new portraits must
+  match that set. Robes, footwear and accessories (`progress/cosmetics.ts`) are
+  kept in the model but hidden from the UI; never invent items or XP prices,
+  cosmetics never give XP or advantages, and there is no shop.
 - Mascot (maintainer decision): Testalume is a small friendly flame, only the
   flame with eyes, eyebrows and mouth: no lamp or bowl under it, no arms (both
   were tried and removed). Its colours (`FLAME` in `src/components/Mascot.tsx`)

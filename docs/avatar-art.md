@@ -1,49 +1,40 @@
 # Avatar portraits
 
-The six player portraits in `src/assets/avatars/` (male/female × light,
-brown, dark skin) were made with OpenAI's image model `gpt-image-1-mini`
-(quality "medium", 1024×1024, transparent background), then scaled to 384×384
-webp. `PlayerAvatar.tsx` shows them on a round sky-to-sand backdrop.
+Every avatar is a Bible character (`src/progress/characters.ts`, names and
+descriptions in `src/content/locales/en/characters.ts`). Each portrait is a
+transparent webp at `src/assets/characters/<id>.webp`, 384×384. `PlayerAvatar`
+picks the files up by name and shows them on a round sky-to-sand backdrop; a
+character without a file yet shows a neutral silhouette. So adding a portrait
+is only adding the file.
 
-They are a set: same painterly style, framing, light, age and clothing. To
-keep new pictures (other ages, robes, sandals, accessories for the XP rewards)
-consistent, make them the same way:
+Done so far (November 2026): the first ten men (Adam to Japheth) and the first
+ten women (Eve to Rebekah) of the lists.
 
-1. Start from an existing portrait as the reference image (`images/edits`),
-   never from a bare prompt, or the style drifts towards photorealism.
-2. Reuse the style paragraph below word for word.
-3. Check the result inside the round backdrop at 36 px (header) and 128 px
-   (avatar editor) before adding it.
+## Method
 
-## The first portrait (`male-brown`), generated from text
+All portraits form one set: same painterly style, framing, light and size.
+Keep it that way:
 
-> Head-and-shoulders portrait avatar of an adult man from biblical times, warm
-> medium-brown skin, short dark curly hair and a neat short dark beard, wearing
-> a simple cream linen tunic with a terracotta-red woollen mantle draped over
-> his left shoulder. He faces the viewer, calm and kind expression with a gentle
-> closed-mouth smile. Style: soft painterly 2D illustration like modern
-> animated-film concept art: clean simple shapes, soft gradients, warm golden
-> afternoon light from the upper right, the same look as a storybook painting
-> of ancient Jerusalem. Dignified and suitable for adults: not childish, not a
-> caricature, no big cartoon eyes. Centered for a circular profile picture, head
-> in the upper middle, shoulders reaching the bottom edge. Transparent
-> background, nothing behind him. No text, no frame, no halo.
+1. Model `gpt-image-1.5` via `POST /v1/images/edits`, quality "medium",
+   1024×1024, `background: transparent`, base64 output. It followed props
+   (lamb, sheaf of wheat, rope, water jar) much better than `gpt-image-1-mini`.
+2. Reference image: `docs/avatar-art/reference-male.webp` for men,
+   `reference-female.webp` for women (converted to PNG before upload). These
+   were the first generic avatars; they are kept only as the style reference.
+3. Prompt = "Use the reference image only for its painting style, framing and
+   transparent background; paint a different person." + the character's own
+   description + the style paragraph below.
+4. Scale to 384×384 webp (quality 80, alpha quality 90, about 30 KB each).
+5. Look at the new ones next to the existing set at 56 px (list) and 112 px
+   (chosen character) before adding them.
 
-## The others, edited from a reference
+The character descriptions used are in `docs/avatar-art/prompts.json`. Each
+gives age, skin, hair, clothing in period colours and, when it helps tell
+characters apart, one prop from their story (Abel's lamb, Noah's coil of rope,
+Rebekah's water jar). No halos, no weapons in hand, no gore; villains look
+stern, never monstrous.
 
-Men (reference: `male-brown`): "Paint the same portrait design (cream linen
-tunic, terracotta-red mantle over his left shoulder, same pose) but of a white
-man with fair, light skin, short dark-brown wavy hair and a neat short beard"
-(or "a Black man with deep dark-brown skin, short tightly coiled black hair and
-a neat short black beard"), followed by the style paragraph.
-
-Women: `female-light` and `female-dark` from `female-brown` + `male-brown`;
-`female-brown` was then remade from `female-light` + `male-brown` so all three
-look the same age. Design: "deep sky-blue head covering framing her face and
-falling over her shoulders, cream linen tunic, calm kind expression with a
-gentle closed-mouth smile, a woman in her late twenties".
-
-Style paragraph:
+Style paragraph (word for word):
 
 > Match the reference image exactly in rendering: a stylised painterly 2D
 > illustration like animated-film concept art, simplified smooth shapes, soft
@@ -53,5 +44,4 @@ Style paragraph:
 > reference. Dignified, suitable for adults, not childish. No text, no frame,
 > no halo.
 
-Cost: the whole set took 10 images (4 of them discarded) on
-`gpt-image-1-mini` at medium quality.
+Jesus and God are deliberately not avatars.
