@@ -5,6 +5,7 @@ import { useContent } from "../content/useContent";
 import { useI18n } from "../i18n";
 import { CHARACTERS, GENDERS, findCharacter, isUnlocked, type Character, type Gender } from "../progress/characters";
 import { characterUnlocks, progressActions, useProgress } from "../progress/store";
+import { useDevMode } from "../dev/devMode";
 import { shareGame } from "../lib/share";
 import { PlayerAvatar } from "./PlayerAvatar";
 
@@ -25,6 +26,8 @@ export function CharacterPicker({ selected, onSelect, fresh = [] }: CharacterPic
   const pack = useContent();
   const progress = useProgress();
   const unlocks = useMemo(() => characterUnlocks(progress), [progress]);
+  // Developer mode: every character can be tried on; locked ones still say what unlocks them.
+  const dev = useDevMode();
   const current = findCharacter(selected);
   const [gender, setGender] = useState<Gender>(current?.gender ?? "male");
   const [shareNote, setShareNote] = useState<string | null>(null);
@@ -90,7 +93,8 @@ export function CharacterPicker({ selected, onSelect, fresh = [] }: CharacterPic
 
       <ul className="character-list">
         {CHARACTERS.filter((c) => c.gender === gender).map((c) => {
-          const open = isUnlocked(c, unlocks);
+          const unlocked = isUnlocked(c, unlocks);
+          const open = unlocked || dev;
           const chosen = c.id === selected;
           const { name, about } = text(c.id);
           const body = (
@@ -106,7 +110,7 @@ export function CharacterPicker({ selected, onSelect, fresh = [] }: CharacterPic
                   )}
                 </span>
                 <span className="character-row__about">{about}</span>
-                {!open && (
+                {!unlocked && (
                   <span className={`character-row__req${c.unlock.kind === "plus" ? " is-plus" : ""}`}>
                     {c.unlock.kind === "plus" ? <Crown size={14} strokeWidth={2.6} aria-hidden="true" /> : <Lock size={14} strokeWidth={2.6} aria-hidden="true" />}
                     <span>{requirement(c)}</span>

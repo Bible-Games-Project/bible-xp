@@ -1,33 +1,37 @@
-import { Mic, Palette, RotateCcw, Trophy } from "lucide-react";
+import { Mic, Palette, RotateCcw, Trophy, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { navigate } from "../app/router";
 import { progressActions } from "../progress/store";
+import { AVATAR_STYLES_CSS, AvatarStyles } from "./AvatarStyles";
 import { ColorPicker, PICKER_STYLES, type PickerMode } from "./ColorPicker";
 import { setDevMode, useDevMode } from "./devMode";
 import { VOICE_STYLES, VoicePanel } from "./VoicePanel";
 
 /*
  * The DEV button: switches developer mode on and off. While it is on, every
- * Journey stop is open (StoryScreen) and these tools appear beside it:
+ * Journey stop is open (StoryScreen), every avatar can be tried on
+ * (CharacterPicker) and these tools appear beside it:
  * colour picker, voices (pick an ElevenLabs voice for each role), the
- * ranking with sample players, and replaying onboarding.
+ * avatar style test, the ranking with sample players, and replaying onboarding.
  * Only developer builds mount this (main.tsx); release builds drop it.
  */
 function DevTools() {
   const on = useDevMode();
   const [mode, setMode] = useState<PickerMode>("idle");
   const [voices, setVoices] = useState(false);
+  const [styles, setStyles] = useState(false);
 
   useEffect(() => {
     if (on) return;
     setMode("idle");
     setVoices(false);
+    setStyles(false);
   }, [on]);
 
   return (
     <div data-devtool="">
-      {mode === "idle" && !voices && (
+      {mode === "idle" && !voices && !styles && (
         <div className="dev-bar">
           <button
             type="button"
@@ -47,6 +51,9 @@ function DevTools() {
               <button type="button" className="dev-tool" aria-label="Voices" title="Voices" onClick={() => setVoices(true)}>
                 <Mic size={17} aria-hidden="true" />
               </button>
+              <button type="button" className="dev-tool" aria-label="Avatar styles" title="Avatar styles" onClick={() => setStyles(true)}>
+                <UserRound size={17} aria-hidden="true" />
+              </button>
               <button type="button" className="dev-tool" aria-label="Sample ranking" title="Sample ranking" onClick={() => navigate({ name: "leaderboard", sample: true })}>
                 <Trophy size={17} aria-hidden="true" />
               </button>
@@ -59,6 +66,7 @@ function DevTools() {
       )}
       <ColorPicker enabled={on} mode={on ? mode : "idle"} setMode={setMode} />
       {on && voices && <VoicePanel onClose={() => setVoices(false)} />}
+      {on && styles && <AvatarStyles onClose={() => setStyles(false)} />}
     </div>
   );
 }
@@ -77,7 +85,7 @@ const DEV_STYLES = `
 /** Adds the DEV button to the page. */
 export function mountDevTools() {
   const style = document.createElement("style");
-  style.textContent = PICKER_STYLES + DEV_STYLES + VOICE_STYLES;
+  style.textContent = PICKER_STYLES + DEV_STYLES + VOICE_STYLES + AVATAR_STYLES_CSS;
   document.head.appendChild(style);
   const host = document.createElement("div");
   document.body.appendChild(host);

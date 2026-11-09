@@ -45,3 +45,45 @@ Style paragraph (word for word):
 > no halo.
 
 Jesus and God are deliberately not avatars.
+
+## Full-body style test (November 2026)
+
+The maintainer wants the characters drawn full-body (for unlock cards), brighter
+and more varied. Three candidate styles were made with the same four people
+(Adam, Eve, Noah, Rebekah) and are shown by the DEV button's "Avatar styles"
+panel (`src/dev/AvatarStyles.tsx`, pictures in `src/dev/avatar-styles/`).
+
+Method: `gpt-image-1.5`, 1024×1536, quality medium, transparent background.
+Adam was generated from text (`images/generations`); the other three are
+`images/edits` with Adam's picture as the style reference ("Use the reference
+image only for its art style, rendering, proportions, framing and lighting;
+paint a different person."). Saved as 512×768 webp.
+
+Common paragraph:
+
+> Full-body character: the whole figure visible from the top of the head to
+> the feet, with a little empty space around it, centred, standing, turned
+> three-quarters toward the viewer. Transparent background, nothing behind the
+> figure, no ground, no shadow, no text, no frame, no halo. Dignified and
+> suitable for all ages, not childish, not a caricature.
+
+Styles:
+
+- A, bright painting: "bright painterly 2D illustration like animated-film
+  concept art: clean simple shapes, soft brush texture, vivid saturated but
+  natural colours, bright warm daylight with a soft rim light around the
+  figure, high clarity and contrast so it reads well at small sizes. Not a
+  photograph, not a 3D render."
+- B, 3D animation: "stylised 3D animated-film character render: appealing
+  slightly stylised proportions (head a little larger than realistic),
+  expressive but dignified face, soft global illumination, vivid saturated
+  colours, clean believable materials (linen, wool, leather, clay), bright
+  cheerful lighting with a soft rim light. Not photorealistic."
+- C, flat cartoon: "clean flat storybook illustration for a collectible card
+  in a mobile game: bold simple shapes, crisp dark outlines of varying weight,
+  two-tone cel shading, bright joyful saturated palette, strong clear
+  silhouette that reads at small sizes. Not a photograph, not a 3D render."
+
+Each character also gets a prop from their story: a songbird on Adam's hand
+(naming the animals), wildflowers for Eve, a dove and a carpenter's mallet for
+Noah, the water jar and gold bracelets for Rebekah.

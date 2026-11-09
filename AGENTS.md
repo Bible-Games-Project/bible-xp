@@ -175,7 +175,8 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   stats, Settings). No streak chip in the header; the streak shows in the
   Profile and as milestone banners in the results.
 - Developer mode (`src/dev/`, maintainer request): one game, with a "DEV"
-  toggle button in it. While on: every Journey stop is open, and icon buttons
+  toggle button in it. While on: every Journey stop is open, every avatar can be
+  tried on (unlocks and "New" badges stay real), and icon buttons
   give the colour picker (pick any element, recolour it with an HSL wheel and a
   lightness bar through the token it uses, e.g. `--gold`, or for elements like
   it only; tapping the mascot lists its `--mascot-*` tokens one by one; a

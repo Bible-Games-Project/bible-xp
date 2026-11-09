@@ -46,6 +46,11 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
+/** Outside React: true while developer mode is on. */
+export function isDevModeOn(): boolean {
+  return on;
+}
+
 /** True while developer mode is on; always false in a release build. */
 export function useDevMode(): boolean {
   return useSyncExternalStore(subscribe, () => on, () => false);

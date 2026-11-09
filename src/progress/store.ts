@@ -1,9 +1,10 @@
+import { isDevModeOn } from "../dev/devMode";
 import { useSyncExternalStore } from "react";
 import { getContent } from "../content";
 import type { Tier } from "../content/types";
 import { localDate } from "../lib/date";
 import type { AvatarLook } from "./avatar";
-import { findCharacter, STARTING_CHARACTER, unlockedIds, unlockState, type UnlockState } from "./characters";
+import { CHARACTERS, findCharacter, STARTING_CHARACTER, unlockedIds, unlockState, type UnlockState } from "./characters";
 import {
   abandonSession,
   completeIntro,
@@ -135,7 +136,8 @@ export const progressActions = {
     commit(completeOnboarding(state, choices, now(), unlockedCharacters()));
   },
   setLook(look: AvatarLook) {
-    commit(setLook(state, look, unlockedCharacters()));
+    // Developer mode lets every character be tried on; unlocks and "New" badges stay real.
+    commit(setLook(state, look, isDevModeOn() ? CHARACTERS.map((c) => c.id) : unlockedCharacters()));
   },
   /** The player shared the game (the share sheet completed, or the link was copied). */
   markShared() {
