@@ -186,12 +186,14 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   with sample players, and replaying onboarding. The mascot's colours are the `--mascot-*` tokens in
   `tokens.css` (set through `style`, since SVG presentation attributes ignore
   CSS variables). The switch and the colour tweaks persist in localStorage, apart
-  from the player's progress. It exists only in `bun run dev` and `bun run
-  build:devtools` (`--mode devtools`, output `dist-devtools/`); the Claude
-  artifact the maintainer plays is a devtools build. Release builds (`bun run
-  build`, what bgp-admin publishes) must not contain it: `main.tsx` and
-  `leaderboard.ts` write the condition out so it folds to false; check with a
-  grep for `dev-toggle` and `Sample player` in `dist/`.
+  from the player's progress. It exists in `bun run dev`, `bun run
+  build:devtools` and (maintainer request, November 2026) on the preview site
+  `*.pages.dev`, which runs the release build: `DEV_BUILD` in
+  `dev/devMode.ts` checks the hostname. The published app never runs on
+  pages.dev, so it never shows the button; the tools stay in their own chunk
+  (`DevTools-*.js`, imported dynamically from `main.tsx`) that the app never
+  downloads. Never import `dev/DevTools` statically, and keep sample ranking
+  data behind `DEV_BUILD`.
 - Onboarding (maintainer decision): first-time players see exactly three
   steps over the Home picture — language (English only), Bible knowledge level
   (Beginner/Intermediate/Advanced → starting tier 1/2/3, see

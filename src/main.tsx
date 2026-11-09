@@ -6,7 +6,7 @@ import { App } from "./App";
 import { trackAppHeight } from "./app/viewport";
 import { preloadAvatars } from "./components/PlayerAvatar";
 import { preloadScenes } from "./components/Scene";
-import { mountDevTools } from "./dev/DevTools";
+import { DEV_BUILD } from "./dev/devMode";
 import { STARTING_CHARACTER } from "./progress/characters";
 import { getProgress } from "./progress/store";
 import "./theme/tokens.css";
@@ -21,9 +21,9 @@ trackAppHeight();
 preloadScenes();
 preloadAvatars([...Object.values(STARTING_CHARACTER), getProgress().profile.look?.character ?? ""]);
 
-// The DEV button (developer mode): `bun run dev` and `bun run build:devtools`
-// only. Release builds (`bun run build`) compile this to `if (false)` and drop it.
-if (import.meta.env.DEV || import.meta.env.MODE === "devtools") mountDevTools();
+// The DEV button (developer mode): developer builds and the preview site only.
+// Loaded as a separate chunk, so the published app never downloads it.
+if (DEV_BUILD) void import("./dev/DevTools").then((m) => m.mountDevTools());
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

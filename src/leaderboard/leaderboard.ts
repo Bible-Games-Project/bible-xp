@@ -1,3 +1,4 @@
+import { DEV_BUILD } from "../dev/devMode";
 import type { AvatarLook } from "../progress/avatar";
 
 /*
@@ -81,7 +82,6 @@ export const sampleLeaderboard: LeaderboardService = {
  * implementation here; screens do not change.
  */
 export function leaderboardService(options: { sample?: boolean } = {}): LeaderboardService {
-  // Written out (not DEV_BUILD from dev/devMode) so release builds fold it to false and drop the sample data.
-  const developerBuild = import.meta.env.DEV || import.meta.env.MODE === "devtools";
-  return options.sample && developerBuild ? sampleLeaderboard : localLeaderboard;
+  // Sample players only in developer builds and on the preview site, never in the published app.
+  return options.sample && DEV_BUILD ? sampleLeaderboard : localLeaderboard;
 }
