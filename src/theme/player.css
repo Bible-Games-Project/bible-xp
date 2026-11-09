@@ -50,7 +50,7 @@
 /* ---------------------------------------------------------------- Onboarding */
 
 .onboarding {
-  min-height: 100dvh;
+  min-height: var(--app-height);
 }
 .onboarding__progress {
   display: flex;

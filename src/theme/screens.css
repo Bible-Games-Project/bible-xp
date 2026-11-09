@@ -931,7 +931,7 @@
 
 /* Daily tab: the challenge card sits low, under the picture. */
 .daily {
-  min-height: 100dvh;
+  min-height: var(--app-height);
 }
 .daily .daily-hero {
   margin-top: auto;
@@ -1090,7 +1090,7 @@
 /* ---------------------------------------------------------------- Home */
 
 .home {
-  min-height: 100dvh;
+  min-height: var(--app-height);
 }
 .home__lumi {
   display: flex;

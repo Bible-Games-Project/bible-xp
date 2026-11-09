@@ -20,6 +20,15 @@ body {
   font-weight: 600;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
+  zoom: var(--ui-scale);
+}
+
+/* No visible scroll bars (maintainer request): pages still scroll by touch, wheel and keyboard. */
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
 }
 
 h1,
@@ -66,7 +75,7 @@ a {
 }
 
 #root {
-  min-height: 100dvh;
+  min-height: var(--app-height);
 }
 
 .sr-only {

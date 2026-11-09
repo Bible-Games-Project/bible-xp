@@ -103,6 +103,13 @@ bgp-admin at `templates/agent-docs/`, so ask before adding it.
   components. `src/theme/palette.test.ts` enforces this, with colours sampled
   from the picture: if Home's picture changes, re-sample them and re-derive
   the palette.
+- Phone size (maintainer request): on screens up to 480px wide the whole page
+  is drawn at 87.5% (`--ui-scale` in tokens.css, `zoom` on <body>), because
+  at full size everything looked oversized. Inside the zoomed page every CSS
+  length shrinks, so full-height screens use `var(--app-height)` (measured in
+  `app/viewport.ts`), never `100dvh`, and safe areas go through
+  `--safe-top`/`--safe-bottom`. Scroll bars are hidden everywhere
+  (maintainer request); pages still scroll by touch.
 - The learning path is called "Journey" (maintainer decision; "Atlas" and an
   Eden river map were rejected). The Journey tab (`#/path`) and Home's
   "Start/Continue the journey" button go straight to the road of the current

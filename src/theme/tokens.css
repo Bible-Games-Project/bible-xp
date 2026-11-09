@@ -149,11 +149,29 @@
   --gutter: 16px;
   --max-width: 560px;
   --tabbar-h: 66px;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Divided by the phone scale (base.css) so the zoomed page still clears the notch exactly. */
+  --safe-top: calc(env(safe-area-inset-top, 0px) / var(--ui-scale));
+  --safe-bottom: calc(env(safe-area-inset-bottom, 0px) / var(--ui-scale));
+  /* Full screen height; main.tsx sets the exact value for the scaled page. */
+  --app-height: 100dvh;
+
+  /*
+   * Phone scale (maintainer request): the whole game, text, buttons, icons and
+   * pictures alike, is drawn at 87.5% on phone-sized screens so it doesn't
+   * look oversized. Applied as `zoom` on <body> in base.css.
+   */
+  --ui-scale: 1;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@supports (zoom: 1) {
+  @media (max-width: 480px) {
+    :root {
+      --ui-scale: 0.875;
+    }
+  }
 }
 
 :root[data-large-text="true"] {
